@@ -1,13 +1,14 @@
-import { AppUpdate } from "./app";
+import { AppUpdate, CardAddRequest } from "./app";
 
-type SerializedAppUpdate = null;
+type SerializedAppUpdate =
+  | {type: "cardAdd", request: CardAddRequest};
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function serializeAppUpdate(update: AppUpdate): SerializedAppUpdate {
-  return null;
+  return update;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function deserializeAppUpdate(untypedUpdate: unknown): AppUpdate {
-  return null;
+  const serializedUpdate = untypedUpdate as AppUpdate;
+
+  return serializedUpdate;
 }

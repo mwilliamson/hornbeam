@@ -1,7 +1,16 @@
 import Button from "./widgets/Button";
+import "./ToolsView.scss";
 
-export default function ToolsView() {
+interface ToolsViewProps {
+  onCardAddClick: () => void;
+}
+
+export default function ToolsView(props: ToolsViewProps) {
+  const {onCardAddClick} = props;
+
   return (
-    <Button>Add Card</Button>
+    <div className="ToolsView">
+      <Button onClick={onCardAddClick}>Add Card</Button>
+    </div>
   );
 }

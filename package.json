@@ -13,7 +13,8 @@
         "lodash": "^4.17.21",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "simple-sync": "github:mwilliamson/simple-sync#7dc125219ca81b67a58f3ca08065aed29963abdb"
+        "simple-sync": "github:mwilliamson/simple-sync#7dc125219ca81b67a58f3ca08065aed29963abdb",
+        "uuidv7": "^0.6.3"
     },
     "devDependencies": {
         "@types/lodash": "^4.17.0",

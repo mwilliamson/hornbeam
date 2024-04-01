@@ -1,10 +1,12 @@
 export interface Card {
   id: string;
+  parentCardId: string | null;
   text: string;
 }
 
 export interface CardAddRequest {
   id: string;
+  parentCardId: string | null;
   text: string;
 }
 
@@ -16,8 +18,13 @@ export class AppState {
   }
 
   public cardAdd(request: CardAddRequest): AppState {
+    const card: Card = {
+      id: request.id,
+      parentCardId: request.parentCardId,
+      text: request.text,
+    };
     return new AppState(
-      [...this.cards, {id: request.id, text: request.text}]
+      [...this.cards, card]
     );
   }
 }

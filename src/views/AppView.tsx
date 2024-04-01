@@ -24,8 +24,18 @@ export default function AppView(props: AppViewProps) {
 
   const [viewState, setViewState] = useState(initialViewState);
 
+  // TODO: allow user to set text
+
   const handleCardAddClick = () => {
-    sendUpdate({type: "cardAdd", request: {id: generateId(), text: "New card"}});
+    // TODO: separate button for adding a child card?
+    sendUpdate({
+      type: "cardAdd",
+      request: {
+        id: generateId(),
+        parentCardId: viewState.selectedCardId,
+        text: "New card",
+      },
+    });
   };
 
   return (

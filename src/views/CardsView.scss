@@ -12,6 +12,12 @@
   gap: 1em;
 }
 
+.CardsView-Tree-Children {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+}
+
 .CardsView-Card {
   flex: 0 0 auto;
   background-color: #fff;

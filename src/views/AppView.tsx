@@ -12,7 +12,7 @@ interface ViewState {
 
 const initialViewState: ViewState = {
   selectedCardId: null,
-}
+};
 
 interface AppViewProps {
   sendUpdate: (update: AppUpdate) => void;
@@ -48,7 +48,7 @@ export default function AppView(props: AppViewProps) {
           cards={state.cards}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
-          />
+        />
       </div>
     </div>
   );

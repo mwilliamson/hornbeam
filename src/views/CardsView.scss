@@ -7,7 +7,11 @@
 @mixin CardsView-CardsRow {
   display: flex;
   flex-direction: column;
+  /**
+  TODO: specify height in ems, adjust SVG accordingly?
   gap: 1em;
+  **/
+  gap: 12px;
   margin-bottom: 2em;
 }
 
@@ -20,7 +24,10 @@
 .CardsView-TreeView {
   display: flex;
   flex-direction: row;
-  gap: 5em;
+
+  & > * {
+    flex: 0 0 auto;
+  }
 }
 
 .CardsView-TreeView-Children {
@@ -33,7 +40,11 @@
   border: 1px solid #666;
   border-radius: 0.5em;
   padding: 0.5em 1em;
+  /**
+  TODO: specify height in ems, adjust SVG accordingly?
   height: 5em;
+  **/
+  height: 62px;
   width: 15em;
   display: flex;
   flex-direction: column;

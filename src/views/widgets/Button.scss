@@ -3,6 +3,7 @@
   all: unset;
   box-sizing: border-box;
   cursor: pointer;
+  user-select: none;
 
   &:disabled {
       cursor: not-allowed;

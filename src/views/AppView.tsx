@@ -19,7 +19,7 @@ export default function AppView(props: AppViewProps) {
 
   return (
     <div className="AppView">
-      <div>
+      <div className="AppView-Tools">
         <ToolsView onCardAddClick={handleCardAddClick} />
       </div>
       <div>

@@ -26,7 +26,9 @@ function Card(props: CardProps) {
 
   return (
     <div className="CardsView-Card">
-      {card.text}
+      <div className="CardsView-Card-Content">
+        {card.text}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,36 @@
+{
+    "scripts": {
+        "build": "node build.mjs",
+        "watch": "npm run build -- --watch",
+        "check": "tsc",
+        "check-watch": "npm run check -- --watch",
+        "eslint": "eslint src",
+        "start": "node -r dotenv/config node_modules/simple-sync/lib/server.js public/"
+    },
+    "dependencies": {
+        "classnames": "^2.5.1",
+        "dotenv": "^16.4.5",
+        "lodash": "^4.17.21",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "simple-sync": "github:mwilliamson/simple-sync#7dc125219ca81b67a58f3ca08065aed29963abdb"
+    },
+    "devDependencies": {
+        "@types/lodash": "^4.17.0",
+        "@types/react": "^18.2.73",
+        "@types/react-dom": "^18.2.23",
+        "@typescript-eslint/eslint-plugin": "^7.4.0",
+        "@typescript-eslint/parser": "^7.4.0",
+        "esbuild": "^0.20.2",
+        "esbuild-sass-plugin": "^3.2.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-react": "^7.34.1",
+        "eslint-plugin-react-hooks": "^4.6.0",
+        "express": "^4.19.2",
+        "typescript": "^5.4.3"
+    },
+    "volta": {
+        "node": "20.12.0",
+        "npm": "10.5.0"
+    }
+}

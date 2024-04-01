@@ -1,0 +1,32 @@
+.Button {
+  /** Reset **/
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+
+  &:disabled {
+      cursor: not-allowed;
+  }
+
+  /** Styling **/
+  border-radius: 0.4rem;
+  padding: 0.6rem 1rem;
+  font-weight: bold;
+
+  &:disabled {
+      opacity: 0.4;
+  }
+}
+
+.Button--primary {
+  &.Button--variant-outline {
+      background-color: #fff;
+      color: #3182ce;
+      border: 1px solid currentColor;
+  }
+
+  &.Button--variant-solid {
+      background-color: #3182ce;
+      color: #fff;
+  }
+}

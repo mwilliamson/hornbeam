@@ -33,7 +33,7 @@ export default function AppView(props: AppViewProps) {
       <div className="AppView-Tools">
         <ToolsView onCardAddClick={handleCardAddClick} />
       </div>
-      <div>
+      <div className="AppView-Cards">
         <CardsView
           cards={state.cards}
           cardSelectedId={viewState.selectedCardId}

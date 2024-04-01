@@ -13,14 +13,16 @@ export default function CardsView(props: CardsViewProps) {
 
   return (
     <div className="CardsView">
-      {cards.map(card => (
-        <Card
-          key={card.id}
-          card={card}
-          isSelected={cardSelectedId === card.id}
-          onSelect={() => onCardSelect(card.id)}
-        />
-      ))}
+      <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
+        {cards.map(card => (
+          <Card
+            key={card.id}
+            card={card}
+            isSelected={cardSelectedId === card.id}
+            onSelect={() => onCardSelect(card.id)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -34,10 +36,15 @@ interface CardProps {
 function Card(props: CardProps) {
   const {card, isSelected, onSelect} = props;
 
+  const handleClick = (event: React.SyntheticEvent) => {
+    event.stopPropagation();
+    onSelect();
+  };
+
   return (
     <div
       className={classNames("CardsView-Card", {"CardsView-Card--selected": isSelected})}
-      onClick={onSelect}
+      onClick={handleClick}
     >
       <div className="CardsView-Card-Content">
         {card.text}

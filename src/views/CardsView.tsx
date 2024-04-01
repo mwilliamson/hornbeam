@@ -19,6 +19,8 @@ export default function CardsView(props: CardsViewProps) {
     card => card.parentCardId,
   );
 
+  const cardTops = calculateCardTops(cards, cardsByParentId);
+
   return (
     <div className="CardsView">
       <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
@@ -27,6 +29,7 @@ export default function CardsView(props: CardsViewProps) {
             key={card.id}
             card={card}
             cardsByParentId={cardsByParentId}
+            cardTops={cardTops}
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
           />
@@ -39,25 +42,25 @@ export default function CardsView(props: CardsViewProps) {
 interface CardTreeViewProps {
   card: Card;
   cardsByParentId: {[id: string]: ReadonlyArray<Card>};
+  cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
 }
 
 function CardTreeView(props: CardTreeViewProps) {
-  const {card, cardsByParentId, cardSelectedId, onCardSelect} = props;
+  const {card, cardsByParentId, cardTops, cardSelectedId, onCardSelect} = props;
 
   const children = cardsByParentId[card.id] || [];
+  const lastChild = children.length === 0 ? null : children[children.length - 1];
 
   const cardHeight = 62;
   const parentChildGap = 100;
-  const siblingGap = 12;
   const branchStroke = "#666";
-  // TODO: account for grandchildren
-  const branchesHeight = cardHeight * children.length + (siblingGap * (children.length - 1));
-  const branchY = (childCardIndex: number) => {
-    const cardTop = (cardHeight + siblingGap) * childCardIndex;
+  const branchY = (childCard: Card) => {
+    const cardTop = cardTops[childCard.id] - cardTops[card.id];
     return Math.floor(cardTop + cardHeight / 2) + 0.5;
   };
+  const branchesHeight = lastChild === null ? 0 : branchY(lastChild) + 1;
 
   return (
     <div className="CardsView-TreeView">
@@ -77,7 +80,7 @@ function CardTreeView(props: CardTreeViewProps) {
             height={branchesHeight}
           >
             {children.map((childCard, childCardIndex) => {
-              const y = branchY(childCardIndex);
+              const y = branchY(childCard);
 
               if (childCardIndex === 0) {
                 return (
@@ -102,7 +105,7 @@ function CardTreeView(props: CardTreeViewProps) {
                     />
                     <line
                       x1={parentChildGap / 2}
-                      y1={branchY(0)}
+                      y1={branchY(children[0])}
                       x2={parentChildGap / 2}
                       y2={y}
                       stroke={branchStroke}
@@ -129,6 +132,7 @@ function CardTreeView(props: CardTreeViewProps) {
                 key={childCard.id}
                 card={childCard}
                 cardsByParentId={cardsByParentId}
+                cardTops={cardTops}
                 cardSelectedId={cardSelectedId}
                 onCardSelect={onCardSelect}
               />
@@ -138,6 +142,42 @@ function CardTreeView(props: CardTreeViewProps) {
       )}
     </div>
   );
+}
+
+function calculateCardTops(
+  cards: ReadonlyArray<Card>,
+  cardsByParentId: {[id: string]: ReadonlyArray<Card>}
+): {[cardId: string]: number} {
+  // TODO: if we're going to calculate positions here, should we just position
+  // the cards absolutely? Probably.
+  const cardHeight = 62;
+  const siblingGap = 12;
+
+  const cardTops: {[id: string]: number} = {};
+
+  let y = 0;
+
+  const handleCard = (card: Card) => {
+    cardTops[card.id] = y;
+
+    const childCards = cardsByParentId[card.id] ?? [];
+
+    if (childCards.length === 0) {
+      y += cardHeight + siblingGap;
+    } else {
+      for (const childCard of childCards) {
+        handleCard(childCard);
+      }
+    }
+  };
+
+  for (const card of cards) {
+    if (card.parentCardId === null) {
+      handleCard(card);
+    }
+  }
+
+  return cardTops;
 }
 
 interface CardViewProps {

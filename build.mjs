@@ -26,6 +26,18 @@ const context = await esbuild.context({
       }
     },
     sassPlugin(),
+    {
+      name: "progress",
+      setup(build) {
+        build.onStart(() => {
+          console.log("Starting build...");
+        });
+
+        build.onEnd(result => {
+          console.log(`Build finished with ${result.errors.length} errors`);
+        })
+      }
+    }
   ],
 });
 

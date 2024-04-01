@@ -51,11 +51,13 @@ function CardTreeView(props: CardTreeViewProps) {
 
   return (
     <div>
-      <CardView
-        card={card}
-        isSelected={cardSelectedId === card.id}
-        onSelect={() => onCardSelect(card.id)}
-      />
+      <div className="CardsView-Tree-Parent">
+        <CardView
+          card={card}
+          isSelected={cardSelectedId === card.id}
+          onSelect={() => onCardSelect(card.id)}
+        />
+      </div>
       <div className="CardsView-Tree-Children">
         {children.map(childCard => (
           <CardTreeView

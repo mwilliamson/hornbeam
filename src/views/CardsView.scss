@@ -16,6 +16,12 @@
   @include CardsView-CardsRow;
 }
 
+.CardsView-Tree-Parent {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
 .CardsView-Tree-Children {
   @include CardsView-CardsRow;
 }

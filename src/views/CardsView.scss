@@ -22,12 +22,6 @@
   gap: 5em;
 }
 
-.CardsView-TreeView-Parent {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-}
-
 .CardsView-TreeView-Children {
   @include CardsView-CardsRow;
 }

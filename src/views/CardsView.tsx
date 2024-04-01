@@ -50,15 +50,15 @@ function CardTreeView(props: CardTreeViewProps) {
   // TODO: extract card row?
 
   return (
-    <div>
-      <div className="CardsView-Tree-Parent">
+    <div className="CardsView-TreeView">
+      <div className="CardsView-TreeView-Parent">
         <CardView
           card={card}
           isSelected={cardSelectedId === card.id}
           onSelect={() => onCardSelect(card.id)}
         />
       </div>
-      <div className="CardsView-Tree-Children">
+      <div className="CardsView-TreeView-Children">
         {children.map(childCard => (
           <CardTreeView
             key={childCard.id}

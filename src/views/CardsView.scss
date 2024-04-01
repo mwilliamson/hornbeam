@@ -6,7 +6,7 @@
 
 @mixin CardsView-CardsRow {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 1em;
 }
 
@@ -16,13 +16,19 @@
   @include CardsView-CardsRow;
 }
 
-.CardsView-Tree-Parent {
+.CardsView-TreeView {
   display: flex;
   flex-direction: row;
+  gap: 5em;
+}
+
+.CardsView-TreeView-Parent {
+  display: flex;
+  flex-direction: column;
   justify-content: space-around;
 }
 
-.CardsView-Tree-Children {
+.CardsView-TreeView-Children {
   @include CardsView-CardsRow;
 }
 

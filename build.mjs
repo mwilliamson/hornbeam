@@ -41,11 +41,10 @@ const context = await esbuild.context({
   ],
 });
 
-await context.rebuild();
-
 if (args.values.watch) {
   console.log("Watching");
   await context.watch();
 } else {
+  await context.rebuild();
   context.dispose();
 }

@@ -1,17 +1,25 @@
+import classNames from "classnames";
 import { Card } from "../app";
 import "./CardsView.scss";
 
 interface CardsViewProps {
   cards: ReadonlyArray<Card>;
+  cardSelectedId: string | null;
+  onCardSelect: (cardId: string | null) => void;
 }
 
 export default function CardsView(props: CardsViewProps) {
-  const {cards} = props;
+  const {cards, cardSelectedId, onCardSelect} = props;
 
   return (
     <div className="CardsView">
       {cards.map(card => (
-        <Card card={card} key={card.id} />
+        <Card
+          key={card.id}
+          card={card}
+          isSelected={cardSelectedId === card.id}
+          onSelect={() => onCardSelect(card.id)}
+        />
       ))}
     </div>
   );
@@ -19,13 +27,18 @@ export default function CardsView(props: CardsViewProps) {
 
 interface CardProps {
   card: Card;
+  isSelected: boolean;
+  onSelect: () => void;
 }
 
 function Card(props: CardProps) {
-  const {card} = props;
+  const {card, isSelected, onSelect} = props;
 
   return (
-    <div className="CardsView-Card">
+    <div
+      className={classNames("CardsView-Card", {"CardsView-Card--selected": isSelected})}
+      onClick={onSelect}
+    >
       <div className="CardsView-Card-Content">
         {card.text}
       </div>

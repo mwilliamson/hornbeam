@@ -1,9 +1,18 @@
+import { useState } from "react";
 import { AppState, AppUpdate } from "../app";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
+
+interface ViewState {
+  selectedCardId: string | null;
+}
+
+const initialViewState: ViewState = {
+  selectedCardId: null,
+}
 
 interface AppViewProps {
   sendUpdate: (update: AppUpdate) => void;
@@ -12,6 +21,8 @@ interface AppViewProps {
 
 export default function AppView(props: AppViewProps) {
   const {sendUpdate, state} = props;
+
+  const [viewState, setViewState] = useState(initialViewState);
 
   const handleCardAddClick = () => {
     sendUpdate({type: "cardAdd", request: {id: generateId(), text: "New card"}});
@@ -23,7 +34,11 @@ export default function AppView(props: AppViewProps) {
         <ToolsView onCardAddClick={handleCardAddClick} />
       </div>
       <div>
-        <CardsView cards={state.cards} />
+        <CardsView
+          cards={state.cards}
+          cardSelectedId={viewState.selectedCardId}
+          onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
+          />
       </div>
     </div>
   );

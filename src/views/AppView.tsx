@@ -5,12 +5,15 @@ import "../scss/style.scss";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
+import CardAddModal from "./CardAddModal";
 
 interface ViewState {
+  addingCard: boolean,
   selectedCardId: string | null;
 }
 
 const initialViewState: ViewState = {
+  addingCard: false,
   selectedCardId: null,
 };
 
@@ -24,18 +27,26 @@ export default function AppView(props: AppViewProps) {
 
   const [viewState, setViewState] = useState(initialViewState);
 
-  // TODO: allow user to set text
-
+  // TODO: separate button for adding a child card?
   const handleCardAddClick = () => {
-    // TODO: separate button for adding a child card?
+    setViewState({...viewState, addingCard: true});
+  };
+
+  const handleCardAddModalClose = () => {
+    setViewState({...viewState, addingCard: false});
+  };
+
+  const handleCardAdd = (text: string) => {
+    // TODO: add wait
     sendUpdate({
       type: "cardAdd",
       request: {
         id: generateId(),
         parentCardId: viewState.selectedCardId,
-        text: "New card",
+        text,
       },
     });
+    handleCardAddModalClose();
   };
 
   return (
@@ -50,6 +61,12 @@ export default function AppView(props: AppViewProps) {
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
         />
       </div>
+      {viewState.addingCard && (
+        <CardAddModal
+          onClose={handleCardAddModalClose}
+          onCardAdd={handleCardAdd}
+        />
+      )}
     </div>
   );
 }

@@ -10,7 +10,7 @@ export default function ToolsView(props: ToolsViewProps) {
 
   return (
     <div className="ToolsView">
-      <Button onClick={onCardAddClick}>Add Card</Button>
+      <Button type="button" onClick={onCardAddClick}>Add Card</Button>
     </div>
   );
 }

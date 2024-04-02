@@ -10,6 +10,10 @@ export interface CardAddRequest {
   text: string;
 }
 
+export interface CardDeleteRequest {
+  id: string;
+}
+
 export class AppState {
   public readonly cards: ReadonlyArray<Card>;
 
@@ -27,6 +31,12 @@ export class AppState {
       [...this.cards, card]
     );
   }
+
+  public cardDelete(request: CardDeleteRequest): AppState {
+    return new AppState(
+      this.cards.filter(card => card.id !== request.id)
+    );
+  }
 }
 
 export function initialAppState(): AppState {
@@ -34,11 +44,14 @@ export function initialAppState(): AppState {
 }
 
 export type AppUpdate =
-  | {type: "cardAdd", request: CardAddRequest};
+  | {type: "cardAdd", request: CardAddRequest}
+  | {type: "cardDelete", request: CardDeleteRequest};
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
   switch (update.type) {
     case "cardAdd":
       return state.cardAdd(update.request);
+    case "cardDelete":
+      return state.cardDelete(update.request);
   }
 }

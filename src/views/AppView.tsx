@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppState, AppUpdate } from "../app";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
@@ -6,6 +6,7 @@ import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
 import CardAddModal from "./CardAddModal";
+import isInputEvent from "../util/isInputEvent";
 
 interface ViewState {
   addingCard: boolean,
@@ -48,6 +49,27 @@ export default function AppView(props: AppViewProps) {
     });
     handleCardAddModalClose();
   };
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      // TODO: use proper selection of the cards and put the event on the cards?
+      if (isInputEvent(event)) {
+        return;
+      }
+
+      if (event.key === "Delete" || event.key === "Backspace") {
+        if (viewState.selectedCardId !== null) {
+          sendUpdate({type: "cardDelete", request: {id: viewState.selectedCardId}});
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [viewState.selectedCardId, sendUpdate]);
 
   return (
     <div className="AppView">

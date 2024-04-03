@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 
 import ActionModal from "./widgets/ActionModal";
 import Button from "./widgets/Button";
+import Input from "./widgets/Input";
 import "./CardAddModal.scss";
 
 interface CardAddModalProps {
@@ -26,11 +27,10 @@ export default function CardAddModal(props: CardAddModalProps) {
         <h2 id={labelElementId}>Add Card</h2>
       </ActionModal.Header>
       <ActionModal.Body>
-        <input
+        <Input
           autoFocus
-          onChange={event => setText(event.target.value)}
+          onChange={text => setText(text)}
           value={text}
-          style={{fontSize: "1rem", padding: "0.2rem 0.5rem", width: "100%"}}
         />
       </ActionModal.Body>
       <ActionModal.Footer>

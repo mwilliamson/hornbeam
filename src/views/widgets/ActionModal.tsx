@@ -41,6 +41,10 @@ export default function ActionModal(props: ActionModalProps) {
   );
 }
 
+ActionModal.Header = Modal.Header;
+ActionModal.Body = Modal.Body;
+ActionModal.Footer = Modal.Footer;
+
 interface SubmitButtonProps {
   children: React.ReactNode;
 }

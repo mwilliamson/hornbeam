@@ -22,18 +22,18 @@ export default function CardAddModal(props: CardAddModalProps) {
       onClose={onClose}
       onSubmit={() => onCardAdd(text)}
     >
-      <div style={{marginBottom: "1em"}}>
+      <ActionModal.Header>
         <h2 id={labelElementId}>Add Card</h2>
-      </div>
-      <div style={{marginBottom: "1em"}}>
+      </ActionModal.Header>
+      <ActionModal.Body>
         <input
           autoFocus
           onChange={event => setText(event.target.value)}
           value={text}
           style={{fontSize: "1rem", padding: "0.2rem 0.5rem", width: "100%"}}
         />
-      </div>
-      <div>
+      </ActionModal.Body>
+      <ActionModal.Footer>
         <div className="CardAddModal-Buttons">
           <div>
             <Button type="button" intent="secondary" onClick={onClose}>Cancel</Button>
@@ -43,7 +43,7 @@ export default function CardAddModal(props: CardAddModalProps) {
             <ActionModal.SubmitButton>Add Card</ActionModal.SubmitButton>
           </div>
         </div>
-      </div>
+        </ActionModal.Footer>
     </ActionModal>
   );
 }

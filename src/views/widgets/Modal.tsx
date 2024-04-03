@@ -35,3 +35,51 @@ export default function Modal(props: ModalProps) {
     </dialog>
   );
 }
+
+interface ModalHeaderProps {
+  children: React.ReactNode;
+}
+
+function ModalHeader(props: ModalHeaderProps) {
+  const {children} = props;
+
+  return (
+    <div className="Modal--Header">
+      {children}
+    </div>
+  );
+}
+
+Modal.Header = ModalHeader;
+
+interface ModalBodyProps {
+  children: React.ReactNode;
+}
+
+function ModalBody(props: ModalBodyProps) {
+  const {children} = props;
+
+  return (
+    <div className="Modal--Body">
+      {children}
+    </div>
+  );
+}
+
+Modal.Body = ModalBody;
+
+interface ModalFooterProps {
+  children: React.ReactNode;
+}
+
+function ModalFooter(props: ModalFooterProps) {
+  const {children} = props;
+
+  return (
+    <div className="Modal--Footer">
+      {children}
+    </div>
+  );
+}
+
+Modal.Footer = ModalFooter;

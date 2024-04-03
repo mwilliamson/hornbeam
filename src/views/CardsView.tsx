@@ -53,7 +53,6 @@ function CardTreeView(props: CardTreeViewProps) {
   const children = cardsByParentId[card.id] || [];
   const lastChild = children.length === 0 ? null : children[children.length - 1];
 
-  const cardHeight = 62;
   const parentChildGap = 100;
   const branchStroke = "#666";
   const branchY = (childCard: Card) => {
@@ -150,7 +149,6 @@ function calculateCardTops(
 ): {[cardId: string]: number} {
   // TODO: if we're going to calculate positions here, should we just position
   // the cards absolutely? Probably.
-  const cardHeight = 62;
   const siblingGap = 12;
 
   const cardTops: {[id: string]: number} = {};
@@ -208,3 +206,5 @@ function CardView(props: CardViewProps) {
     </div>
   );
 }
+
+const cardHeight = 85;

@@ -18,8 +18,6 @@ interface ActionModalProps {
   onSubmit: () => Promise<void>;
 }
 
-const SUBMIT_VALUE = "submit";
-
 export default function ActionModal(props: ActionModalProps) {
   const {children, labelElementId, onClose, onSubmit} = props;
 
@@ -56,7 +54,6 @@ function SubmitButton(props: SubmitButtonProps) {
     <Button
       type="submit"
       disabled={actionModalState.isLoading}
-      value={SUBMIT_VALUE}
     >
       {children}
     </Button>

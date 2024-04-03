@@ -53,6 +53,7 @@ function SubmitButton(props: SubmitButtonProps) {
   return (
     <Button
       type="submit"
+      intent="primary"
       disabled={actionModalState.isLoading}
     >
       {children}

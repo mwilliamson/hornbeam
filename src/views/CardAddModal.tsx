@@ -36,7 +36,7 @@ export default function CardAddModal(props: CardAddModalProps) {
       <div>
         <div className="CardAddModal-Buttons">
           <div>
-            <Button type="button" onClick={onClose}>Cancel</Button>
+            <Button type="button" intent="secondary" onClick={onClose}>Cancel</Button>
           </div>
           <div>
             <ActionModal.Status />

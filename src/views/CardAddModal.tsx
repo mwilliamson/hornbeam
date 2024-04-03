@@ -5,7 +5,7 @@ import Modal from "./widgets/Modal";
 import "./CardAddModal.scss";
 
 interface CardAddModalProps {
-  onCardAdd: (text: string) => void;
+  onCardAdd: (text: string) => Promise<void>;
   onClose: () => void;
 }
 
@@ -18,6 +18,7 @@ export default function CardAddModal(props: CardAddModalProps) {
 
   const handleClose = (returnValue: string) => {
     if (returnValue === "submit") {
+      // TODO: add wait
       onCardAdd(text);
     } else {
       onClose();

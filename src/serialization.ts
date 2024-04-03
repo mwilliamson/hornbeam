@@ -1,15 +1,20 @@
 import { AppUpdate, CardAddRequest, CardDeleteRequest } from "./app";
 
-type SerializedAppUpdate =
-  | {type: "cardAdd", request: CardAddRequest}
-  | {type: "cardDelete", request: CardDeleteRequest};
+interface SerializedAppUpdate {
+  updateId: string;
+  request: SerializedRequest;
+}
+
+type SerializedRequest =
+  | {type: "cardAdd", cardAdd: CardAddRequest}
+  | {type: "cardDelete", cardDelete: CardDeleteRequest};
 
 export function serializeAppUpdate(update: AppUpdate): SerializedAppUpdate {
   return update;
 }
 
 export function deserializeAppUpdate(untypedUpdate: unknown): AppUpdate {
-  const serializedUpdate = untypedUpdate as AppUpdate;
+  const serializedUpdate = untypedUpdate as SerializedAppUpdate;
 
   return serializedUpdate;
 }

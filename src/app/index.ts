@@ -15,10 +15,19 @@ export interface CardDeleteRequest {
 }
 
 export class AppState {
+  public readonly updateIds: ReadonlyArray<string>;
   public readonly cards: ReadonlyArray<Card>;
 
-  public constructor(cards: ReadonlyArray<Card>) {
+  public constructor(updateIds: ReadonlyArray<string>, cards: ReadonlyArray<Card>) {
+    this.updateIds = updateIds;
     this.cards = cards;
+  }
+
+  public addUpdateId(updateId: string): AppState {
+    return new AppState(
+      [...this.updateIds, updateId],
+      this.cards,
+    );
   }
 
   public cardAdd(request: CardAddRequest): AppState {
@@ -28,40 +37,51 @@ export class AppState {
       text: request.text,
     };
     return new AppState(
+      this.updateIds,
       [...this.cards, card]
     );
   }
 
   public cardDelete(request: CardDeleteRequest): AppState {
     return new AppState(
+      this.updateIds,
       this.cards.filter(card => card.id !== request.id)
     );
   }
 }
 
 export function initialAppState(): AppState {
-  return new AppState([]);
+  return new AppState([], []);
 }
 
-export type AppUpdate =
-  | {type: "cardAdd", request: CardAddRequest}
-  | {type: "cardDelete", request: CardDeleteRequest};
+export interface AppUpdate {
+  updateId: string;
+  request: Request;
+}
 
-export const appUpdates = {
-  cardAdd(request: CardAddRequest): AppUpdate {
-    return {type: "cardAdd", request};
+export type Request =
+  | {type: "cardAdd", cardAdd: CardAddRequest}
+  | {type: "cardDelete", cardDelete: CardDeleteRequest};
+
+export const requests = {
+  cardAdd(request: CardAddRequest): Request {
+    return {type: "cardAdd", cardAdd: request};
   },
 
-  cardDelete(request: CardDeleteRequest): AppUpdate {
-    return {type: "cardDelete", request};
+  cardDelete(request: CardDeleteRequest): Request {
+    return {type: "cardDelete", cardDelete: request};
   },
 };
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
-  switch (update.type) {
+  switch (update.request.type) {
     case "cardAdd":
-      return state.cardAdd(update.request);
+      state = state.cardAdd(update.request.cardAdd);
+      break;
     case "cardDelete":
-      return state.cardDelete(update.request);
+      state = state.cardDelete(update.request.cardDelete);
+      break;
   }
+
+  return state.addUpdateId(update.updateId);
 }

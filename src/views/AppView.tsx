@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
-import { AppState, AppUpdate, appUpdates } from "../app";
+import { useEffect, useRef, useState } from "react";
+import { uuidv7 } from "uuidv7";
+
+import { AppState, AppUpdate, Request, requests } from "../app";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import "./AppView.scss";
@@ -7,6 +9,7 @@ import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
 import CardAddModal from "./CardAddModal";
 import isInputEvent from "../util/isInputEvent";
+import { Deferred, createDeferred } from "../app/util/promises";
 
 interface ViewState {
   addingCard: boolean,
@@ -23,10 +26,55 @@ interface AppViewProps {
   state: AppState;
 }
 
+function useSendRequest(
+  sendUpdate: (update: AppUpdate) => void,
+  state: AppState,
+): (request: Request) => Promise<void> {
+  const pendingRef = useRef({
+    requests: new Map<string, Deferred<void>>(),
+    lastUpdateIndex: 0,
+  });
+
+  const sendRequestRef = useRef(async (request: Request) => {
+    const updateId = uuidv7();
+    sendUpdate({
+      updateId,
+      request,
+    });
+
+    const deferred = createDeferred<void>();
+
+    pendingRef.current.requests.set(updateId, deferred);
+
+    return deferred.promise;
+  });
+
+  useEffect(() => {
+    for (
+      let updateIndex = pendingRef.current.lastUpdateIndex + 1;
+      updateIndex < state.updateIds.length;
+      updateIndex++
+    ) {
+      const updateId = state.updateIds[updateIndex];
+      const pendingRequest = pendingRef.current.requests.get(updateId);
+      if (pendingRequest !== undefined) {
+        pendingRequest.resolve();
+        pendingRef.current.requests.delete(updateId);
+      }
+
+      pendingRef.current.lastUpdateIndex = updateIndex;
+    }
+  }, [state.updateIds]);
+
+  return sendRequestRef.current;
+}
+
 export default function AppView(props: AppViewProps) {
   const {sendUpdate, state} = props;
 
   const [viewState, setViewState] = useState(initialViewState);
+
+  const sendRequest = useSendRequest(sendUpdate, state);
 
   // TODO: separate button for adding a child card?
   const handleCardAddClick = () => {
@@ -37,9 +85,8 @@ export default function AppView(props: AppViewProps) {
     setViewState({...viewState, addingCard: false});
   };
 
-  const handleCardAdd = (text: string) => {
-    // TODO: add wait
-    sendUpdate(appUpdates.cardAdd({
+  const handleCardAdd = async (text: string) => {
+    await sendRequest(requests.cardAdd({
       id: generateId(),
       parentCardId: viewState.selectedCardId,
       text,
@@ -56,7 +103,8 @@ export default function AppView(props: AppViewProps) {
 
       if (event.key === "Delete" || event.key === "Backspace") {
         if (viewState.selectedCardId !== null) {
-          sendUpdate(appUpdates.cardDelete({id: viewState.selectedCardId}));
+          // TODO: wait
+          sendRequest(requests.cardDelete({id: viewState.selectedCardId}));
         }
       }
     }
@@ -66,7 +114,7 @@ export default function AppView(props: AppViewProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [viewState.selectedCardId, sendUpdate]);
+  }, [viewState.selectedCardId, sendRequest]);
 
   return (
     <div className="AppView">

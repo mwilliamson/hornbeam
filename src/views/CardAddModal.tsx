@@ -37,7 +37,7 @@ export default function CardAddModal(props: CardAddModalProps) {
           />
         </div>
         <div className="mt-md">
-          Parent: {parent === null ? "None" : `#${parent.number}: ${parent.text}`}
+          Parent: {parent === null ? "None" : `${parent.text} (#${parent.number})`}
         </div>
       </ActionModal.Body>
       <ActionModal.Footer>

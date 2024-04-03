@@ -4,14 +4,16 @@ import ActionModal from "./widgets/ActionModal";
 import Button from "./widgets/Button";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
+import { Card } from "../app";
 
 interface CardAddModalProps {
   onCardAdd: (text: string) => Promise<void>;
   onClose: () => void;
+  parent: Card | null;
 }
 
 export default function CardAddModal(props: CardAddModalProps) {
-  const {onCardAdd, onClose} = props;
+  const {onCardAdd, onClose, parent} = props;
 
   const [text, setText] = useState("");
 
@@ -27,11 +29,16 @@ export default function CardAddModal(props: CardAddModalProps) {
         <h2 id={labelElementId}>Add Card</h2>
       </ActionModal.Header>
       <ActionModal.Body>
-        <Input
-          autoFocus
-          onChange={text => setText(text)}
-          value={text}
-        />
+        <div className="mb-md">
+          <Input
+            autoFocus
+            onChange={text => setText(text)}
+            value={text}
+          />
+        </div>
+        <div className="mt-md">
+          Parent: {parent === null ? "None" : `#${parent.number}: ${parent.text}`}
+        </div>
       </ActionModal.Body>
       <ActionModal.Footer>
         <div className="CardAddModal-Buttons">

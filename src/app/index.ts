@@ -59,6 +59,10 @@ export class AppState {
       this.nextCardNumber,
     );
   }
+
+  public findCardById(cardId: string): Card | null {
+    return this.cards.find(card => card.id == cardId) ?? null;
+  }
 }
 
 export function initialAppState(): AppState {

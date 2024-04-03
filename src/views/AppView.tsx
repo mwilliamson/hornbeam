@@ -135,6 +135,11 @@ export default function AppView(props: AppViewProps) {
         <CardAddModal
           onClose={handleCardAddModalClose}
           onCardAdd={handleCardAdd}
+          parent={
+            viewState.selectedCardId === null
+              ? null
+              : state.findCardById(viewState.selectedCardId)
+          }
         />
       )}
     </div>

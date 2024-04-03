@@ -47,6 +47,16 @@ export type AppUpdate =
   | {type: "cardAdd", request: CardAddRequest}
   | {type: "cardDelete", request: CardDeleteRequest};
 
+export const appUpdates = {
+  cardAdd(request: CardAddRequest): AppUpdate {
+    return {type: "cardAdd", request};
+  },
+
+  cardDelete(request: CardDeleteRequest): AppUpdate {
+    return {type: "cardDelete", request};
+  },
+};
+
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
   switch (update.type) {
     case "cardAdd":

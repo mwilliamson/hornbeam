@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AppState, AppUpdate } from "../app";
+import { AppState, AppUpdate, appUpdates } from "../app";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import "./AppView.scss";
@@ -39,14 +39,11 @@ export default function AppView(props: AppViewProps) {
 
   const handleCardAdd = (text: string) => {
     // TODO: add wait
-    sendUpdate({
-      type: "cardAdd",
-      request: {
-        id: generateId(),
-        parentCardId: viewState.selectedCardId,
-        text,
-      },
-    });
+    sendUpdate(appUpdates.cardAdd({
+      id: generateId(),
+      parentCardId: viewState.selectedCardId,
+      text,
+    }));
     handleCardAddModalClose();
   };
 
@@ -59,7 +56,7 @@ export default function AppView(props: AppViewProps) {
 
       if (event.key === "Delete" || event.key === "Backspace") {
         if (viewState.selectedCardId !== null) {
-          sendUpdate({type: "cardDelete", request: {id: viewState.selectedCardId}});
+          sendUpdate(appUpdates.cardDelete({id: viewState.selectedCardId}));
         }
       }
     }

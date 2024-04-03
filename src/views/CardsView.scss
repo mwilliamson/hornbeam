@@ -58,7 +58,10 @@
 }
 
 .CardsView-Card-Text {
-  flex: 1 1 auto;
+  flex: 1 0 0;
+  min-height: 0;
+  overflow: hidden;
+  /* How to add ellipsis? */
 }
 
 .CardsView-Card-Details {

@@ -1,9 +1,14 @@
+@use "../../scss/spacing";
+
+$border: 1px solid #e5e5e5;
+
 .Modal {
   width: 800px;
-  border: 1px solid #e5e5e5;
+  border: $border;
+  border-radius: 10px;
   background-color: white;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  padding: 20px;
+  padding: 0;
 
   &[open]::backdrop {
     background-color: #000;
@@ -12,9 +17,15 @@
 }
 
 .Modal--Header {
-  margin-bottom: 1em;
+  padding: spacing.$md;
+  border-bottom: $border;
 }
 
 .Modal--Body {
-  margin-bottom: 1em;
+  padding: spacing.$md;
+}
+
+.Modal--Footer {
+  border-top: $border;
+  padding: spacing.$md;
 }

@@ -20,7 +20,6 @@ export default function Modal(props: ModalProps) {
   }, []);
 
   const handleClose = (event: React.SyntheticEvent<HTMLDialogElement>) => {
-    event.preventDefault();
     const returnValue: string = (event.target as unknown as {returnValue: string}).returnValue;
     onClose(returnValue);
   };

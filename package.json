@@ -14,6 +14,7 @@
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "simple-sync": "github:mwilliamson/simple-sync#7dc125219ca81b67a58f3ca08065aed29963abdb",
+        "spin.js": "^4.1.1",
         "uuidv7": "^0.6.3"
     },
     "devDependencies": {

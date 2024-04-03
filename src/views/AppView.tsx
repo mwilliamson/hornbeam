@@ -86,6 +86,9 @@ export default function AppView(props: AppViewProps) {
   };
 
   const handleCardAdd = async (text: string) => {
+    await new Promise(resolve => {
+      setTimeout(resolve, 1000);
+    });
     await sendRequest(requests.cardAdd({
       id: generateId(),
       parentCardId: viewState.selectedCardId,

@@ -50,10 +50,19 @@
   width: 15em;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
 
   &--selected {
     border-color: #3182ce;
     box-shadow: 0 0 3px 3px #3182ce;
   }
+}
+
+.CardsView-Card-Text {
+  flex: 1 1 auto;
+}
+
+.CardsView-Card-Details {
+  flex: 0 0 auto;
+  font-size: 14px;
+  color: #666;
 }

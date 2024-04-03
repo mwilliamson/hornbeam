@@ -199,8 +199,11 @@ function CardView(props: CardViewProps) {
       className={classNames("CardsView-Card", {"CardsView-Card--selected": isSelected})}
       onClick={handleClick}
     >
-      <div className="CardsView-Card-Content">
+      <div className="CardsView-Card-Text">
         {card.text}
+      </div>
+      <div className="CardsView-Card-Details">
+        #{card.number}
       </div>
     </div>
   );

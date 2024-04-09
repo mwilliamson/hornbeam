@@ -4,26 +4,34 @@ import ActionModal from "./widgets/ActionModal";
 import Button from "./widgets/Button";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
-import { Card } from "../app";
+import { Card, Category } from "../app";
 
 interface CardAddModalProps {
-  onCardAdd: (text: string) => Promise<void>;
+  availableCategories: ReadonlyArray<Category>;
+  onCardAdd: (categoryId: string, text: string) => Promise<void>;
   onClose: () => void;
   parent: Card | null;
 }
 
 export default function CardAddModal(props: CardAddModalProps) {
-  const {onCardAdd, onClose, parent} = props;
+  const {availableCategories, onCardAdd, onClose, parent} = props;
 
+  const [categoryId, setCategoryId] = useState<string>("");
   const [text, setText] = useState("");
 
   const labelElementId = useId();
+
+  const handleSubmit = async () => {
+    if (categoryId) {
+      await onCardAdd(categoryId, text);
+    }
+  };
 
   return (
     <ActionModal
       labelElementId={labelElementId}
       onClose={onClose}
-      onSubmit={() => onCardAdd(text)}
+      onSubmit={handleSubmit}
     >
       <ActionModal.Header>
         <h2 id={labelElementId}>Add Card</h2>
@@ -36,8 +44,22 @@ export default function CardAddModal(props: CardAddModalProps) {
             value={text}
           />
         </div>
-        <div className="mt-md">
+        <div className="my-md">
           Parent: {parent === null ? "None" : `${parent.text} (#${parent.number})`}
+        </div>
+        <div className="mt-md">
+          <label>
+            Category:
+            {" "}
+            <select onChange={event => setCategoryId(event.target.value)} value={categoryId ?? undefined}>
+              <option value=""></option>
+              {availableCategories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </ActionModal.Body>
       <ActionModal.Footer>

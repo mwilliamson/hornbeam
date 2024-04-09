@@ -1,4 +1,5 @@
 export interface Card {
+  categoryId: string;
   id: string;
   number: number;
   parentCardId: string | null;
@@ -6,6 +7,7 @@ export interface Card {
 }
 
 export interface CardAddRequest {
+  categoryId: string;
   id: string;
   parentCardId: string | null;
   text: string;
@@ -14,6 +16,38 @@ export interface CardAddRequest {
 export interface CardDeleteRequest {
   id: string;
 }
+
+export interface Category {
+  id: string;
+  name: string;
+}
+
+const categories: ReadonlyArray<Category> = [
+  {
+    id: "018ec4b8-30c5-7c09-a519-4b460db76da5",
+    name: "Goal"
+  },
+  {
+    id: "018ec4b8-30c5-7c09-a519-4b45f141679a",
+    name: "Bug"
+  },
+  {
+    id: "018ec4b8-30c5-7c09-a519-4b47c6a3cb5c",
+    name: "Risk"
+  },
+  {
+    id: "018ec4b8-30c5-7c09-a519-4b486f2cb5c2",
+    name: "Question"
+  },
+  {
+    id: "018ec4b8-30c5-7c09-a519-4b499ba9020c",
+    name: "Feature"
+  },
+  {
+    id: "018ec4b8-30c5-7c09-a519-4b4a243ce8c3",
+    name: "Detail"
+  },
+];
 
 export class AppState {
   public readonly updateIds: ReadonlyArray<string>;
@@ -40,6 +74,7 @@ export class AppState {
 
   public cardAdd(request: CardAddRequest): AppState {
     const card: Card = {
+      categoryId: request.categoryId,
       id: request.id,
       number: this.nextCardNumber,
       parentCardId: request.parentCardId,
@@ -62,6 +97,14 @@ export class AppState {
 
   public findCardById(cardId: string): Card | null {
     return this.cards.find(card => card.id == cardId) ?? null;
+  }
+
+  public allCategories(): ReadonlyArray<Category> {
+    return categories;
+  }
+
+  public availableCategories(): ReadonlyArray<Category> {
+    return categories;
   }
 }
 

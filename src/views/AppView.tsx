@@ -10,6 +10,7 @@ import ToolsView from "./ToolsView";
 import CardAddModal from "./CardAddModal";
 import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../app/util/promises";
+import { keyBy } from "../util/maps";
 
 interface ViewState {
   addingCard: boolean,
@@ -85,11 +86,12 @@ export default function AppView(props: AppViewProps) {
     setViewState({...viewState, addingCard: false});
   };
 
-  const handleCardAdd = async (text: string) => {
+  const handleCardAdd = async (categoryId: string, text: string) => {
     await new Promise(resolve => {
       setTimeout(resolve, 1000);
     });
     await sendRequest(requests.cardAdd({
+      categoryId,
       id: generateId(),
       parentCardId: viewState.selectedCardId,
       text,
@@ -119,6 +121,8 @@ export default function AppView(props: AppViewProps) {
     };
   }, [viewState.selectedCardId, sendRequest]);
 
+  const categoriesById = keyBy(state.allCategories(), category => category.id);
+
   return (
     <div className="AppView">
       <div className="AppView-Tools">
@@ -129,10 +133,12 @@ export default function AppView(props: AppViewProps) {
           cards={state.cards}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
+          categoriesById={categoriesById}
         />
       </div>
       {viewState.addingCard && (
         <CardAddModal
+          availableCategories={state.availableCategories()}
           onClose={handleCardAddModalClose}
           onCardAdd={handleCardAdd}
           parent={

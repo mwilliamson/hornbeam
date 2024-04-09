@@ -2,17 +2,18 @@ import classNames from "classnames";
 import groupBy from "lodash/groupBy";
 import React from "react";
 
-import { Card } from "../app";
+import { Card, Category } from "../app";
 import "./CardsView.scss";
 
 interface CardsViewProps {
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
+  categoriesById: Map<string, Category>;
 }
 
 export default function CardsView(props: CardsViewProps) {
-  const {cards, cardSelectedId, onCardSelect} = props;
+  const {cards, cardSelectedId, onCardSelect, categoriesById} = props;
 
   const cardsByParentId = groupBy(
     cards.filter(card => card.parentCardId !== null),
@@ -32,6 +33,7 @@ export default function CardsView(props: CardsViewProps) {
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
+            categoriesById={categoriesById}
           />
         ))}
       </div>
@@ -45,10 +47,18 @@ interface CardTreeViewProps {
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
+  categoriesById: Map<string, Category>;
 }
 
 function CardTreeView(props: CardTreeViewProps) {
-  const {card, cardsByParentId, cardTops, cardSelectedId, onCardSelect} = props;
+  const {
+    card,
+    cardsByParentId,
+    cardTops,
+    cardSelectedId,
+    onCardSelect,
+    categoriesById,
+  } = props;
 
   const children = cardsByParentId[card.id] || [];
   const lastChild = children.length === 0 ? null : children[children.length - 1];
@@ -66,6 +76,7 @@ function CardTreeView(props: CardTreeViewProps) {
       <div className="CardsView-TreeView-Parent">
         <CardView
           card={card}
+          cardCategory={categoriesById.get(card.categoryId) ?? null}
           isSelected={cardSelectedId === card.id}
           onSelect={() => onCardSelect(card.id)}
         />
@@ -134,6 +145,7 @@ function CardTreeView(props: CardTreeViewProps) {
                 cardTops={cardTops}
                 cardSelectedId={cardSelectedId}
                 onCardSelect={onCardSelect}
+                categoriesById={categoriesById}
               />
             ))}
           </div>
@@ -180,12 +192,13 @@ function calculateCardTops(
 
 interface CardViewProps {
   card: Card;
+  cardCategory: Category | null;
   isSelected: boolean;
   onSelect: () => void;
 }
 
 function CardView(props: CardViewProps) {
-  const {card, isSelected, onSelect} = props;
+  const {card, cardCategory, isSelected, onSelect} = props;
 
   const handleClick = (event: React.SyntheticEvent) => {
     event.stopPropagation();
@@ -201,7 +214,12 @@ function CardView(props: CardViewProps) {
         {card.text}
       </div>
       <div className="CardsView-Card-Details">
-        #{card.number}
+        <div className="CardsView-Card-Number">
+          #{card.number}
+        </div>
+        <div className="CardsView-Card-Category">
+          {cardCategory === null ? null : cardCategory.name}
+        </div>
       </div>
     </div>
   );

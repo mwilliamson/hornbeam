@@ -32,7 +32,7 @@ function useSendRequest(
 ): (request: Request) => Promise<void> {
   const pendingRef = useRef({
     requests: new Map<string, Deferred<void>>(),
-    lastUpdateIndex: 0,
+    lastUpdateIndex: -1,
   });
 
   const sendRequestRef = useRef(async (request: Request) => {

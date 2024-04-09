@@ -50,7 +50,7 @@ export default function CardAddModal(props: CardAddModalProps) {
             <ActionModal.SubmitButton>Add Card</ActionModal.SubmitButton>
           </div>
         </div>
-        </ActionModal.Footer>
+      </ActionModal.Footer>
     </ActionModal>
   );
 }

@@ -19,7 +19,7 @@ export default function Spinner() {
       if (spinner !== null) {
         spinner.stop();
       }
-    }
+    };
   }, []);
 
   // \u200b is a zero width space, which forces the span to line height

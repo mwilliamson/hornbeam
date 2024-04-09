@@ -20,32 +20,43 @@ export interface CardDeleteRequest {
 export interface Category {
   id: string;
   name: string;
+  color: Color;
+}
+
+export interface Color {
+  hex: string;
 }
 
 const categories: ReadonlyArray<Category> = [
   {
     id: "018ec4b8-30c5-7c09-a519-4b460db76da5",
-    name: "Goal"
+    name: "Goal",
+    color: {hex: "#adf7b6"},
   },
   {
     id: "018ec4b8-30c5-7c09-a519-4b45f141679a",
-    name: "Bug"
+    name: "Bug",
+    color: {hex: "#ffacbb"},
   },
   {
     id: "018ec4b8-30c5-7c09-a519-4b47c6a3cb5c",
-    name: "Risk"
+    name: "Risk",
+    color: {hex: "#ffc09f"},
   },
   {
     id: "018ec4b8-30c5-7c09-a519-4b486f2cb5c2",
-    name: "Question"
+    name: "Question",
+    color: {hex: "#e6aeff"},
   },
   {
     id: "018ec4b8-30c5-7c09-a519-4b499ba9020c",
-    name: "Feature"
+    name: "Feature",
+    color: {hex: "#ffee93"},
   },
   {
     id: "018ec4b8-30c5-7c09-a519-4b4a243ce8c3",
-    name: "Detail"
+    name: "Detail",
+    color: {hex: "#a0ced9"},
   },
 ];
 

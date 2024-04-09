@@ -205,9 +205,12 @@ function CardView(props: CardViewProps) {
     onSelect();
   };
 
+  const backgroundColor = cardCategory === null ? undefined : cardCategory.color.hex;
+
   return (
     <div
       className={classNames("CardsView-Card", {"CardsView-Card--selected": isSelected})}
+      style={{backgroundColor}}
       onClick={handleClick}
     >
       <div className="CardsView-Card-Text">

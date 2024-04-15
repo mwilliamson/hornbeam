@@ -7,7 +7,7 @@ import "../scss/style.scss";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
-import CardAddModal from "./CardAddModal";
+import CardAddModal, { ValidCardFormValues } from "./CardAddModal";
 import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../app/util/promises";
 import { keyBy } from "../util/maps";
@@ -86,7 +86,7 @@ export default function AppView(props: AppViewProps) {
     setViewState({...viewState, addingCard: false});
   };
 
-  const handleCardAdd = async (categoryId: string, text: string) => {
+  const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
     await new Promise(resolve => {
       setTimeout(resolve, 1000);
     });

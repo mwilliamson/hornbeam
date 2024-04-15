@@ -6,10 +6,16 @@ import Button from "./widgets/Button";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
 import CategorySelect from "./controls/CategorySelect";
+import { ValidationResult } from "../util/validation";
+
+export interface ValidCardFormValues {
+  categoryId: string;
+  text: string;
+}
 
 interface CardAddModalProps {
   availableCategories: ReadonlyArray<Category>;
-  onCardAdd: (categoryId: string, text: string) => Promise<void>;
+  onCardAdd: (values: ValidCardFormValues) => Promise<void>;
   onClose: () => void;
   parent: Card | null;
 }
@@ -23,9 +29,19 @@ export default function CardAddModal(props: CardAddModalProps) {
   const modalLabelElementId = useId();
   const textElementId = useId();
 
+  const validate = (): ValidationResult<ValidCardFormValues, null> => {
+    if (categoryId === "") {
+      return {type: "invalid", error: null};
+    } else {
+      return {type: "valid", value: {categoryId, text}};
+    }
+  };
+
   const handleSubmit = async () => {
-    if (categoryId) {
-      await onCardAdd(categoryId, text);
+    const result = validate();
+
+    if (result.type === "valid") {
+      await onCardAdd(result.value);
     }
   };
 

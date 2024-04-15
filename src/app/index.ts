@@ -35,7 +35,7 @@ const categories: ReadonlyArray<Category> = [
   },
   {
     id: "018ec4b8-30c5-7c09-a519-4b499ba9020c",
-    name: "Feature",
+    name: "User Task",
     color: {hex: "#ffee93"},
   },
   {

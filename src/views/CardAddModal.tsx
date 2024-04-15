@@ -6,7 +6,7 @@ import Button from "./widgets/Button";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
 import CategorySelect from "./controls/CategorySelect";
-import { ValidationResult } from "../util/validation";
+import { ValidationError, ValidationResult } from "../util/validation";
 
 export interface ValidCardFormValues {
   categoryId: string;
@@ -23,15 +23,27 @@ interface CardAddModalProps {
 export default function CardAddModal(props: CardAddModalProps) {
   const {availableCategories, onCardAdd, onClose, parent} = props;
 
+  const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
   const [categoryId, setCategoryId] = useState<string>("");
   const [text, setText] = useState("");
 
   const modalLabelElementId = useId();
-  const textElementId = useId();
+  const textControlId = useId();
+  const categoryControlId = useId();
 
-  const validate = (): ValidationResult<ValidCardFormValues, null> => {
+  const validate = (): ValidationResult<ValidCardFormValues> => {
+    const errors: Array<ValidationError> = [];
+
     if (categoryId === "") {
-      return {type: "invalid", error: null};
+      errors.push({
+        elementId: categoryControlId,
+        inlineText: "Please select a category.",
+        summaryText: "Card is missing a category.",
+      });
+    }
+
+    if (errors.length > 0) {
+      return {type: "invalid", errors};
     } else {
       return {type: "valid", value: {categoryId, text}};
     }
@@ -42,6 +54,8 @@ export default function CardAddModal(props: CardAddModalProps) {
 
     if (result.type === "valid") {
       await onCardAdd(result.value);
+    } else {
+      setErrors(result.errors);
     }
   };
 
@@ -55,14 +69,25 @@ export default function CardAddModal(props: CardAddModalProps) {
         <h2 id={modalLabelElementId}>Add Card</h2>
       </ActionModal.Header>
       <ActionModal.Body>
+        {errors.length > 0 && (
+          <div className="CardAddModal-Errors">
+            <ul>
+              {errors.map((error, errorIndex) => (
+                <li key={errorIndex}>
+                  {error.summaryText}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="CardAddModal-Body">
-          <label className="CardAddModal-ControlLabel" htmlFor={textElementId}>
+          <label className="CardAddModal-ControlLabel" htmlFor={textControlId}>
             Text
           </label>
           <div className="CardAddModal-Control">
             <Input
               autoFocus
-              id={textElementId}
+              id={textControlId}
               onChange={text => setText(text)}
               value={text}
             />
@@ -80,6 +105,11 @@ export default function CardAddModal(props: CardAddModalProps) {
               onChange={categoryId => setCategoryId(categoryId)}
               value={categoryId}
             />
+            {errors.filter(error => error.elementId).map((error, errorIndex) => (
+              <div key={errorIndex}>
+                {error.inlineText}
+              </div>
+            ))}
           </div>
         </div>
       </ActionModal.Body>

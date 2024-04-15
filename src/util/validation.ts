@@ -1,3 +1,9 @@
-export type ValidationResult<T, E> =
+export type ValidationResult<T> =
   | {type: "valid", value: T}
-  | {type: "invalid", error: E};
+  | {type: "invalid", errors: ReadonlyArray<ValidationError>};
+
+export interface ValidationError {
+  elementId: string;
+  inlineText: string;
+  summaryText: string;
+}

@@ -1,10 +1,11 @@
 import { useId, useState } from "react";
 
+import { Card, Category } from "../app";
 import ActionModal from "./widgets/ActionModal";
 import Button from "./widgets/Button";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
-import { Card, Category } from "../app";
+import CategorySelect from "./controls/CategorySelect";
 
 interface CardAddModalProps {
   availableCategories: ReadonlyArray<Category>;
@@ -51,14 +52,11 @@ export default function CardAddModal(props: CardAddModalProps) {
           <label>
             Category:
             {" "}
-            <select onChange={event => setCategoryId(event.target.value)} value={categoryId ?? undefined}>
-              <option value=""></option>
-              {availableCategories.map(category => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
+            <CategorySelect
+              availableCategories={availableCategories}
+              onChange={categoryId => setCategoryId(categoryId)}
+              value={categoryId}
+            />
           </label>
         </div>
       </ActionModal.Body>

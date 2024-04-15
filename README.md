@@ -35,6 +35,5 @@ http://localhost:8000/?path=/example
 
 During development:
 
-* Run `npm run watch` to continuously build the client.
-* Run `npm run check-watch` to continuously type-check the client.
-* Run `npm run eslint` to run eslint.
+* Run `npm run build-watch` to continuously build the client.
+* Run `npm run check-watch` to continuously type-check and lint the client.

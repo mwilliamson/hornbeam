@@ -1,4 +1,7 @@
+import { useId } from "react";
+
 import { Category } from "../../app";
+import "./CategorySelect.scss";
 
 interface CategorySelectProps {
   availableCategories: ReadonlyArray<Category>;
@@ -9,14 +12,36 @@ interface CategorySelectProps {
 export default function CategorySelect(props: CategorySelectProps) {
   const {availableCategories, onChange, value} = props;
 
+  const htmlName = useId();
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      onChange(event.target.value);
+    }
+  };
+
   return (
-    <select onChange={event => onChange(event.target.value)} value={value ?? undefined}>
-      <option value=""></option>
+    <div className="CategorySelect">
       {availableCategories.map(category => (
-        <option key={category.id} value={category.id}>
-          {category.name}
-        </option>
+        <div key={category.id} className="CategorySelect-Category">
+          <input
+            type="radio"
+            checked={category.id === value}
+            onChange={handleChange}
+            name={htmlName}
+            id={htmlName + "_" + category.id}
+            value={category.id}
+            className="CategorySelect-Input"
+          />
+          <label
+            className="CategorySelect-CategoryLabel"
+            style={{backgroundColor: category.color.hex}}
+            htmlFor={htmlName + "_" + category.id}
+          >
+            {category.name}
+          </label>
+        </div>
       ))}
-    </select>
+    </div>
   );
 }

@@ -49,15 +49,15 @@ export default function CardAddModal(props: CardAddModalProps) {
           Parent: {parent === null ? "None" : `${parent.text} (#${parent.number})`}
         </div>
         <div className="mt-md">
-          <label>
-            Category:
+          <fieldset>
+            <legend>Category</legend>
             {" "}
             <CategorySelect
               availableCategories={availableCategories}
               onChange={categoryId => setCategoryId(categoryId)}
               value={categoryId}
             />
-          </label>
+          </fieldset>
         </div>
       </ActionModal.Body>
       <ActionModal.Footer>

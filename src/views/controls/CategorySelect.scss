@@ -1,0 +1,27 @@
+@use "../../scss/spacing";
+
+.CategorySelect {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: spacing.$md;
+}
+
+.CategorySelect-CategoryLabel {
+  display: inline-block;
+  border: 1px solid #666;
+  border-radius: 0.5em;
+  padding: 1em 1em;
+  text-align: center;
+  width: 100%;
+
+  .CategorySelect-Category:has(:checked) & {
+    border-color: #3182ce;
+    box-shadow: 0 0 3px 3px #3182ce;
+  }
+}
+
+.CategorySelect-Input {
+  position: absolute;
+  clip: rect(0, 0, 0, 0);
+  pointer-events: none;
+}

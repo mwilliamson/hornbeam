@@ -35,6 +35,14 @@ export default function CardAddModal(props: CardAddModalProps) {
   const validate = (): ValidationResult<ValidCardFormValues> => {
     const errors: Array<ValidationError> = [];
 
+    if (text === "") {
+      errors.push({
+        elementId: textControlId,
+        inlineText: "Enter the card text.",
+        summaryText: "Card is missing text."
+      });
+    }
+
     if (categoryId === "") {
       errors.push({
         elementId: categoryControlId,
@@ -84,6 +92,7 @@ export default function CardAddModal(props: CardAddModalProps) {
               onChange={text => setText(text)}
               value={text}
             />
+            <ValidationErrorsInlineView elementId={textControlId} errors={errors} />
           </div>
           <label className="CardAddModal-ControlLabel">
             Parent

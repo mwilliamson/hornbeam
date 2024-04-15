@@ -1,23 +1,23 @@
+@use "../../scss/cards";
 @use "../../scss/spacing";
+@use "../../scss/text";
 
 .CategorySelect {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-  gap: 0.5em;
+  gap: cards.$card-gap;
 }
 
 .CategorySelect-CategoryLabel {
-  display: inline-block;
-  border: 1px solid #666;
-  border-radius: 0.5em;
-  font-size: 14px;
+  @include cards.card;
+
+  font-size: text.$font-size-sm;
   padding: 1em 0;
   text-align: center;
   width: 100%;
 
   .CategorySelect-Category:has(:checked) & {
-    border-color: #3182ce;
-    box-shadow: 0 0 3px 3px #3182ce;
+    @include cards.card--selected;
   }
 }
 

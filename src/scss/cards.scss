@@ -1,0 +1,13 @@
+@mixin card {
+  display: inline-block;
+  border: 1px solid #666;
+  border-radius: 0.5em;
+  background-color: #fff;
+}
+
+@mixin card--selected {
+  border-color: #3182ce;
+  box-shadow: 0 0 3px 3px #3182ce;
+}
+
+$card-gap: 12px;

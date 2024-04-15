@@ -1,4 +1,6 @@
+@use "../scss/cards";
 @use "../scss/spacing";
+@use "../scss/text";
 
 .CardsView {
   height: 100%;
@@ -14,7 +16,7 @@
   TODO: specify height in ems, adjust SVG accordingly?
   gap: 1em;
   **/
-  gap: 12px;
+  gap: cards.$card-gap;
 }
 
 .CardsView-Cards {
@@ -37,10 +39,9 @@
 }
 
 .CardsView-Card {
+  @include cards.card;
+
   flex: 0 0 auto;
-  background-color: #fff;
-  border: 1px solid #666;
-  border-radius: 0.5em;
   padding: 0.5em 1em;
   /**
   TODO: specify height in ems, adjust SVG accordingly?
@@ -52,8 +53,7 @@
   flex-direction: column;
 
   &--selected {
-    border-color: #3182ce;
-    box-shadow: 0 0 3px 3px #3182ce;
+    @include cards.card--selected;
   }
 }
 
@@ -69,6 +69,6 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: text.$font-size-sm;
   color: #444;
 }

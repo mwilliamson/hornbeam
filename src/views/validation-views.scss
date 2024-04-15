@@ -1,0 +1,15 @@
+@use "../scss/spacing";
+
+$color-error: red;
+
+.validation-views-ValidationErrorsSummaryView {
+  border: 3px solid $color-error;
+  list-style-type: none;
+  padding: spacing.$md;
+}
+
+.validation-views-ValidationErrorsInlineView {
+  color: $color-error;
+  list-style-type: none;
+  padding: 0;
+}

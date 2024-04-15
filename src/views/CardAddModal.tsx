@@ -7,6 +7,7 @@ import Input from "./widgets/Input";
 import "./CardAddModal.scss";
 import CategorySelect from "./controls/CategorySelect";
 import { ValidationError, ValidationResult } from "../util/validation";
+import { ValidationErrorsInlineView, ValidationErrorsSummaryView } from "./validation-views";
 
 export interface ValidCardFormValues {
   categoryId: string;
@@ -37,7 +38,7 @@ export default function CardAddModal(props: CardAddModalProps) {
     if (categoryId === "") {
       errors.push({
         elementId: categoryControlId,
-        inlineText: "Please select a category.",
+        inlineText: "Select a category.",
         summaryText: "Card is missing a category.",
       });
     }
@@ -70,15 +71,7 @@ export default function CardAddModal(props: CardAddModalProps) {
       </ActionModal.Header>
       <ActionModal.Body>
         {errors.length > 0 && (
-          <div className="CardAddModal-Errors">
-            <ul>
-              {errors.map((error, errorIndex) => (
-                <li key={errorIndex}>
-                  {error.summaryText}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ValidationErrorsSummaryView errors={errors} />
         )}
         <div className="CardAddModal-Body">
           <label className="CardAddModal-ControlLabel" htmlFor={textControlId}>
@@ -105,11 +98,7 @@ export default function CardAddModal(props: CardAddModalProps) {
               onChange={categoryId => setCategoryId(categoryId)}
               value={categoryId}
             />
-            {errors.filter(error => error.elementId).map((error, errorIndex) => (
-              <div key={errorIndex}>
-                {error.inlineText}
-              </div>
-            ))}
+            <ValidationErrorsInlineView elementId={categoryControlId} errors={errors} />
           </div>
         </div>
       </ActionModal.Body>

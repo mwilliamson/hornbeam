@@ -1,3 +1,16 @@
+.CardAddModal-Body {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 12px;
+}
+
+.CardAddModal-ControlLabel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-weight: bold;
+}
+
 .CardAddModal-Buttons {
   display: flex;
   flex-direction: row;

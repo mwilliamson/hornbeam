@@ -2,15 +2,16 @@
 
 .CategorySelect {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: spacing.$md;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.5em;
 }
 
 .CategorySelect-CategoryLabel {
   display: inline-block;
   border: 1px solid #666;
   border-radius: 0.5em;
-  padding: 1em 1em;
+  font-size: 14px;
+  padding: 1em 0;
   text-align: center;
   width: 100%;
 

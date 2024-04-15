@@ -20,7 +20,8 @@ export default function CardAddModal(props: CardAddModalProps) {
   const [categoryId, setCategoryId] = useState<string>("");
   const [text, setText] = useState("");
 
-  const labelElementId = useId();
+  const modalLabelElementId = useId();
+  const textElementId = useId();
 
   const handleSubmit = async () => {
     if (categoryId) {
@@ -30,34 +31,40 @@ export default function CardAddModal(props: CardAddModalProps) {
 
   return (
     <ActionModal
-      labelElementId={labelElementId}
+      labelElementId={modalLabelElementId}
       onClose={onClose}
       onSubmit={handleSubmit}
     >
       <ActionModal.Header>
-        <h2 id={labelElementId}>Add Card</h2>
+        <h2 id={modalLabelElementId}>Add Card</h2>
       </ActionModal.Header>
       <ActionModal.Body>
-        <div className="mb-md">
-          <Input
-            autoFocus
-            onChange={text => setText(text)}
-            value={text}
-          />
-        </div>
-        <div className="my-md">
-          Parent: {parent === null ? "None" : `${parent.text} (#${parent.number})`}
-        </div>
-        <div className="mt-md">
-          <fieldset>
-            <legend>Category</legend>
-            {" "}
+        <div className="CardAddModal-Body">
+          <label className="CardAddModal-ControlLabel" htmlFor={textElementId}>
+            Text
+          </label>
+          <div className="CardAddModal-Control">
+            <Input
+              autoFocus
+              id={textElementId}
+              onChange={text => setText(text)}
+              value={text}
+            />
+          </div>
+          <label className="CardAddModal-ControlLabel">
+            Parent
+          </label>
+          <div className="CardAddModal-Control">
+            {parent === null ? "None" : `${parent.text} (#${parent.number})`}
+          </div>
+          <label className="CardAddModal-ControlLabel">Category</label>
+          <div className="CardAddModal-Control">
             <CategorySelect
               availableCategories={availableCategories}
               onChange={categoryId => setCategoryId(categoryId)}
               value={categoryId}
             />
-          </fieldset>
+          </div>
         </div>
       </ActionModal.Body>
       <ActionModal.Footer>

@@ -1,10 +1,10 @@
 import { useId, useState } from "react";
 
-import { Card, CardSet, Category } from "../app";
-import { ValidationError, ValidationResult } from "../util/validation";
-import CategorySelect from "./controls/CategorySelect";
-import Input from "./widgets/Input";
-import { ValidationErrorsInlineView } from "./validation-views";
+import { Card, CardSet, Category } from "../../app";
+import { ValidationError, ValidationResult } from "../../util/validation";
+import CategorySelect from "../categories/CategorySelect";
+import Input from "../widgets/Input";
+import { ValidationErrorsInlineView } from "../validation-views";
 import "./CardForm.scss";
 
 export interface CardFormState {

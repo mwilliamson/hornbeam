@@ -1,24 +1,24 @@
 import { useId, useState } from "react";
 
-import { CardSet, Category } from "../app";
-import ActionModal from "./widgets/ActionModal";
-import { ValidationError } from "../util/validation";
+import { Card, CardSet, Category } from "../../app";
+import ActionModal from "../widgets/ActionModal";
+import { ValidationError } from "../../util/validation";
 import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
-import { ValidationErrorsSummaryView } from "./validation-views";
+import { ValidationErrorsSummaryView } from "../validation-views";
 
-interface CardAddModalProps {
+interface CardEditModalProps {
   allCards: CardSet;
   availableCategories: ReadonlyArray<Category>;
-  initialParentCardId: string | null;
-  onCardAdd: (values: ValidCardFormValues) => Promise<void>;
+  card: Card;
+  onCardSave: (values: ValidCardFormValues) => Promise<void>;
   onClose: () => void;
 }
 
-export default function CardAddModal(props: CardAddModalProps) {
-  const {allCards, availableCategories, onCardAdd, onClose, initialParentCardId} = props;
+export default function CardEditModal(props: CardEditModalProps) {
+  const {allCards, availableCategories, card, onCardSave, onClose} = props;
 
   const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
-  const [formState, setFormState] = useCardFormState({parentCardId: initialParentCardId});
+  const [formState, setFormState] = useCardFormState(card);
 
   const modalLabelElementId = useId();
 
@@ -27,7 +27,7 @@ export default function CardAddModal(props: CardAddModalProps) {
 
     if (result.type === "valid") {
       setErrors([]);
-      await onCardAdd(result.value);
+      await onCardSave(result.value);
     } else {
       setErrors(result.errors);
     }
@@ -40,7 +40,7 @@ export default function CardAddModal(props: CardAddModalProps) {
       onSubmit={handleSubmit}
     >
       <ActionModal.Header>
-        <h2 id={modalLabelElementId}>Add Card</h2>
+        <h2 id={modalLabelElementId}>Edit Card</h2>
       </ActionModal.Header>
       <ActionModal.Body>
         <ValidationErrorsSummaryView errors={errors} />
@@ -53,7 +53,7 @@ export default function CardAddModal(props: CardAddModalProps) {
         />
       </ActionModal.Body>
       <ActionModal.Footer>
-        <ActionModal.MainButtons onCancel={onClose} submitText="Add Card" />
+        <ActionModal.MainButtons onCancel={onClose} submitText="Save Card" />
       </ActionModal.Footer>
     </ActionModal>
   );

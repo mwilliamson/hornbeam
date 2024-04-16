@@ -9,16 +9,16 @@ import { ValidationErrorsSummaryView } from "./validation-views";
 interface CardAddModalProps {
   allCards: CardSet;
   availableCategories: ReadonlyArray<Category>;
+  initialParentCardId: string | null;
   onCardAdd: (values: ValidCardFormValues) => Promise<void>;
   onClose: () => void;
-  parentId: string | null;
 }
 
 export default function CardAddModal(props: CardAddModalProps) {
-  const {allCards, availableCategories, onCardAdd, onClose, parentId} = props;
+  const {allCards, availableCategories, onCardAdd, onClose, initialParentCardId} = props;
 
   const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
-  const [formState, setFormState] = useCardFormState(null);
+  const [formState, setFormState] = useCardFormState({parentCardId: initialParentCardId});
 
   const modalLabelElementId = useId();
 
@@ -48,7 +48,6 @@ export default function CardAddModal(props: CardAddModalProps) {
           allCards={allCards}
           availableCategories={availableCategories}
           errors={errors}
-          parentId={parentId}
           onStateChange={value => setFormState(value)}
           state={formState}
         />

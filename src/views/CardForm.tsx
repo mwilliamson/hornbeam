@@ -13,15 +13,19 @@ export interface CardFormState {
     category: string;
   };
   categoryId: string;
+  parentCardId: string | null;
   text: string;
 }
 
 export interface ValidCardFormValues {
   categoryId: string;
+  parentCardId: string | null;
   text: string;
 }
 
-export function useCardFormState(card: Card | null): [CardFormState, (newState: CardFormState) => void] {
+export function useCardFormState(
+  card: Partial<Card>,
+): [CardFormState, (newState: CardFormState) => void] {
   const textControlId = useId();
   const categoryControlId = useId();
 
@@ -30,13 +34,14 @@ export function useCardFormState(card: Card | null): [CardFormState, (newState: 
       text: textControlId,
       category: categoryControlId,
     },
-    categoryId: card === null ? "" : card.categoryId,
-    text: card === null ? "" : card.text,
+    categoryId: card?.categoryId ?? "",
+    parentCardId: card?.parentCardId ?? null,
+    text: card?.text ?? "",
   }));
 }
 
 export function validateCardForm(value: CardFormState): ValidationResult<ValidCardFormValues> {
-  const {controlIds, categoryId, text} = value;
+  const {controlIds, categoryId, parentCardId, text} = value;
 
   const errors: Array<ValidationError> = [];
 
@@ -59,7 +64,7 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
   if (errors.length > 0) {
     return {type: "invalid", errors};
   } else {
-    return {type: "valid", value: {categoryId, text}};
+    return {type: "valid", value: {categoryId, parentCardId, text}};
   }
 }
 
@@ -67,18 +72,19 @@ interface CardFormProps {
   allCards: CardSet;
   availableCategories: ReadonlyArray<Category>;
   errors: ReadonlyArray<ValidationError>;
-  parentId: string | null;
 
   onStateChange: (value: CardFormState) => void;
   state: CardFormState;
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {allCards, availableCategories, errors, parentId, onStateChange: onChange, state: value} = props;
+  const {allCards, availableCategories, errors, onStateChange: onChange, state} = props;
 
-  const parent = parentId === null ? null : allCards.findCardById(parentId);
+  const parent = state.parentCardId === null
+    ? null
+    : allCards.findCardById(state.parentCardId);
 
-  const {controlIds: {text: textControlId, category: categoryControlId}} = value;
+  const {controlIds: {text: textControlId, category: categoryControlId}} = state;
 
   return (
     <div className="CardForm">
@@ -89,8 +95,8 @@ export default function CardForm(props: CardFormProps) {
         <Input
           autoFocus
           id={textControlId}
-          onChange={text => onChange({...value, text})}
-          value={value.text}
+          onChange={text => onChange({...state, text})}
+          value={state.text}
         />
         <ValidationErrorsInlineView elementId={textControlId} errors={errors} />
       </div>
@@ -104,8 +110,8 @@ export default function CardForm(props: CardFormProps) {
       <div className="CardForm-Control">
         <CategorySelect
           availableCategories={availableCategories}
-          onChange={categoryId => onChange({...value, categoryId})}
-          value={value.categoryId}
+          onChange={categoryId => onChange({...state, categoryId})}
+          value={state.categoryId}
         />
         <ValidationErrorsInlineView elementId={categoryControlId} errors={errors} />
       </div>

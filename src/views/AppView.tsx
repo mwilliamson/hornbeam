@@ -164,9 +164,9 @@ export default function AppView(props: AppViewProps) {
         <CardAddModal
           availableCategories={state.availableCategories()}
           allCards={state}
+          initialParentCardId={viewState.selectedCardId}
           onClose={handleCardAddModalClose}
           onCardAdd={handleCardAdd}
-          parentId={viewState.selectedCardId}
         />
       )}
       {editCard !== null && (

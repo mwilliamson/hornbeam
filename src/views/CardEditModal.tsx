@@ -48,7 +48,6 @@ export default function CardEditModal(props: CardEditModalProps) {
           allCards={allCards}
           availableCategories={availableCategories}
           errors={errors}
-          parentId={card.parentCardId}
           onStateChange={value => setFormState(value)}
           state={formState}
         />

@@ -1,4 +1,5 @@
 import Button from "./widgets/Button";
+import "./ToolsView.scss";
 
 interface ToolsViewProps {
   onCardAddClick: () => void;

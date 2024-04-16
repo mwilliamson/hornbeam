@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 
-import { Card, CardSet, Category } from "../../app";
+import { CardAddRequest, CardSet, Category } from "../../app";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import Input from "../widgets/Input";
@@ -23,8 +23,9 @@ export interface ValidCardFormValues {
   text: string;
 }
 
+// TODO: Partial<CardAddRequest> isn't quite right in that it allows fields we ignore (notably, the ID)
 export function useCardFormState(
-  card: Partial<Card>,
+  card: Partial<CardAddRequest>,
 ): [CardFormState, (newState: CardFormState) => void] {
   const textControlId = useId();
   const categoryControlId = useId();

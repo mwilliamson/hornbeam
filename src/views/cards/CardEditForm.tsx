@@ -32,7 +32,7 @@ export default function CardEditModal(props: CardEditModalProps) {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
+    <Form className="p-md" onSubmit={handleSubmit}>
       <h2>Edit Card</h2>
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm

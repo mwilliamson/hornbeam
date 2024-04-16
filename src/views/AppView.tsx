@@ -13,15 +13,16 @@ import { keyBy } from "../util/maps";
 import { ValidCardFormValues } from "./cards/CardForm";
 import CardAddForm from "./cards/CardAddForm";
 import CardEditForm from "./cards/CardEditForm";
+import CardDetailView from "./cards/CardDetailView";
 
 interface ViewState {
-  addingCard: boolean,
+  addingCard: Partial<CardAddRequest> | null,
   selectedCardId: string | null;
   editCardId: string | null;
 }
 
 const initialViewState: ViewState = {
-  addingCard: false,
+  addingCard: null,
   selectedCardId: null,
   editCardId: null,
 };
@@ -82,12 +83,12 @@ export default function AppView(props: AppViewProps) {
   const sendRequest = useSendRequest(sendUpdate, state);
 
   // TODO: separate button for adding a child card?
-  const handleCardAddClick = () => {
-    setViewState({...viewState, addingCard: true});
+  const handleCardAddClick = (initialCardAddRequest: Partial<CardAddRequest>) => {
+    setViewState({...viewState, addingCard: initialCardAddRequest});
   };
 
   const handleCardAddClose = () => {
-    setViewState({...viewState, addingCard: false});
+    setViewState({...viewState, addingCard: null});
   };
 
   const handleCardAdd = async (request: CardAddRequest) => {
@@ -163,7 +164,7 @@ export default function AppView(props: AppViewProps) {
 interface SidebarProps {
   appState: AppState;
   onCardAdd: (values: CardAddRequest) => Promise<void>;
-  onCardAddClick: () => void;
+  onCardAddClick: (initialCard: Partial<Card>) => void;
   onCardAddClose: () => void;
   onCardEdit: (values: CardEditRequest) => Promise<void>;
   onCardEditClose: () => void;
@@ -184,6 +185,10 @@ function Sidebar(props: SidebarProps) {
   const editCard = viewState.editCardId === null
     ? null
     : appState.findCardById(viewState.editCardId);
+
+  const selectedCard = viewState.selectedCardId === null
+    ? null
+    : appState.findCardById(viewState.selectedCardId);
 
   const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
     await onCardAdd({
@@ -213,19 +218,27 @@ function Sidebar(props: SidebarProps) {
         onCardSave={values => handleCardSave(editCard, values)}
       />
     );
-  } else if (viewState.addingCard) {
+  } else if (viewState.addingCard !== null) {
     return (
       <CardAddForm
         availableCategories={appState.availableCategories()}
         allCards={appState}
-        initialParentCardId={viewState.selectedCardId}
+        initialValue={viewState.addingCard}
         onClose={onCardAddClose}
         onCardAdd={handleCardAdd}
       />
     );
+  } else if (selectedCard !== null) {
+    return (
+      <CardDetailView
+        allCategories={appState}
+        card={selectedCard}
+        onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
+      />
+    );
   } else {
     return (
-      <ToolsView onCardAddClick={onCardAddClick} />
+      <ToolsView onCardAddClick={() => onCardAddClick({})} />
     );
   }
 }

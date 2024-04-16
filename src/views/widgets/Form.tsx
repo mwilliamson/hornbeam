@@ -13,11 +13,12 @@ const StateContext = React.createContext<State>({isLoading: false});
 
 interface FormProps {
   children: React.ReactNode;
+  className?: string;
   onSubmit: () => Promise<void>;
 }
 
 export default function Form(props: FormProps) {
-  const {children, onSubmit} = props;
+  const {children, className, onSubmit} = props;
 
   const [state, setState] = useState<State>({isLoading: false});
 
@@ -31,7 +32,7 @@ export default function Form(props: FormProps) {
 
   return (
     <StateContext.Provider value={state}>
-      <form onSubmit={handleSubmit}>
+      <form className={className} onSubmit={handleSubmit}>
         {children}
       </form>
     </StateContext.Provider>

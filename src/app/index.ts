@@ -67,7 +67,7 @@ const categories: ReadonlyArray<Category> = [
   },
 ];
 
-export class AppState implements CardSet {
+export class AppState implements CardSet, CategorySet {
   public readonly updateIds: ReadonlyArray<string>;
   public readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
@@ -137,6 +137,10 @@ export class AppState implements CardSet {
     return this.cards.find(card => card.id == cardId) ?? null;
   }
 
+  public findCategoryById(categoryId: string): Category | null {
+    return this.allCategories().find(category => category.id == categoryId) ?? null;
+  }
+
   public allCategories(): ReadonlyArray<Category> {
     return categories;
   }
@@ -148,6 +152,10 @@ export class AppState implements CardSet {
 
 export interface CardSet {
   findCardById: (cardId: string) => Card | null;
+}
+
+export interface CategorySet {
+  findCategoryById: (categoryId: string) => Category | null;
 }
 
 export function initialAppState(): AppState {

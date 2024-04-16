@@ -1,9 +1,16 @@
+@use "../../scss/spacing";
+
 .CardForm {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-  gap: 12px;
+  min-width: 200px;
 }
 
 .CardForm-ControlLabel {
+  margin-top: spacing.$md;
+  margin-bottom: spacing.$sm;
   font-weight: bold;
+}
+
+.CardForm-Control {
+  margin-top: spacing.$sm;
+  margin-bottom: spacing.$md;
 }

@@ -62,6 +62,7 @@ export default function CardAddModal(props: CardAddModalProps) {
     const result = validate();
 
     if (result.type === "valid") {
+      setErrors([]);
       await onCardAdd(result.value);
     } else {
       setErrors(result.errors);

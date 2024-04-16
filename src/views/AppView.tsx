@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { AppState, AppUpdate, Card, Request, requests } from "../app";
+import { AppState, AppUpdate, Card, CardAddRequest, CardEditRequest, Request, requests } from "../app";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
-import CardAddModal from "./cards/CardAddModal";
 import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../app/util/promises";
 import { keyBy } from "../util/maps";
 import { ValidCardFormValues } from "./cards/CardForm";
-import CardEditModal from "./cards/CardEditModal";
+import CardAddForm from "./cards/CardAddForm";
+import CardEditForm from "./cards/CardEditForm";
 
 interface ViewState {
   addingCard: boolean,
@@ -86,38 +86,28 @@ export default function AppView(props: AppViewProps) {
     setViewState({...viewState, addingCard: true});
   };
 
-  const handleCardAddModalClose = () => {
+  const handleCardAddClose = () => {
     setViewState({...viewState, addingCard: false});
   };
 
-  const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
+  const handleCardAdd = async (request: CardAddRequest) => {
     await new Promise(resolve => {
       setTimeout(resolve, 1000);
     });
-    await sendRequest(requests.cardAdd({
-      categoryId,
-      id: generateId(),
-      parentCardId: viewState.selectedCardId,
-      text,
-    }));
-    handleCardAddModalClose();
+    await sendRequest(requests.cardAdd(request));
+    handleCardAddClose();
   };
 
-  const handleCardEditModalClose = () => {
+  const handleCardEditClose = () => {
     setViewState({...viewState, editCardId: null});
   };
 
-  const handleCardSave = async (card: Card, {categoryId, text}: ValidCardFormValues) => {
+  const handleCardEdit = async (request: CardEditRequest) => {
     await new Promise(resolve => {
       setTimeout(resolve, 1000);
     });
-    await sendRequest(requests.cardEdit({
-      categoryId,
-      id: card.id,
-      parentCardId: card.parentCardId,
-      text,
-    }));
-    handleCardEditModalClose();
+    await sendRequest(requests.cardEdit(request));
+    handleCardEditClose();
   };
 
   useEffect(() => {
@@ -144,12 +134,18 @@ export default function AppView(props: AppViewProps) {
 
   const categoriesById = keyBy(state.allCategories(), category => category.id);
 
-  const editCard = viewState.editCardId === null ? null : state.findCardById(viewState.editCardId);
-
   return (
     <div className="AppView">
       <div className="AppView-Tools">
-        <ToolsView onCardAddClick={handleCardAddClick} />
+        <Sidebar
+          appState={state}
+          onCardAdd={handleCardAdd}
+          onCardAddClick={handleCardAddClick}
+          onCardAddClose={handleCardAddClose}
+          onCardEdit={handleCardEdit}
+          onCardEditClose={handleCardEditClose}
+          viewState={viewState}
+        />
       </div>
       <div className="AppView-Cards">
         <CardsView
@@ -160,24 +156,76 @@ export default function AppView(props: AppViewProps) {
           categoriesById={categoriesById}
         />
       </div>
-      {viewState.addingCard && (
-        <CardAddModal
-          availableCategories={state.availableCategories()}
-          allCards={state}
-          initialParentCardId={viewState.selectedCardId}
-          onClose={handleCardAddModalClose}
-          onCardAdd={handleCardAdd}
-        />
-      )}
-      {editCard !== null && (
-        <CardEditModal
-          availableCategories={state.availableCategories()}
-          allCards={state}
-          card={editCard}
-          onClose={handleCardEditModalClose}
-          onCardSave={values => handleCardSave(editCard, values)}
-        />
-      )}
     </div>
   );
+}
+
+interface SidebarProps {
+  appState: AppState;
+  onCardAdd: (values: CardAddRequest) => Promise<void>;
+  onCardAddClick: () => void;
+  onCardAddClose: () => void;
+  onCardEdit: (values: CardEditRequest) => Promise<void>;
+  onCardEditClose: () => void;
+  viewState: ViewState;
+}
+
+function Sidebar(props: SidebarProps) {
+  const {
+    appState,
+    onCardAdd,
+    onCardAddClick,
+    onCardAddClose,
+    onCardEdit,
+    onCardEditClose,
+    viewState,
+  } = props;
+
+  const editCard = viewState.editCardId === null
+    ? null
+    : appState.findCardById(viewState.editCardId);
+
+  const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
+    await onCardAdd({
+      categoryId,
+      id: generateId(),
+      parentCardId: viewState.selectedCardId,
+      text,
+    });
+  };
+
+  const handleCardSave = async (card: Card, {categoryId, text}: ValidCardFormValues) => {
+    await onCardEdit({
+      categoryId,
+      id: card.id,
+      parentCardId: card.parentCardId,
+      text,
+    });
+  };
+
+  if (editCard !== null) {
+    return (
+      <CardEditForm
+        availableCategories={appState.availableCategories()}
+        allCards={appState}
+        card={editCard}
+        onClose={onCardEditClose}
+        onCardSave={values => handleCardSave(editCard, values)}
+      />
+    );
+  } else if (viewState.addingCard) {
+    return (
+      <CardAddForm
+        availableCategories={appState.availableCategories()}
+        allCards={appState}
+        initialParentCardId={viewState.selectedCardId}
+        onClose={onCardAddClose}
+        onCardAdd={handleCardAdd}
+      />
+    );
+  } else {
+    return (
+      <ToolsView onCardAddClick={onCardAddClick} />
+    );
+  }
 }

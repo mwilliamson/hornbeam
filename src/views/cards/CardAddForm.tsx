@@ -1,12 +1,12 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 
 import { CardSet, Category } from "../../app";
-import ActionModal from "../widgets/ActionModal";
+import Form from "../widgets/Form";
 import { ValidationError } from "../../util/validation";
 import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 import { ValidationErrorsSummaryView } from "../validation-views";
 
-interface CardAddModalProps {
+interface CardAddFormProps {
   allCards: CardSet;
   availableCategories: ReadonlyArray<Category>;
   initialParentCardId: string | null;
@@ -14,13 +14,11 @@ interface CardAddModalProps {
   onClose: () => void;
 }
 
-export default function CardAddModal(props: CardAddModalProps) {
+export default function CardAddForm(props: CardAddFormProps) {
   const {allCards, availableCategories, onCardAdd, onClose, initialParentCardId} = props;
 
   const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
   const [formState, setFormState] = useCardFormState({parentCardId: initialParentCardId});
-
-  const modalLabelElementId = useId();
 
   const handleSubmit = async () => {
     const result = validateCardForm(formState);
@@ -34,27 +32,17 @@ export default function CardAddModal(props: CardAddModalProps) {
   };
 
   return (
-    <ActionModal
-      labelElementId={modalLabelElementId}
-      onClose={onClose}
-      onSubmit={handleSubmit}
-    >
-      <ActionModal.Header>
-        <h2 id={modalLabelElementId}>Add Card</h2>
-      </ActionModal.Header>
-      <ActionModal.Body>
-        <ValidationErrorsSummaryView errors={errors} />
-        <CardForm
-          allCards={allCards}
-          availableCategories={availableCategories}
-          errors={errors}
-          onStateChange={value => setFormState(value)}
-          state={formState}
-        />
-      </ActionModal.Body>
-      <ActionModal.Footer>
-        <ActionModal.MainButtons onCancel={onClose} submitText="Add Card" />
-      </ActionModal.Footer>
-    </ActionModal>
+    <Form onSubmit={handleSubmit}>
+      <h2>Add Card</h2>
+      <ValidationErrorsSummaryView errors={errors} />
+      <CardForm
+        allCards={allCards}
+        availableCategories={availableCategories}
+        errors={errors}
+        onStateChange={value => setFormState(value)}
+        state={formState}
+      />
+      <Form.MainButtons onCancel={onClose} submitText="Add Card" />
+    </Form>
   );
 }

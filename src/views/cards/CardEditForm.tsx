@@ -1,7 +1,7 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 
 import { Card, CardSet, Category } from "../../app";
-import ActionModal from "../widgets/ActionModal";
+import Form from "../widgets/Form";
 import { ValidationError } from "../../util/validation";
 import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 import { ValidationErrorsSummaryView } from "../validation-views";
@@ -20,8 +20,6 @@ export default function CardEditModal(props: CardEditModalProps) {
   const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
   const [formState, setFormState] = useCardFormState(card);
 
-  const modalLabelElementId = useId();
-
   const handleSubmit = async () => {
     const result = validateCardForm(formState);
 
@@ -34,27 +32,17 @@ export default function CardEditModal(props: CardEditModalProps) {
   };
 
   return (
-    <ActionModal
-      labelElementId={modalLabelElementId}
-      onClose={onClose}
-      onSubmit={handleSubmit}
-    >
-      <ActionModal.Header>
-        <h2 id={modalLabelElementId}>Edit Card</h2>
-      </ActionModal.Header>
-      <ActionModal.Body>
-        <ValidationErrorsSummaryView errors={errors} />
-        <CardForm
-          allCards={allCards}
-          availableCategories={availableCategories}
-          errors={errors}
-          onStateChange={value => setFormState(value)}
-          state={formState}
-        />
-      </ActionModal.Body>
-      <ActionModal.Footer>
-        <ActionModal.MainButtons onCancel={onClose} submitText="Save Card" />
-      </ActionModal.Footer>
-    </ActionModal>
+    <Form onSubmit={handleSubmit}>
+      <h2>Edit Card</h2>
+      <ValidationErrorsSummaryView errors={errors} />
+      <CardForm
+        allCards={allCards}
+        availableCategories={availableCategories}
+        errors={errors}
+        onStateChange={value => setFormState(value)}
+        state={formState}
+      />
+      <Form.MainButtons onCancel={onClose} submitText="Save Card" />
+    </Form>
   );
 }

@@ -2,9 +2,9 @@ import { useId, useState } from "react";
 
 import { Card, Category } from "../app";
 import ActionModal from "./widgets/ActionModal";
-import Button from "./widgets/Button";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
+import CancelButton from "./controls/CancelButton";
 import CategorySelect from "./controls/CategorySelect";
 import { ValidationError, ValidationResult } from "../util/validation";
 import { ValidationErrorsInlineView, ValidationErrorsSummaryView } from "./validation-views";
@@ -115,7 +115,7 @@ export default function CardAddModal(props: CardAddModalProps) {
       <ActionModal.Footer>
         <div className="CardAddModal-Buttons">
           <div>
-            <Button type="button" intent="secondary" onClick={onClose}>Cancel</Button>
+            <CancelButton onClick={onClose} />
           </div>
           <div>
             <ActionModal.Status />

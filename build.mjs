@@ -12,7 +12,7 @@ const args = util.parseArgs({
 });
 
 const context = await esbuild.context({
-  entryPoints: ["src/client.tsx", "src/demo.tsx"],
+  entryPoints: ["src/client.tsx", "src/demo.tsx", "src/cosmos.tsx"],
   bundle: true,
   outdir: "public/",
   mainFields: ["module", "browser", "main"],

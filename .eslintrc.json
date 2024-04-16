@@ -46,5 +46,6 @@
             "error",
             "always"
         ]
-    }
+    },
+    "ignorePatterns": ["src/cosmos.imports.ts"]
 }

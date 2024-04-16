@@ -7,9 +7,15 @@ layout {
             borderless true
         }
         pane split_direction="horizontal" {
-            pane {
-                command "npm"
-                args "start"
+            pane split_direction="horizontal" {
+                pane {
+                    command "npm"
+                    args "start"
+                }
+                pane {
+                    command "npm"
+                    args "run" "cosmos"
+                }
             }
             pane {
                 command "npm"

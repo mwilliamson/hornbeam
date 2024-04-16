@@ -4,7 +4,6 @@ import { Card, Category } from "../app";
 import ActionModal from "./widgets/ActionModal";
 import Input from "./widgets/Input";
 import "./CardAddModal.scss";
-import CancelButton from "./controls/CancelButton";
 import CategorySelect from "./controls/CategorySelect";
 import { ValidationError, ValidationResult } from "../util/validation";
 import { ValidationErrorsInlineView, ValidationErrorsSummaryView } from "./validation-views";
@@ -113,15 +112,7 @@ export default function CardAddModal(props: CardAddModalProps) {
         </div>
       </ActionModal.Body>
       <ActionModal.Footer>
-        <div className="CardAddModal-Buttons">
-          <div>
-            <CancelButton onClick={onClose} />
-          </div>
-          <div>
-            <ActionModal.Status />
-            <ActionModal.SubmitButton>Add Card</ActionModal.SubmitButton>
-          </div>
-        </div>
+        <ActionModal.MainButtons onCancel={onClose} submitText="Add Card" />
       </ActionModal.Footer>
     </ActionModal>
   );

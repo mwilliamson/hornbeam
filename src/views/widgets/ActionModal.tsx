@@ -1,5 +1,6 @@
 import React, { useContext, useState } from "react";
 
+import CancelButton from "./CancelButton";
 import Button from "./Button";
 import Modal from "./Modal";
 import Spinner from "./Spinner";
@@ -44,6 +45,29 @@ export default function ActionModal(props: ActionModalProps) {
 ActionModal.Header = Modal.Header;
 ActionModal.Body = Modal.Body;
 ActionModal.Footer = Modal.Footer;
+
+interface MainButtonsProps {
+  onCancel: () => void;
+  submitText: string;
+}
+
+function MainButtons(props: MainButtonsProps) {
+  const {onCancel, submitText} = props;
+
+  return (
+    <div className="CardAddModal-Buttons">
+      <div>
+        <CancelButton onClick={onCancel} />
+      </div>
+      <div>
+        <ActionModal.Status />
+        <ActionModal.SubmitButton>{submitText}</ActionModal.SubmitButton>
+      </div>
+    </div>
+  );
+}
+
+ActionModal.MainButtons = MainButtons;
 
 interface SubmitButtonProps {
   children: React.ReactNode;

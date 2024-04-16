@@ -1,4 +1,4 @@
-import Button from "../widgets/Button";
+import Button from "./Button";
 
 interface CancelButtonProps {
   onClick: () => void;

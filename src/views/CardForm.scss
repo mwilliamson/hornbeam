@@ -1,0 +1,9 @@
+.CardForm {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 12px;
+}
+
+.CardForm-ControlLabel {
+  font-weight: bold;
+}

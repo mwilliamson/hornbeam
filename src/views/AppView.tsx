@@ -7,10 +7,11 @@ import "../scss/style.scss";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
-import CardAddModal, { ValidCardFormValues } from "./CardAddModal";
+import CardAddModal from "./CardAddModal";
 import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../app/util/promises";
 import { keyBy } from "../util/maps";
+import { ValidCardFormValues } from "./CardForm";
 
 interface ViewState {
   addingCard: boolean,

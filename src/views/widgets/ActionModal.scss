@@ -1,3 +1,9 @@
+.ActionModal-MainButtons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .ActionModal-Status {
   margin: 0 1em;
 }

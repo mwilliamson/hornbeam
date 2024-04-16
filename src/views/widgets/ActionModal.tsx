@@ -55,7 +55,7 @@ function MainButtons(props: MainButtonsProps) {
   const {onCancel, submitText} = props;
 
   return (
-    <div className="CardAddModal-Buttons">
+    <div className="ActionModal-MainButtons">
       <div>
         <CancelButton onClick={onCancel} />
       </div>

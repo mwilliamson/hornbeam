@@ -42,9 +42,7 @@ export default function CardAddModal(props: CardAddModalProps) {
         <h2 id={modalLabelElementId}>Add Card</h2>
       </ActionModal.Header>
       <ActionModal.Body>
-        {errors.length > 0 && (
-          <ValidationErrorsSummaryView errors={errors} />
-        )}
+        <ValidationErrorsSummaryView errors={errors} />
         <CardForm
           availableCategories={availableCategories}
           errors={errors}

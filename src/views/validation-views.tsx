@@ -8,7 +8,7 @@ interface ValidationErrorsSummaryViewProps {
 export function ValidationErrorsSummaryView(props: ValidationErrorsSummaryViewProps) {
   const {errors} = props;
 
-  return (
+  return errors.length > 0 && (
     <ul className="validation-views-ValidationErrorsSummaryView">
       {errors.map((error, errorIndex) => (
         <li key={errorIndex}>

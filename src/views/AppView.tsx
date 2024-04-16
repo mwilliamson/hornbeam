@@ -136,6 +136,15 @@ export default function AppView(props: AppViewProps) {
 
   return (
     <div className="AppView">
+      <div className="AppView-Cards">
+        <CardsView
+          cards={state.cards}
+          cardSelectedId={viewState.selectedCardId}
+          onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
+          onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
+          categoriesById={categoriesById}
+        />
+      </div>
       <div className="AppView-Tools">
         <Sidebar
           appState={state}
@@ -145,15 +154,6 @@ export default function AppView(props: AppViewProps) {
           onCardEdit={handleCardEdit}
           onCardEditClose={handleCardEditClose}
           viewState={viewState}
-        />
-      </div>
-      <div className="AppView-Cards">
-        <CardsView
-          cards={state.cards}
-          cardSelectedId={viewState.selectedCardId}
-          onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
-          onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
-          categoriesById={categoriesById}
         />
       </div>
     </div>

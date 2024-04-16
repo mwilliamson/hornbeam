@@ -2,7 +2,6 @@ import { useId, useState } from "react";
 
 import { Card, Category } from "../app";
 import ActionModal from "./widgets/ActionModal";
-import "./CardAddModal.scss";
 import { ValidationError } from "../util/validation";
 import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 import { ValidationErrorsSummaryView } from "./validation-views";

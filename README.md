@@ -6,13 +6,10 @@
 * Start the server with `npm start`.
 * Run `npm run build` to build the client.
 
-If you want to persist updates, pass an extra argument to `npm start`, for instance:
+The server can be configured with the environment variables:
 
-```
-npm start -- example.log
-```
-
-You can also set the environment variables:
+* `EVENT_LOG_PATH`: the path to which the events should be saved,
+  allowing state to be persisted over server restarts.
 
 * `PORT`: the port to run the server on. Defaults to 8080.
 

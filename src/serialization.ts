@@ -1,4 +1,4 @@
-import { AppUpdate, CardAddRequest, CardDeleteRequest } from "./app";
+import { AppUpdate, CardAddRequest, CardDeleteRequest, CardEditRequest } from "./app";
 
 interface SerializedAppUpdate {
   updateId: string;
@@ -7,7 +7,8 @@ interface SerializedAppUpdate {
 
 type SerializedRequest =
   | {type: "cardAdd", cardAdd: CardAddRequest}
-  | {type: "cardDelete", cardDelete: CardDeleteRequest};
+  | {type: "cardDelete", cardDelete: CardDeleteRequest}
+  | {type: "cardEdit", cardEdit: CardEditRequest};
 
 export function serializeAppUpdate(update: AppUpdate): SerializedAppUpdate {
   return update;

@@ -17,6 +17,13 @@ export interface CardDeleteRequest {
   id: string;
 }
 
+export interface CardEditRequest {
+  categoryId: string;
+  id: string;
+  parentCardId: string | null;
+  text: string;
+}
+
 export interface Category {
   id: string;
   name: string;
@@ -60,7 +67,7 @@ const categories: ReadonlyArray<Category> = [
   },
 ];
 
-export class AppState {
+export class AppState implements CardSet {
   public readonly updateIds: ReadonlyArray<string>;
   public readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
@@ -106,6 +113,26 @@ export class AppState {
     );
   }
 
+  public cardEdit(request: CardEditRequest): AppState {
+    return new AppState(
+      this.updateIds,
+      this.cards.map(card => {
+        if (card.id !== request.id) {
+          return card;
+        }
+
+        return {
+          categoryId: request.categoryId,
+          id: request.id,
+          number: card.number,
+          parentCardId: request.parentCardId,
+          text: request.text,
+        };
+      }),
+      this.nextCardNumber,
+    );
+  }
+
   public findCardById(cardId: string): Card | null {
     return this.cards.find(card => card.id == cardId) ?? null;
   }
@@ -119,6 +146,10 @@ export class AppState {
   }
 }
 
+export interface CardSet {
+  findCardById: (cardId: string) => Card | null;
+}
+
 export function initialAppState(): AppState {
   return new AppState([], [], 1);
 }
@@ -130,7 +161,8 @@ export interface AppUpdate {
 
 export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
-  | {type: "cardDelete", cardDelete: CardDeleteRequest};
+  | {type: "cardDelete", cardDelete: CardDeleteRequest}
+  | {type: "cardEdit", cardEdit: CardEditRequest};
 
 export const requests = {
   cardAdd(request: CardAddRequest): Request {
@@ -140,6 +172,10 @@ export const requests = {
   cardDelete(request: CardDeleteRequest): Request {
     return {type: "cardDelete", cardDelete: request};
   },
+
+  cardEdit(request: CardEditRequest): Request {
+    return {type: "cardEdit", cardEdit: request};
+  }
 };
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
@@ -149,6 +185,9 @@ export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
       break;
     case "cardDelete":
       state = state.cardDelete(update.request.cardDelete);
+      break;
+    case "cardEdit":
+      state = state.cardEdit(update.request.cardEdit);
       break;
   }
 

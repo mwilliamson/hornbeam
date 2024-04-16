@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { AppState, AppUpdate, Request, requests } from "../app";
+import { AppState, AppUpdate, Card, Request, requests } from "../app";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import "./AppView.scss";
@@ -12,15 +12,18 @@ import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../app/util/promises";
 import { keyBy } from "../util/maps";
 import { ValidCardFormValues } from "./CardForm";
+import CardEditModal from "./CardEditModal";
 
 interface ViewState {
   addingCard: boolean,
   selectedCardId: string | null;
+  editCardId: string | null;
 }
 
 const initialViewState: ViewState = {
   addingCard: false,
   selectedCardId: null,
+  editCardId: null,
 };
 
 interface AppViewProps {
@@ -100,6 +103,23 @@ export default function AppView(props: AppViewProps) {
     handleCardAddModalClose();
   };
 
+  const handleCardEditModalClose = () => {
+    setViewState({...viewState, editCardId: null});
+  };
+
+  const handleCardSave = async (card: Card, {categoryId, text}: ValidCardFormValues) => {
+    await new Promise(resolve => {
+      setTimeout(resolve, 1000);
+    });
+    await sendRequest(requests.cardEdit({
+      categoryId,
+      id: card.id,
+      parentCardId: card.parentCardId,
+      text,
+    }));
+    handleCardEditModalClose();
+  };
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       // TODO: use proper selection of the cards and put the event on the cards?
@@ -124,6 +144,8 @@ export default function AppView(props: AppViewProps) {
 
   const categoriesById = keyBy(state.allCategories(), category => category.id);
 
+  const editCard = viewState.editCardId === null ? null : state.findCardById(viewState.editCardId);
+
   return (
     <div className="AppView">
       <div className="AppView-Tools">
@@ -134,19 +156,26 @@ export default function AppView(props: AppViewProps) {
           cards={state.cards}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
+          onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
           categoriesById={categoriesById}
         />
       </div>
       {viewState.addingCard && (
         <CardAddModal
           availableCategories={state.availableCategories()}
+          allCards={state}
           onClose={handleCardAddModalClose}
           onCardAdd={handleCardAdd}
-          parent={
-            viewState.selectedCardId === null
-              ? null
-              : state.findCardById(viewState.selectedCardId)
-          }
+          parentId={viewState.selectedCardId}
+        />
+      )}
+      {editCard !== null && (
+        <CardEditModal
+          availableCategories={state.availableCategories()}
+          allCards={state}
+          card={editCard}
+          onClose={handleCardEditModalClose}
+          onCardSave={values => handleCardSave(editCard, values)}
         />
       )}
     </div>

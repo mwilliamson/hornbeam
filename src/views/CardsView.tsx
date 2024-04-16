@@ -9,11 +9,12 @@ interface CardsViewProps {
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
+  onCardEdit: (cardId: string | null) => void;
   categoriesById: Map<string, Category>;
 }
 
 export default function CardsView(props: CardsViewProps) {
-  const {cards, cardSelectedId, onCardSelect, categoriesById} = props;
+  const {cards, cardSelectedId, onCardSelect, onCardEdit, categoriesById} = props;
 
   const cardsByParentId = groupBy(
     cards.filter(card => card.parentCardId !== null),
@@ -33,6 +34,7 @@ export default function CardsView(props: CardsViewProps) {
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
+            onCardEdit={onCardEdit}
             categoriesById={categoriesById}
           />
         ))}
@@ -47,6 +49,7 @@ interface CardTreeViewProps {
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
+  onCardEdit: (cardId: string | null) => void;
   categoriesById: Map<string, Category>;
 }
 
@@ -57,6 +60,7 @@ function CardTreeView(props: CardTreeViewProps) {
     cardTops,
     cardSelectedId,
     onCardSelect,
+    onCardEdit,
     categoriesById,
   } = props;
 
@@ -79,6 +83,7 @@ function CardTreeView(props: CardTreeViewProps) {
           cardCategory={categoriesById.get(card.categoryId) ?? null}
           isSelected={cardSelectedId === card.id}
           onSelect={() => onCardSelect(card.id)}
+          onEdit={() => onCardEdit(card.id)}
         />
       </div>
       {children.length > 0 && (
@@ -145,6 +150,7 @@ function CardTreeView(props: CardTreeViewProps) {
                 cardTops={cardTops}
                 cardSelectedId={cardSelectedId}
                 onCardSelect={onCardSelect}
+                onCardEdit={onCardEdit}
                 categoriesById={categoriesById}
               />
             ))}
@@ -195,14 +201,20 @@ interface CardViewProps {
   cardCategory: Category | null;
   isSelected: boolean;
   onSelect: () => void;
+  onEdit: () => void;
 }
 
 function CardView(props: CardViewProps) {
-  const {card, cardCategory, isSelected, onSelect} = props;
+  const {card, cardCategory, isSelected, onSelect, onEdit} = props;
 
   const handleClick = (event: React.SyntheticEvent) => {
     event.stopPropagation();
     onSelect();
+  };
+
+  const handleDoubleClick = (event: React.SyntheticEvent) => {
+    event.stopPropagation();
+    onEdit();
   };
 
   const backgroundColor = cardCategory === null ? undefined : cardCategory.color.hex;
@@ -212,6 +224,7 @@ function CardView(props: CardViewProps) {
       className={classNames("CardsView-Card", {"CardsView-Card--selected": isSelected})}
       style={{backgroundColor}}
       onClick={handleClick}
+      onDoubleClick={handleDoubleClick}
     >
       <div className="CardsView-Card-Text">
         {card.text}

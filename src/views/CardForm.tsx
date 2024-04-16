@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 
-import { Card, Category } from "../app";
+import { Card, CardSet, Category } from "../app";
 import { ValidationError, ValidationResult } from "../util/validation";
 import CategorySelect from "./controls/CategorySelect";
 import Input from "./widgets/Input";
@@ -21,7 +21,7 @@ export interface ValidCardFormValues {
   text: string;
 }
 
-export function useCardFormState(): [CardFormState, (newState: CardFormState) => void] {
+export function useCardFormState(card: Card | null): [CardFormState, (newState: CardFormState) => void] {
   const textControlId = useId();
   const categoryControlId = useId();
 
@@ -30,8 +30,8 @@ export function useCardFormState(): [CardFormState, (newState: CardFormState) =>
       text: textControlId,
       category: categoryControlId,
     },
-    categoryId: "",
-    text: "",
+    categoryId: card === null ? "" : card.categoryId,
+    text: card === null ? "" : card.text,
   }));
 }
 
@@ -64,16 +64,19 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
 }
 
 interface CardFormProps {
+  allCards: CardSet;
   availableCategories: ReadonlyArray<Category>;
   errors: ReadonlyArray<ValidationError>;
-  parent: Card | null;
+  parentId: string | null;
 
   onStateChange: (value: CardFormState) => void;
   state: CardFormState;
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {availableCategories, errors, parent, onStateChange: onChange, state: value} = props;
+  const {allCards, availableCategories, errors, parentId, onStateChange: onChange, state: value} = props;
+
+  const parent = parentId === null ? null : allCards.findCardById(parentId);
 
   const {controlIds: {text: textControlId, category: categoryControlId}} = value;
 

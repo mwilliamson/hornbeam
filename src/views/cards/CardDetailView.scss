@@ -5,6 +5,10 @@
   border-bottom: 1px solid #666;
 }
 
+.CardDetailView-Title {
+  font-size: text.$font-size-lg;
+}
+
 .CardDetailView-History {
   margin: spacing.$md;
 }

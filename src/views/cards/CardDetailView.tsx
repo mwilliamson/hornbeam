@@ -19,7 +19,9 @@ export default function CardDetailView(props: CardDetailViewProps) {
   return (
     <>
       <div className="CardDetailView-Header p-md" style={{backgroundColor: categoryColor}}>
-        <h2>{card.text} (#{card.number})</h2>
+        <h2 className="CardDetailView-Title">
+          {card.text} (#{card.number})
+        </h2>
       </div>
       <div>
         <Button

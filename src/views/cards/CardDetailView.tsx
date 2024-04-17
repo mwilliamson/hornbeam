@@ -23,7 +23,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
           {card.text} (#{card.number})
         </h2>
       </div>
-      <div>
+      <div className="CardDetailView-Actions">
         <Button
           intent="primary"
           type="button"

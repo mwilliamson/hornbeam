@@ -9,15 +9,22 @@
   font-size: text.$font-size-lg;
 }
 
-.CardDetailView-Actions, .CardDetailView-History {
+$event-border: 1px solid #666;
+
+.CardDetailView-Actions,
+.CardDetailView-History,
+.CardDetailView-Events {
   margin: spacing.$md;
 }
 
+.CardDetailView-Events {
+  margin: spacing.$md calc(0rem - spacing.$md);
+  border-top: $event-border;
+}
+
 .CardDetailView-Event {
-  border: 1px solid #666;
-  border-radius: 5px;
-  margin: spacing.$md 0;
-  padding: spacing.$sm spacing.$md;
+  border-bottom: $event-border;
+  padding: spacing.$md;
 }
 
 .CardDetailView-Event-Instant {

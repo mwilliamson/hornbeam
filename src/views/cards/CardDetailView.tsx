@@ -34,16 +34,18 @@ export default function CardDetailView(props: CardDetailViewProps) {
       </div>
       <div className="CardDetailView-History">
         <h3>History</h3>
-        {cardHistory(card).map((event, eventIndex) => (
-          <div key={eventIndex} className="CardDetailView-Event">
-            <div className="CardDetailView-Event-Instant">
-              <InstantView value={event.instant} />
+        <div className="CardDetailView-Events">
+          {cardHistory(card).map((event, eventIndex) => (
+            <div key={eventIndex} className="CardDetailView-Event">
+              <div className="CardDetailView-Event-Instant">
+                <InstantView value={event.instant} />
+              </div>
+              <div className="CardDetailView-Event-Description">
+                <CardEventDescription cardEvent={event} />
+              </div>
             </div>
-            <div className="CardDetailView-Event-Description">
-              <CardEventDescription cardEvent={event} />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </>
   );

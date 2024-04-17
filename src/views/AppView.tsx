@@ -8,7 +8,7 @@ import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
 import isInputEvent from "../util/isInputEvent";
-import { Deferred, createDeferred } from "../app/util/promises";
+import { Deferred, createDeferred } from "../util/promises";
 import { keyBy } from "../util/maps";
 import { ValidCardFormValues } from "./cards/CardForm";
 import CardAddForm from "./cards/CardAddForm";

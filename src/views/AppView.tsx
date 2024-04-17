@@ -92,9 +92,6 @@ export default function AppView(props: AppViewProps) {
   };
 
   const handleCardAdd = async (request: CardAddRequest) => {
-    await new Promise(resolve => {
-      setTimeout(resolve, 1000);
-    });
     await sendRequest(requests.cardAdd(request));
     handleCardAddClose();
   };
@@ -104,9 +101,6 @@ export default function AppView(props: AppViewProps) {
   };
 
   const handleCardEdit = async (request: CardEditRequest) => {
-    await new Promise(resolve => {
-      setTimeout(resolve, 1000);
-    });
     await sendRequest(requests.cardEdit(request));
     handleCardEditClose();
   };

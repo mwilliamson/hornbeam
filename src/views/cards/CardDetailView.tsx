@@ -20,6 +20,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Header p-md" style={{backgroundColor: categoryColor}}>
         <h2>{card.text} (#{card.number})</h2>
       </div>
+      <p>Created: {card.createdAt.toString()}</p>
       <div>
         <Button
           intent="primary"

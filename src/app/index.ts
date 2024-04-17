@@ -1,5 +1,8 @@
+import { Instant } from "@js-joda/core";
+
 export interface Card {
   categoryId: string;
+  createdAt: Instant;
   id: string;
   number: number;
   parentCardId: string | null;
@@ -8,6 +11,7 @@ export interface Card {
 
 export interface CardAddRequest {
   categoryId: string;
+  createdAt: Instant;
   id: string;
   parentCardId: string | null;
   text: string;
@@ -93,6 +97,7 @@ export class AppState implements CardSet, CategorySet {
   public cardAdd(request: CardAddRequest): AppState {
     const card: Card = {
       categoryId: request.categoryId,
+      createdAt: request.createdAt,
       id: request.id,
       number: this.nextCardNumber,
       parentCardId: request.parentCardId,
@@ -123,6 +128,7 @@ export class AppState implements CardSet, CategorySet {
 
         return {
           categoryId: request.categoryId,
+          createdAt: card.createdAt,
           id: request.id,
           number: card.number,
           parentCardId: request.parentCardId,

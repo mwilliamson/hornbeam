@@ -14,6 +14,7 @@ import { ValidCardFormValues } from "./cards/CardForm";
 import CardAddForm from "./cards/CardAddForm";
 import CardEditForm from "./cards/CardEditForm";
 import CardDetailView from "./cards/CardDetailView";
+import { Instant } from "@js-joda/core";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
@@ -187,6 +188,7 @@ function Sidebar(props: SidebarProps) {
   const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
     await onCardAdd({
       categoryId,
+      createdAt: Instant.now(),
       id: generateId(),
       parentCardId: viewState.selectedCardId,
       text,

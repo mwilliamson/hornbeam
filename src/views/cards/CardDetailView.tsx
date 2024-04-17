@@ -1,5 +1,6 @@
-import { Card, CategorySet } from "../../app";
+import { Card, CardEvent, CategorySet, cardHistory } from "../../app";
 import Button from "../widgets/Button";
+import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
 
 interface CardDetailViewProps {
@@ -20,7 +21,6 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Header p-md" style={{backgroundColor: categoryColor}}>
         <h2>{card.text} (#{card.number})</h2>
       </div>
-      <p>Created: {card.createdAt.toString()}</p>
       <div>
         <Button
           intent="primary"
@@ -30,6 +30,32 @@ export default function CardDetailView(props: CardDetailViewProps) {
           Add Child
         </Button>
       </div>
+      <div className="CardDetailView-History">
+        <h3>History</h3>
+        {cardHistory(card).map((event, eventIndex) => (
+          <div key={eventIndex} className="CardDetailView-Event">
+            <div className="CardDetailView-Event-Instant">
+              <InstantView value={event.instant} />
+            </div>
+            <div className="CardDetailView-Event-Description">
+              <CardEventDescription cardEvent={event} />
+            </div>
+          </div>
+        ))}
+      </div>
     </>
   );
+}
+
+interface CardEventDescriptionProps {
+  cardEvent: CardEvent;
+}
+
+function CardEventDescription(props: CardEventDescriptionProps) {
+  const {cardEvent} = props;
+
+  switch (cardEvent.type) {
+    case "created":
+      return "Card created";
+  }
 }

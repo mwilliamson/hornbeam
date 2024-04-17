@@ -9,6 +9,18 @@ export interface Card {
   text: string;
 }
 
+export type CardEvent =
+  | {type: "created", instant: Instant};
+
+export function cardHistory(card: Card): ReadonlyArray<CardEvent> {
+  return [
+    {
+      type: "created",
+      instant: card.createdAt,
+    }
+  ];
+}
+
 export interface CardAddRequest {
   categoryId: string;
   createdAt: Instant;

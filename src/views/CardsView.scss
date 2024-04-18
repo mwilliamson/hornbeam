@@ -1,3 +1,4 @@
+@use "../scss/buttons";
 @use "../scss/cards";
 @use "../scss/spacing";
 @use "../scss/text";
@@ -46,10 +47,18 @@
 }
 
 .CardsView-AddChild {
+  @include buttons.button-reset;
+
+  font-size: 14px;
   position: absolute;
-  top: -12px;
-  height: 24px;
+  top: -20px;
+  height: 40px;
   width: 24px;
+  background-color: #edf2f7;
+  text-align: center;
+  border: 1px solid #666;
+  border-left: none;
+  border-radius: 0 0.5em 0.5em 0;
 }
 
 .CardsView-TreeView-Children {

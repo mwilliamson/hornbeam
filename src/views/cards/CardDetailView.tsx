@@ -79,6 +79,7 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
   return (
     <EditableCardPropertyView
       initialEditValue={card.text}
+      label="Text"
       onSave={onCardTextSave}
       renderControl={({id, onChange, value}) => (
         <Input
@@ -153,6 +154,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
 
 interface EditableCardPropertyViewProps<TEdit, TValid> {
   initialEditValue: TEdit;
+  label: React.ReactNode;
   onSave: (value: TValid) => Promise<void>;
   renderControl: (args: {id: string, onChange: (value: TEdit) => void, value: TEdit}) => React.ReactNode;
   renderReadonly: (args: {id: string}) => React.ReactNode;
@@ -160,7 +162,7 @@ interface EditableCardPropertyViewProps<TEdit, TValid> {
 }
 
 function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyViewProps<TEdit, TValid>) {
-  const {initialEditValue, onSave, renderControl, renderReadonly, validate} = props;
+  const {initialEditValue, label, onSave, renderControl, renderReadonly, validate} = props;
 
   const controlId = useId();
   const [editState, setEditState] = useState<{value: TEdit, errors: ReadonlyArray<ValidationError>} | null>(null);
@@ -205,7 +207,7 @@ function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyView
           )
         }
       >
-        Text
+        {label}
       </ControlLabel>
       <ControlGroup>
         {editState === null ? (

@@ -7,6 +7,7 @@ import ControlLabel from "../widgets/ControlLabel";
 import ControlGroup from "../widgets/ControlGroup";
 import Input from "../widgets/Input";
 import { ValidationErrorsInlineView } from "../validation-views";
+import CardParentView from "./CardParentView";
 
 export interface CardFormState {
   controlIds: {
@@ -65,10 +66,6 @@ interface CardFormProps {
 export default function CardForm(props: CardFormProps) {
   const {allCards, allCategories, errors, onStateChange: onChange, state} = props;
 
-  const parent = state.parentCardId === null
-    ? null
-    : allCards.findCardById(state.parentCardId);
-
   const {controlIds: {text: textControlId, category: categoryControlId}} = state;
 
   return (
@@ -89,7 +86,7 @@ export default function CardForm(props: CardFormProps) {
         Parent
       </ControlLabel>
       <ControlGroup>
-        {parent === null ? "None" : `${parent.text} (#${parent.number})`}
+        <CardParentView allCards={allCards} parentCardId={state.parentCardId} />
       </ControlGroup>
       <ControlLabel>Category</ControlLabel>
       <ControlGroup>

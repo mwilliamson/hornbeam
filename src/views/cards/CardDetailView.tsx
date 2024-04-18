@@ -46,6 +46,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
         <CardParentPropertyView allCards={allCards} parentCardId={card.parentCardId} />
+        <CardCategoryPropertyView allCategories={allCategories} categoryId={card.categoryId} />
       </div>
 
       <div className="CardDetailView-History">
@@ -157,6 +158,29 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
       </ControlLabel>
       <ControlGroup>
         <CardParentView allCards={allCards} parentCardId={parentCardId} />
+      </ControlGroup>
+    </>
+
+  );
+}
+
+interface CardCategoryPropertyViewProps {
+  allCategories: CategorySet;
+  categoryId: string;
+}
+
+function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
+  const {allCategories, categoryId} = props;
+
+  const category = allCategories.findCategoryById(categoryId);
+
+  return (
+    <>
+      <ControlLabel>
+        Category
+      </ControlLabel>
+      <ControlGroup>
+        {category?.name}
       </ControlGroup>
     </>
 

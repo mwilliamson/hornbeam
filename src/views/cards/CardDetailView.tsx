@@ -210,7 +210,15 @@ function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyView
   const controlId = useId();
   const [editState, setEditState] = useState<{value: TEdit, errors: ReadonlyArray<ValidationError>} | null>(null);
 
-  const handleTextSave = async (event: React.FormEvent) => {
+  const handleEditClick = () => {
+    setEditState({value: initialEditValue, errors: []});
+  };
+
+  const handleCancelClick = () => {
+    setEditState(null);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (editState !== null) {
@@ -226,18 +234,16 @@ function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyView
   };
 
   return (
-    <form onSubmit={handleTextSave}>
+    <form onSubmit={handleSubmit}>
       <ControlLabel
         buttons={
           editState === null ? (
-            <LinkButton
-              onClick={() => setEditState({value: initialEditValue, errors: []})}
-            >
+            <LinkButton onClick={handleEditClick}>
               Edit
             </LinkButton>
           ) : (
             <>
-              <Button type="button" intent="secondary" inline onClick={() => setEditState(null)}>
+              <Button type="button" intent="secondary" inline onClick={handleCancelClick}>
                 Cancel
               </Button>
               <Button type="submit" intent="primary" inline>

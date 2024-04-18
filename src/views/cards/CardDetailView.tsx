@@ -1,5 +1,7 @@
 import { Card, CardEvent, CategorySet, cardHistory } from "../../app";
 import Button from "../widgets/Button";
+import ControlGroup from "../widgets/ControlGroup";
+import ControlLabel from "../widgets/ControlLabel";
 import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
 import CardView from "./CardView";
@@ -23,6 +25,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
           cardCategory={category}
         />
       </div>
+
       <div className="CardDetailView-Actions">
         <Button
           intent="primary"
@@ -32,6 +35,12 @@ export default function CardDetailView(props: CardDetailViewProps) {
           Add Child
         </Button>
       </div>
+
+      <div className="CardDetailView-Properties">
+        <ControlLabel>Text</ControlLabel>
+        <ControlGroup>{card.text}</ControlGroup>
+      </div>
+
       <div className="CardDetailView-History">
         <h3 className="CardDetailView-History-Title">History</h3>
         <div>

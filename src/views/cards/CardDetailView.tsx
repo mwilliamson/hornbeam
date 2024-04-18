@@ -1,12 +1,14 @@
 import { useId, useState } from "react";
-import { Card, CardEvent, CategorySet, cardHistory } from "../../app";
+import { Card, CardEvent, CategorySet, cardHistory, validateCardText } from "../../app";
+import { ValidationError } from "../../util/validation";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
+import Input from "../widgets/Input";
 import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
 import CardView from "./CardView";
-import Input from "../widgets/Input";
+import { ValidationErrorsInlineView } from "../validation-views";
 
 interface CardDetailViewProps {
   allCategories: CategorySet;
@@ -19,15 +21,20 @@ export default function CardDetailView(props: CardDetailViewProps) {
   const {allCategories, card, onAddChildClick, onCardTextSave} = props;
 
   const textEditControlId = useId();
-  const [textEdit, setTextEdit] = useState<string | null>(null);
+  const [textEdit, setTextEdit] = useState<{text: string, errors: ReadonlyArray<ValidationError>} | null>(null);
 
   const handleTextSave = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (textEdit !== null) {
-      // TODO: validation
-      await onCardTextSave(textEdit);
-      setTextEdit(null);
+      const validationResult = validateCardText(textEditControlId, textEdit.text);
+
+      if (validationResult.type === "valid") {
+        await onCardTextSave(textEdit.text);
+        setTextEdit(null);
+      } else {
+        setTextEdit({...textEdit, errors: validationResult.errors});
+      }
     }
   };
 
@@ -60,7 +67,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
                 /* TODO: proper link button */
                 <a
                   href="#"
-                  onClick={(event) => {event.preventDefault(); setTextEdit(card.text);}}
+                  onClick={(event) => {event.preventDefault(); setTextEdit({text: card.text, errors: []});}}
                   style={{fontSize: 14, color: "#3182ce", textDecoration: "none"}}
                 >
                   Edit
@@ -83,12 +90,18 @@ export default function CardDetailView(props: CardDetailViewProps) {
             {textEdit === null ? (
               <span id={textEditControlId}>{card.text}</span>
             ) : (
-              <Input
-                autoFocus
-                id={textEditControlId}
-                onChange={(newText) => setTextEdit(newText)}
-                value={textEdit}
-              />
+              <>
+                <Input
+                  autoFocus
+                  id={textEditControlId}
+                  onChange={(newText) => setTextEdit(({...textEdit, text: newText}))}
+                  value={textEdit.text}
+                />
+                <ValidationErrorsInlineView
+                  elementId={textEditControlId}
+                  errors={textEdit.errors}
+                />
+              </>
             )}
           </ControlGroup>
         </form>

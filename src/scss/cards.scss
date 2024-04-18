@@ -1,3 +1,5 @@
+@use "./colors";
+
 @mixin card {
   display: inline-block;
   border: 1px solid #666;
@@ -6,8 +8,8 @@
 }
 
 @mixin card--selected {
-  border-color: #3182ce;
-  box-shadow: 0 0 3px 3px #3182ce;
+  border-color: colors.$primary;
+  box-shadow: 0 0 3px 3px colors.$primary;
 }
 
 $card-gap: 12px;

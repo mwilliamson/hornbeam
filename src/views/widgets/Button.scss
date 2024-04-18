@@ -1,3 +1,5 @@
+@use "../../scss/colors";
+
 .Button {
   /** Reset **/
   all: unset;
@@ -27,12 +29,12 @@
 .Button--intent-primary {
   &.Button--variant-outline {
       background-color: #fff;
-      color: #3182ce;
+      color: colors.$primary;
       border: 1px solid currentColor;
   }
 
   &.Button--variant-solid {
-      background-color: #3182ce;
+      background-color: colors.$primary;
       color: #fff;
   }
 }

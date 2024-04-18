@@ -1,4 +1,5 @@
 import { Instant } from "@js-joda/core";
+import { ValidationResult } from "../util/validation";
 
 export interface Card {
   categoryId: string;
@@ -49,6 +50,34 @@ function updateCard(card: Card, request: CardEditRequest): Card {
     parentCardId: request.parentCardId === undefined ? card.parentCardId : request.parentCardId,
     text: request.text === undefined ? card.text : request.text,
   };
+}
+
+export function validateCardText(elementId: string, text: string): ValidationResult<string> {
+  if (text === "") {
+    return ValidationResult.invalid([
+      {
+        elementId,
+        inlineText: "Enter the card text.",
+        summaryText: "Card is missing text."
+      },
+    ]);
+  } else {
+    return ValidationResult.valid(text);
+  }
+}
+
+export function validateCardCategory(elementId: string, categoryId: string): ValidationResult<string> {
+  if (categoryId === "") {
+    return ValidationResult.invalid([
+      {
+        elementId: elementId,
+        inlineText: "Select a category.",
+        summaryText: "Card is missing a category.",
+      },
+    ]);
+  } else {
+    return ValidationResult.valid(categoryId);
+  }
 }
 
 export interface Category {

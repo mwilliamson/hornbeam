@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 
-import { CardAddRequest, CardSet, CategorySet } from "../../app";
+import { CardAddRequest, CardSet, CategorySet, validateCardCategory, validateCardText } from "../../app";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import ControlLabel from "../widgets/ControlLabel";
@@ -45,29 +45,11 @@ export function useCardFormState(
 export function validateCardForm(value: CardFormState): ValidationResult<ValidCardFormValues> {
   const {controlIds, categoryId, parentCardId, text} = value;
 
-  const errors: Array<ValidationError> = [];
-
-  if (text === "") {
-    errors.push({
-      elementId: controlIds.text,
-      inlineText: "Enter the card text.",
-      summaryText: "Card is missing text."
-    });
-  }
-
-  if (categoryId === "") {
-    errors.push({
-      elementId: controlIds.category,
-      inlineText: "Select a category.",
-      summaryText: "Card is missing a category.",
-    });
-  }
-
-  if (errors.length > 0) {
-    return ValidationResult.invalid(errors);
-  } else {
-    return ValidationResult.valid({categoryId, parentCardId, text});
-  }
+  return ValidationResult.flatten({
+    categoryId: validateCardCategory(controlIds.category, categoryId),
+    parentCardId: ValidationResult.valid(parentCardId),
+    text: validateCardText(controlIds.text, text),
+  });
 }
 
 interface CardFormProps {

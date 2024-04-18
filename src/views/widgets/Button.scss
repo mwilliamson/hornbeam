@@ -1,17 +1,9 @@
+@use "../../scss/buttons";
 @use "../../scss/colors";
 
 .Button {
-  /** Reset **/
-  all: unset;
-  box-sizing: border-box;
-  cursor: pointer;
-  user-select: none;
+  @include buttons.button-reset;
 
-  &:disabled {
-      cursor: not-allowed;
-  }
-
-  /** Styling **/
   border-radius: 0.4rem;
   padding: 0.6rem 1rem;
   font-weight: bold;

@@ -1,17 +1,17 @@
 import { useId, useState } from "react";
-import { CategorySet } from "../../app";
 import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
+import { CategorySet } from "../../app/categories";
 import { ValidationError, ValidationResult } from "../../util/validation";
+import CategorySelect from "../categories/CategorySelect";
+import { ValidationErrorsInlineView } from "../validation-views";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
 import Input from "../widgets/Input";
 import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
-import CardView from "./CardView";
-import { ValidationErrorsInlineView } from "../validation-views";
 import CardParentView from "./CardParentView";
-import CategorySelect from "../categories/CategorySelect";
+import CardView from "./CardView";
 
 interface CardDetailViewProps {
   allCards: CardSet;

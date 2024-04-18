@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 
-import { CategorySet } from "../../app";
 import { CardAddRequest, CardSet, validateCardCategory, validateCardText } from "../../app/cards";
+import { CategorySet } from "../../app/categories";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import { ValidationErrorsInlineView } from "../validation-views";

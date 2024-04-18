@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { CategorySet } from "../../app";
 import { Card, CardSet } from "../../app/cards";
+import { CategorySet } from "../../app/categories";
 import { ValidationError } from "../../util/validation";
 import { ValidationErrorsSummaryView } from "../validation-views";
 import Form from "../widgets/Form";

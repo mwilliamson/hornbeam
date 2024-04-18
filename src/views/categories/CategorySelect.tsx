@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { Category } from "../../app";
+import { Category } from "../../app/categories";
 import "./CategorySelect.scss";
 
 interface CategorySelectProps {

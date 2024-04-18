@@ -1,8 +1,8 @@
 import groupBy from "lodash/groupBy";
 import React from "react";
 
-import { CategorySet } from "../app";
 import { Card } from "../app/cards";
+import { CategorySet } from "../app/categories";
 import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 

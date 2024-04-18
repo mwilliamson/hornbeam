@@ -45,10 +45,11 @@ export function useCardFormState(
 export function validateCardForm(value: CardFormState): ValidationResult<ValidCardFormValues> {
   const {controlIds, categoryId, parentCardId, text} = value;
 
+  // The order of fields will determine the order of error messages.
   return ValidationResult.flatten({
+    text: validateCardText(controlIds.text, text),
     categoryId: validateCardCategory(controlIds.category, categoryId),
     parentCardId: ValidationResult.valid(parentCardId),
-    text: validateCardText(controlIds.text, text),
   });
 }
 

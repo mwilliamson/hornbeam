@@ -1,0 +1,11 @@
+@use "./cards";
+@use "./text";
+
+@mixin category-card {
+  @include cards.card;
+
+  font-size: text.$font-size-sm;
+  padding: 1em 0;
+  text-align: center;
+  width: 100%;
+}

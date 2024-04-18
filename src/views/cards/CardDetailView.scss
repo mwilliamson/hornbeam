@@ -1,3 +1,5 @@
+@use "../../scss/cards";
+@use "../../scss/categories";
 @use "../../scss/spacing";
 @use "../../scss/text";
 
@@ -11,6 +13,17 @@ $event-border: 1px solid #999;
 .CardDetailView-Properties,
 .CardDetailView-History {
   margin: spacing.$md;
+}
+
+.CardDetailView-CategoryCardContainer {
+  /* Remove duplication with select */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: cards.$card-gap;
+}
+
+.CardDetailView-CategoryCard {
+  @include categories.category-card;
 }
 
 .CardDetailView-History-Title {

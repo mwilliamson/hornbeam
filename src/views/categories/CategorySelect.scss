@@ -1,6 +1,5 @@
 @use "../../scss/cards";
-@use "../../scss/spacing";
-@use "../../scss/text";
+@use "../../scss/categories";
 
 .CategorySelect {
   display: grid;
@@ -9,12 +8,7 @@
 }
 
 .CategorySelect-CategoryLabel {
-  @include cards.card;
-
-  font-size: text.$font-size-sm;
-  padding: 1em 0;
-  text-align: center;
-  width: 100%;
+  @include categories.category-card;
 
   .CategorySelect-Category:has(:checked) & {
     @include cards.card--selected;

@@ -173,6 +173,10 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
   const {allCategories, categoryId} = props;
 
   const category = allCategories.findCategoryById(categoryId);
+  if (category === null) {
+    // TODO: log error
+    return null;
+  }
 
   return (
     <>
@@ -180,7 +184,14 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
         Category
       </ControlLabel>
       <ControlGroup>
-        {category?.name}
+        <div className="CardDetailView-CategoryCardContainer">
+          <div
+            className="CardDetailView-CategoryCard"
+            style={{backgroundColor: category.color.hex}}
+          >
+            {category.name}
+          </div>
+        </div>
       </ControlGroup>
     </>
 

@@ -12,10 +12,18 @@ interface CardsViewProps {
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardEdit: (cardId: string | null) => void;
+  onCardAddChildClick: (cardId: string) => void;
 }
 
 export default function CardsView(props: CardsViewProps) {
-  const {allCategories, cards, cardSelectedId, onCardSelect, onCardEdit} = props;
+  const {
+    allCategories,
+    cards,
+    cardSelectedId,
+    onCardSelect,
+    onCardEdit,
+    onCardAddChildClick,
+  } = props;
 
   const cardsByParentId = groupBy(
     cards.filter(card => card.parentCardId !== null),
@@ -37,6 +45,7 @@ export default function CardsView(props: CardsViewProps) {
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
             onCardEdit={onCardEdit}
+            onCardAddChildClick={onCardAddChildClick}
           />
         ))}
       </div>
@@ -52,6 +61,7 @@ interface CardTreeViewProps {
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardEdit: (cardId: string | null) => void;
+  onCardAddChildClick: (cardId: string) => void;
 }
 
 function CardTreeView(props: CardTreeViewProps) {
@@ -63,6 +73,7 @@ function CardTreeView(props: CardTreeViewProps) {
     cardSelectedId,
     onCardSelect,
     onCardEdit,
+    onCardAddChildClick,
   } = props;
 
   const children = cardsByParentId[card.id] || [];
@@ -86,16 +97,35 @@ function CardTreeView(props: CardTreeViewProps) {
     onCardEdit(card.id);
   };
 
+  const handleAddChildClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onCardAddChildClick(card.id);
+  };
+
+  const isSelected = cardSelectedId === card.id;
+
   return (
     <div className="CardsView-TreeView">
       <div className="CardsView-TreeView-Parent">
         <CardView
           card={card}
           cardCategory={allCategories.findCategoryById(card.categoryId)}
-          isSelected={cardSelectedId === card.id}
+          isSelected={isSelected}
           onClick={handleCardClick}
           onDoubleClick={handleCardDoubleClick}
         />
+        {isSelected && (
+          <div className="CardsView-AddChildContainer">
+            <button
+              type="button"
+              aria-label="Add child"
+              className="CardsView-AddChild"
+              onClick={handleAddChildClick}
+            >
+              +
+            </button>
+          </div>
+        )}
       </div>
       {children.length > 0 && (
         <>
@@ -163,6 +193,7 @@ function CardTreeView(props: CardTreeViewProps) {
                 cardSelectedId={cardSelectedId}
                 onCardSelect={onCardSelect}
                 onCardEdit={onCardEdit}
+                onCardAddChildClick={onCardAddChildClick}
               />
             ))}
           </div>

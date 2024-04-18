@@ -182,7 +182,7 @@ function CardChildrenView(props: CardChildrenViewProps) {
       <ControlLabel
         buttons={
           <LinkButton onClick={onAddChildClick}>
-            Add Child
+            Add child
           </LinkButton>
         }
       >

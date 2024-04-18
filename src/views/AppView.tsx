@@ -141,6 +141,7 @@ export default function AppView(props: AppViewProps) {
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
           onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
+          onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
         />
       </div>
       <div className="AppView-Tools">

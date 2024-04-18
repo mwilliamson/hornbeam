@@ -28,10 +28,28 @@
 .CardsView-TreeView {
   display: flex;
   flex-direction: row;
+  align-items: start;
 
   & > * {
     flex: 0 0 auto;
   }
+}
+
+.CardsView-TreeView-Parent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.CardsView-AddChildContainer {
+  position: relative;
+}
+
+.CardsView-AddChild {
+  position: absolute;
+  top: -12px;
+  height: 24px;
+  width: 24px;
 }
 
 .CardsView-TreeView-Children {

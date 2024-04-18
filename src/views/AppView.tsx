@@ -231,6 +231,7 @@ function Sidebar(props: SidebarProps) {
   } else if (selectedCard !== null) {
     return (
       <CardDetailView
+        allCards={appState}
         allCategories={appState}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}

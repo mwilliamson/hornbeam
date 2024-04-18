@@ -1,5 +1,5 @@
 import { useId, useState } from "react";
-import { Card, CardEvent, CategorySet, cardHistory, validateCardText } from "../../app";
+import { Card, CardEvent, CardSet, CategorySet, cardHistory, validateCardText } from "../../app";
 import { ValidationError } from "../../util/validation";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";
@@ -9,8 +9,10 @@ import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
 import CardView from "./CardView";
 import { ValidationErrorsInlineView } from "../validation-views";
+import CardParentView from "./CardParentView";
 
 interface CardDetailViewProps {
+  allCards: CardSet;
   allCategories: CategorySet;
   card: Card;
   onAddChildClick: () => void;
@@ -18,7 +20,7 @@ interface CardDetailViewProps {
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
-  const {allCategories, card, onAddChildClick, onCardTextSave} = props;
+  const {allCards, allCategories, card, onAddChildClick, onCardTextSave} = props;
 
   const category = allCategories.findCategoryById(card.categoryId);
 
@@ -43,6 +45,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
 
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
+        <CardParentPropertyView allCards={allCards} parentCardId={card.parentCardId} />
       </div>
 
       <div className="CardDetailView-History">
@@ -136,6 +139,27 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
         )}
       </ControlGroup>
     </form>
+  );
+}
+
+interface CardParentPropertyViewProps {
+  allCards: CardSet;
+  parentCardId: string | null
+}
+
+function CardParentPropertyView(props: CardParentPropertyViewProps) {
+  const {allCards, parentCardId} = props;
+
+  return (
+    <>
+      <ControlLabel>
+        Parent
+      </ControlLabel>
+      <ControlGroup>
+        <CardParentView allCards={allCards} parentCardId={parentCardId} />
+      </ControlGroup>
+    </>
+
   );
 }
 

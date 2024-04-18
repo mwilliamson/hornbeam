@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { Card, CardEvent, CardSet, CategorySet, cardHistory, validateCardText } from "../../app";
-import { ValidationError } from "../../util/validation";
+import { ValidationError, ValidationResult } from "../../util/validation";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
@@ -76,70 +76,23 @@ interface CardTextPropertyViewProps {
 function CardTextPropertyView(props: CardTextPropertyViewProps) {
   const {card, onCardTextSave} = props;
 
-  const textEditControlId = useId();
-  const [textEdit, setTextEdit] = useState<{text: string, errors: ReadonlyArray<ValidationError>} | null>(null);
-
-  const handleTextSave = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    if (textEdit !== null) {
-      const validationResult = validateCardText(textEditControlId, textEdit.text);
-
-      if (validationResult.isValid) {
-        await onCardTextSave(textEdit.text);
-        setTextEdit(null);
-      } else {
-        setTextEdit({...textEdit, errors: validationResult.errors});
-      }
-    }
-  };
-
   return (
-    <form onSubmit={handleTextSave}>
-      <ControlLabel
-        buttons={
-          textEdit === null ? (
-            /* TODO: proper link button */
-            <a
-              href="#"
-              onClick={(event) => {event.preventDefault(); setTextEdit({text: card.text, errors: []});}}
-              style={{fontSize: 14, color: "#3182ce", textDecoration: "none"}}
-            >
-              Edit
-            </a>
-          ) : (
-            <>
-              <Button type="button" intent="secondary" inline onClick={() => setTextEdit(null)}>
-                Cancel
-              </Button>
-              <Button type="submit" intent="primary" inline>
-                Save
-              </Button>
-            </>
-          )
-        }
-      >
-        Text
-      </ControlLabel>
-      <ControlGroup>
-        {textEdit === null ? (
-          <span id={textEditControlId}>{card.text}</span>
-        ) : (
-          <>
-            <Input
-              autoFocus
-              id={textEditControlId}
-              onChange={(newText) => setTextEdit(({...textEdit, text: newText}))}
-              value={textEdit.text}
-            />
-            <ValidationErrorsInlineView
-              elementId={textEditControlId}
-              errors={textEdit.errors}
-            />
-          </>
-        )}
-      </ControlGroup>
-    </form>
+    <EditableCardPropertyView
+      initialEditValue={card.text}
+      onSave={onCardTextSave}
+      renderControl={({id, onChange, value}) => (
+        <Input
+          autoFocus
+          id={id}
+          onChange={onChange}
+          value={value}
+        />
+      )}
+      renderReadonly={({id}) => (
+        <span id={id}>{card.text}</span>
+      )}
+      validate={validateCardText}
+    />
   );
 }
 
@@ -195,6 +148,84 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
       </ControlGroup>
     </>
 
+  );
+}
+
+interface EditableCardPropertyViewProps<TEdit, TValid> {
+  initialEditValue: TEdit;
+  onSave: (value: TValid) => Promise<void>;
+  renderControl: (args: {id: string, onChange: (value: TEdit) => void, value: TEdit}) => React.ReactNode;
+  renderReadonly: (args: {id: string}) => React.ReactNode;
+  validate: (controlId: string, value: TEdit) => ValidationResult<TValid>;
+}
+
+function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyViewProps<TEdit, TValid>) {
+  const {initialEditValue, onSave, renderControl, renderReadonly, validate} = props;
+
+  const controlId = useId();
+  const [editState, setEditState] = useState<{value: TEdit, errors: ReadonlyArray<ValidationError>} | null>(null);
+
+  const handleTextSave = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (editState !== null) {
+      const validationResult = validate(controlId, editState.value);
+
+      if (validationResult.isValid) {
+        await onSave(validationResult.value);
+        setEditState(null);
+      } else {
+        setEditState({...editState, errors: validationResult.errors});
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleTextSave}>
+      <ControlLabel
+        buttons={
+          editState === null ? (
+            /* TODO: proper link button */
+            <a
+              href="#"
+              onClick={(event) => {event.preventDefault(); setEditState({value: initialEditValue, errors: []});}}
+              style={{fontSize: 14, color: "#3182ce", textDecoration: "none"}}
+            >
+              Edit
+            </a>
+          ) : (
+            <>
+              <Button type="button" intent="secondary" inline onClick={() => setEditState(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" intent="primary" inline>
+                Save
+              </Button>
+            </>
+          )
+        }
+      >
+        Text
+      </ControlLabel>
+      <ControlGroup>
+        {editState === null ? (
+          <span id={controlId}>{renderReadonly({id: controlId})}</span>
+        ) : (
+          <>
+            {renderControl({
+              id: controlId,
+              onChange: newValue => setEditState({...editState, value: newValue}),
+              value: editState.value
+            })}
+
+            <ValidationErrorsInlineView
+              elementId={controlId}
+              errors={editState.errors}
+            />
+          </>
+        )}
+      </ControlGroup>
+    </form>
   );
 }
 

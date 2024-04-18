@@ -230,14 +230,11 @@ function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyView
       <ControlLabel
         buttons={
           editState === null ? (
-            /* TODO: proper link button */
-            <a
-              href="#"
-              onClick={(event) => {event.preventDefault(); setEditState({value: initialEditValue, errors: []});}}
-              style={{fontSize: 14, color: "#3182ce", textDecoration: "none"}}
+            <LinkButton
+              onClick={() => setEditState({value: initialEditValue, errors: []})}
             >
               Edit
-            </a>
+            </LinkButton>
           ) : (
             <>
               <Button type="button" intent="secondary" inline onClick={() => setEditState(null)}>

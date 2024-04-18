@@ -13,7 +13,7 @@ export interface CardFormState {
     text: string;
     category: string;
   };
-  categoryId: string;
+  categoryId: string | null;
   parentCardId: string | null;
   text: string;
 }
@@ -36,7 +36,7 @@ export function useCardFormState(
       text: textControlId,
       category: categoryControlId,
     },
-    categoryId: card?.categoryId ?? "",
+    categoryId: card?.categoryId ?? null,
     parentCardId: card?.parentCardId ?? null,
     text: card?.text ?? "",
   }));

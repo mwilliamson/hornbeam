@@ -66,8 +66,8 @@ export function validateCardText(elementId: string, text: string): ValidationRes
   }
 }
 
-export function validateCardCategory(elementId: string, categoryId: string): ValidationResult<string> {
-  if (categoryId === "") {
+export function validateCardCategory(elementId: string, categoryId: string | null): ValidationResult<string> {
+  if (categoryId === null) {
     return ValidationResult.invalid([
       {
         elementId: elementId,

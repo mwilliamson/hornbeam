@@ -6,9 +6,9 @@ import "./CardView.scss";
 interface CardViewProps {
   card: Card;
   cardCategory: Category | null;
-  isSelected: boolean;
-  onClick: (event: React.MouseEvent) => void;
-  onDoubleClick: (event: React.MouseEvent) => void;
+  isSelected?: boolean;
+  onClick?: (event: React.MouseEvent) => void;
+  onDoubleClick?: (event: React.MouseEvent) => void;
 }
 
 export default function CardView(props: CardViewProps) {

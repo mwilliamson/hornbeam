@@ -23,7 +23,7 @@ export default function CardEditModal(props: CardEditModalProps) {
   const handleSubmit = async () => {
     const result = validateCardForm(formState);
 
-    if (result.type === "valid") {
+    if (result.isValid) {
       setErrors([]);
       await onCardSave(result.value);
     } else {

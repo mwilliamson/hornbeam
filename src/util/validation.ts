@@ -1,20 +1,20 @@
 export type ValidationResult<T> =
-  | {type: "valid", value: T}
-  | {type: "invalid", errors: ReadonlyArray<ValidationError>};
+  | {isValid: true, value: T}
+  | {isValid: false, errors: ReadonlyArray<ValidationError>};
 
 export const ValidationResult = {
   valid: <T>(value: T): ValidationResult<T> =>
-    ({type: "valid", value}),
+    ({isValid: true, value}),
 
   invalid: (errors: ReadonlyArray<ValidationError>): ValidationResult<never> =>
-    ({type: "invalid", errors}),
+    ({isValid: false, errors}),
 
   flatten: <T extends {[key: string]: ValidationResult<unknown>}>(results: T): ValidationResult<{[K in keyof T]: T[K] extends ValidationResult<infer V> ? V : never }> => {
     const flattenedValue: {[key: string]: unknown} = {};
     const errors: Array<ValidationError> = [];
 
     for (const [key, result] of Object.entries(results)) {
-      if (result.type === "valid") {
+      if (result.isValid) {
         flattenedValue[key] = result.value;
       } else {
         for (const error of result.errors) {

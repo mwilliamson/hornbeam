@@ -23,7 +23,7 @@ export default function CardAddForm(props: CardAddFormProps) {
   const handleSubmit = async () => {
     const result = validateCardForm(formState);
 
-    if (result.type === "valid") {
+    if (result.isValid) {
       setErrors([]);
       await onCardAdd(result.value);
     } else {

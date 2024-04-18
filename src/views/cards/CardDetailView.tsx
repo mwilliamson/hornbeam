@@ -81,7 +81,7 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
     if (textEdit !== null) {
       const validationResult = validateCardText(textEditControlId, textEdit.text);
 
-      if (validationResult.type === "valid") {
+      if (validationResult.isValid) {
         await onCardTextSave(textEdit.text);
         setTextEdit(null);
       } else {

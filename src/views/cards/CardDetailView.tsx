@@ -32,10 +32,12 @@ export default function CardDetailView(props: CardDetailViewProps) {
   return (
     <>
       <div className="CardDetailView-Header">
-        <CardView
-          card={card}
-          cardCategory={category}
-        />
+        <div>
+          <CardView
+            card={card}
+            cardCategory={category}
+          />
+        </div>
       </div>
 
       <div className="CardDetailView-Properties">

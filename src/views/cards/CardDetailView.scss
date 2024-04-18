@@ -5,6 +5,9 @@
 
 .CardDetailView-Header {
   margin: spacing.$md;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 $event-border: 1px solid #999;

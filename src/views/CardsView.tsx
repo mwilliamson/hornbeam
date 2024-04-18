@@ -75,6 +75,16 @@ function CardTreeView(props: CardTreeViewProps) {
   };
   const branchesHeight = lastChild === null ? 0 : branchY(lastChild) + 1;
 
+  const handleCardClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onCardSelect(card.id);
+  };
+
+  const handleCardDoubleClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onCardEdit(card.id);
+  };
+
   return (
     <div className="CardsView-TreeView">
       <div className="CardsView-TreeView-Parent">
@@ -82,8 +92,8 @@ function CardTreeView(props: CardTreeViewProps) {
           card={card}
           cardCategory={allCategories.findCategoryById(card.categoryId)}
           isSelected={cardSelectedId === card.id}
-          onSelect={() => onCardSelect(card.id)}
-          onEdit={() => onCardEdit(card.id)}
+          onClick={handleCardClick}
+          onDoubleClick={handleCardDoubleClick}
         />
       </div>
       {children.length > 0 && (

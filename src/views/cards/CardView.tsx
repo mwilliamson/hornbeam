@@ -7,22 +7,12 @@ interface CardViewProps {
   card: Card;
   cardCategory: Category | null;
   isSelected: boolean;
-  onSelect: () => void;
-  onEdit: () => void;
+  onClick: (event: React.MouseEvent) => void;
+  onDoubleClick: (event: React.MouseEvent) => void;
 }
 
 export default function CardView(props: CardViewProps) {
-  const {card, cardCategory, isSelected, onSelect, onEdit} = props;
-
-  const handleClick = (event: React.SyntheticEvent) => {
-    event.stopPropagation();
-    onSelect();
-  };
-
-  const handleDoubleClick = (event: React.SyntheticEvent) => {
-    event.stopPropagation();
-    onEdit();
-  };
+  const {card, cardCategory, isSelected, onClick, onDoubleClick} = props;
 
   const backgroundColor = cardCategory === null ? undefined : cardCategory.color.hex;
 
@@ -30,8 +20,8 @@ export default function CardView(props: CardViewProps) {
     <div
       className={classNames("CardView", {"CardView--selected": isSelected})}
       style={{backgroundColor}}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
+      onClick={onClick}
+      onDoubleClick={onDoubleClick}
     >
       <div className="CardView-Text">
         {card.text}

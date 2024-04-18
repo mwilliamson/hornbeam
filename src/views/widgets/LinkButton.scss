@@ -1,0 +1,12 @@
+@use "../../scss/text";
+
+.LinkButton {
+  cursor: pointer;
+  user-select: none;
+  color: #3182ce;
+  font-size: text.$font-size-sm;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

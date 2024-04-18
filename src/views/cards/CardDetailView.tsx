@@ -10,6 +10,7 @@ import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
 import Input from "../widgets/Input";
 import InstantView from "../widgets/InstantView";
+import LinkButton from "../widgets/LinkButton";
 import "./CardDetailView.scss";
 import CardParentView from "./CardParentView";
 import CardView from "./CardView";
@@ -37,16 +38,6 @@ export default function CardDetailView(props: CardDetailViewProps) {
         />
       </div>
 
-      <div className="CardDetailView-Actions">
-        <Button
-          intent="primary"
-          type="button"
-          onClick={onAddChildClick}
-        >
-          Add Child
-        </Button>
-      </div>
-
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
         <CardParentPropertyView allCards={allCards} parentCardId={card.parentCardId} />
@@ -58,6 +49,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <CardChildrenView
           allCards={allCards}
           cardId={card.id}
+          onAddChildClick={onAddChildClick}
         />
       </div>
 
@@ -175,16 +167,23 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
 interface CardChildrenViewProps {
   allCards: CardSet;
   cardId: string;
+  onAddChildClick: () => void;
 }
 
 function CardChildrenView(props: CardChildrenViewProps) {
-  const {allCards, cardId} = props;
+  const {allCards, cardId, onAddChildClick} = props;
 
   const childCount = allCards.countCardChildren(cardId);
 
   return (
     <>
-      <ControlLabel>
+      <ControlLabel
+        buttons={
+          <LinkButton onClick={onAddChildClick}>
+            Add Child
+          </LinkButton>
+        }
+      >
         Children
       </ControlLabel>
       <ControlGroup>

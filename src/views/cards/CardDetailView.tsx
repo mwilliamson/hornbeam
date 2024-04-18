@@ -2,6 +2,7 @@ import { Card, CardEvent, CategorySet, cardHistory } from "../../app";
 import Button from "../widgets/Button";
 import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
+import CardView from "./CardView";
 
 interface CardDetailViewProps {
   allCategories: CategorySet;
@@ -14,14 +15,13 @@ export default function CardDetailView(props: CardDetailViewProps) {
 
   const category = allCategories.findCategoryById(card.categoryId);
 
-  const categoryColor = category === null ? undefined : category.color.hex;
-
   return (
     <>
-      <div className="CardDetailView-Header p-md" style={{backgroundColor: categoryColor}}>
-        <h2 className="CardDetailView-Title">
-          {card.text} (#{card.number})
-        </h2>
+      <div className="CardDetailView-Header">
+        <CardView
+          card={card}
+          cardCategory={category}
+        />
       </div>
       <div className="CardDetailView-Actions">
         <Button
@@ -33,8 +33,8 @@ export default function CardDetailView(props: CardDetailViewProps) {
         </Button>
       </div>
       <div className="CardDetailView-History">
-        <h3>History</h3>
-        <div className="CardDetailView-Events">
+        <h3 className="CardDetailView-History-Title">History</h3>
+        <div>
           {cardHistory(card).map((event, eventIndex) => (
             <div key={eventIndex} className="CardDetailView-Event">
               <div className="CardDetailView-Event-Instant">

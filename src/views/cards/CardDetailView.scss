@@ -2,29 +2,24 @@
 @use "../../scss/text";
 
 .CardDetailView-Header {
-  border-bottom: 1px solid #666;
-}
-
-.CardDetailView-Title {
-  font-size: text.$font-size-lg;
-}
-
-$event-border: 1px solid #666;
-
-.CardDetailView-Actions,
-.CardDetailView-History,
-.CardDetailView-Events {
   margin: spacing.$md;
 }
 
-.CardDetailView-Events {
-  margin: spacing.$md calc(0rem - spacing.$md);
-  border-top: $event-border;
+$event-border: 1px solid #999;
+
+.CardDetailView-Actions,
+.CardDetailView-History {
+  margin: spacing.$md;
+}
+
+.CardDetailView-History-Title {
+  padding-bottom: spacing.$md;
+  border-bottom: $event-border;
 }
 
 .CardDetailView-Event {
   border-bottom: $event-border;
-  padding: spacing.$md;
+  padding: spacing.$md 0;
 }
 
 .CardDetailView-Event-Instant {

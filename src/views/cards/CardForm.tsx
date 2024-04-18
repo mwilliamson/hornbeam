@@ -3,6 +3,7 @@ import { useId, useState } from "react";
 import { CardAddRequest, CardSet, CategorySet } from "../../app";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
+import ControlLabel from "../widgets/ControlLabel";
 import Input from "../widgets/Input";
 import { ValidationErrorsInlineView } from "../validation-views";
 import "./CardForm.scss";
@@ -89,9 +90,9 @@ export default function CardForm(props: CardFormProps) {
 
   return (
     <div className="CardForm">
-      <label className="CardForm-ControlLabel" htmlFor={textControlId}>
+      <ControlLabel htmlFor={textControlId}>
         Text
-      </label>
+      </ControlLabel>
       <div className="CardForm-Control">
         <Input
           autoFocus
@@ -101,13 +102,13 @@ export default function CardForm(props: CardFormProps) {
         />
         <ValidationErrorsInlineView elementId={textControlId} errors={errors} />
       </div>
-      <label className="CardForm-ControlLabel">
+      <ControlLabel>
         Parent
-      </label>
+      </ControlLabel>
       <div className="CardForm-Control">
         {parent === null ? "None" : `${parent.text} (#${parent.number})`}
       </div>
-      <label className="CardForm-ControlLabel">Category</label>
+      <ControlLabel>Category</ControlLabel>
       <div className="CardForm-Control">
         <CategorySelect
           availableCategories={allCategories.availableCategories()}

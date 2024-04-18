@@ -4,9 +4,9 @@ import { CardAddRequest, CardSet, CategorySet } from "../../app";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import ControlLabel from "../widgets/ControlLabel";
+import ControlGroup from "../widgets/ControlGroup";
 import Input from "../widgets/Input";
 import { ValidationErrorsInlineView } from "../validation-views";
-import "./CardForm.scss";
 
 export interface CardFormState {
   controlIds: {
@@ -93,7 +93,7 @@ export default function CardForm(props: CardFormProps) {
       <ControlLabel htmlFor={textControlId}>
         Text
       </ControlLabel>
-      <div className="CardForm-Control">
+      <ControlGroup>
         <Input
           autoFocus
           id={textControlId}
@@ -101,22 +101,22 @@ export default function CardForm(props: CardFormProps) {
           value={state.text}
         />
         <ValidationErrorsInlineView elementId={textControlId} errors={errors} />
-      </div>
+      </ControlGroup>
       <ControlLabel>
         Parent
       </ControlLabel>
-      <div className="CardForm-Control">
+      <ControlGroup>
         {parent === null ? "None" : `${parent.text} (#${parent.number})`}
-      </div>
+      </ControlGroup>
       <ControlLabel>Category</ControlLabel>
-      <div className="CardForm-Control">
+      <ControlGroup>
         <CategorySelect
           availableCategories={allCategories.availableCategories()}
           onChange={categoryId => onChange({...state, categoryId})}
           value={state.categoryId}
         />
         <ValidationErrorsInlineView elementId={categoryControlId} errors={errors} />
-      </div>
+      </ControlGroup>
     </div>
   );
 }

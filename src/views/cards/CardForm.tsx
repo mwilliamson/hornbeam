@@ -64,9 +64,9 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
   }
 
   if (errors.length > 0) {
-    return {type: "invalid", errors};
+    return ValidationResult.invalid(errors);
   } else {
-    return {type: "valid", value: {categoryId, parentCardId, text}};
+    return ValidationResult.valid({categoryId, parentCardId, text});
   }
 }
 

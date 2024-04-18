@@ -1,8 +1,8 @@
-import classNames from "classnames";
 import groupBy from "lodash/groupBy";
 import React from "react";
 
-import { Card, Category, CategorySet } from "../app";
+import { Card, CategorySet } from "../app";
+import CardView, { cardHeight } from "./cards/CardView";
 import "./CardsView.scss";
 
 interface CardsViewProps {
@@ -195,50 +195,3 @@ function calculateCardTops(
 
   return cardTops;
 }
-
-interface CardViewProps {
-  card: Card;
-  cardCategory: Category | null;
-  isSelected: boolean;
-  onSelect: () => void;
-  onEdit: () => void;
-}
-
-function CardView(props: CardViewProps) {
-  const {card, cardCategory, isSelected, onSelect, onEdit} = props;
-
-  const handleClick = (event: React.SyntheticEvent) => {
-    event.stopPropagation();
-    onSelect();
-  };
-
-  const handleDoubleClick = (event: React.SyntheticEvent) => {
-    event.stopPropagation();
-    onEdit();
-  };
-
-  const backgroundColor = cardCategory === null ? undefined : cardCategory.color.hex;
-
-  return (
-    <div
-      className={classNames("CardsView-Card", {"CardsView-Card--selected": isSelected})}
-      style={{backgroundColor}}
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-    >
-      <div className="CardsView-Card-Text">
-        {card.text}
-      </div>
-      <div className="CardsView-Card-Details">
-        <div className="CardsView-Card-Number">
-          #{card.number}
-        </div>
-        <div className="CardsView-Card-Category">
-          {cardCategory === null ? null : cardCategory.name}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const cardHeight = 85;

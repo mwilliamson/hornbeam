@@ -37,38 +37,3 @@
 .CardsView-TreeView-Children {
   @include CardsView-CardsRow;
 }
-
-.CardsView-Card {
-  @include cards.card;
-
-  flex: 0 0 auto;
-  padding: 0.5em 1em;
-  /**
-  TODO: specify height in ems, adjust SVG accordingly?
-  height: 5em;
-  **/
-  height: 85px;
-  width: 15em;
-  display: flex;
-  flex-direction: column;
-
-  &--selected {
-    @include cards.card--selected;
-  }
-}
-
-.CardsView-Card-Text {
-  flex: 1 0 0;
-  min-height: 0;
-  overflow: hidden;
-  /* How to add ellipsis? */
-}
-
-.CardsView-Card-Details {
-  flex: 0 0 auto;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  font-size: text.$font-size-sm;
-  color: text.$color-faded;
-}

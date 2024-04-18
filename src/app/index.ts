@@ -1,13 +1,10 @@
 import { Card, CardAddRequest, CardDeleteRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
+import { Color } from "./colors";
 
 export interface Category {
   id: string;
   name: string;
   color: Color;
-}
-
-export interface Color {
-  hex: string;
 }
 
 const categories: ReadonlyArray<Category> = [

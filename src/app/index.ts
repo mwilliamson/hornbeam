@@ -55,6 +55,10 @@ export class AppState implements CardSet, CategorySet {
     );
   }
 
+  public countCardChildren(cardId: string): number {
+    return this.cards.filter(card => card.parentCardId === cardId).length;
+  }
+
   public findCardById(cardId: string): Card | null {
     return this.cards.find(card => card.id == cardId) ?? null;
   }

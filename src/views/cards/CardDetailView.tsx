@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
 import { CategorySet } from "../../app/categories";
+import pluralize from "../../util/pluralize";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import { ValidationErrorsInlineView } from "../validation-views";
@@ -53,6 +54,10 @@ export default function CardDetailView(props: CardDetailViewProps) {
           allCategories={allCategories}
           categoryId={card.categoryId}
           onCardCategorySave={onCardCategorySave}
+        />
+        <CardChildrenView
+          allCards={allCards}
+          cardId={card.id}
         />
       </div>
 
@@ -121,7 +126,6 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
         <CardParentView allCards={allCards} parentCardId={parentCardId} />
       </ControlGroup>
     </>
-
   );
 }
 
@@ -165,6 +169,28 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
       )}
       validate={validateCardText}
     />
+  );
+}
+
+interface CardChildrenViewProps {
+  allCards: CardSet;
+  cardId: string;
+}
+
+function CardChildrenView(props: CardChildrenViewProps) {
+  const {allCards, cardId} = props;
+
+  const childCount = allCards.countCardChildren(cardId);
+
+  return (
+    <>
+      <ControlLabel>
+        Children
+      </ControlLabel>
+      <ControlGroup>
+        {childCount} {pluralize(childCount, "child", "children")}
+      </ControlGroup>
+    </>
   );
 }
 

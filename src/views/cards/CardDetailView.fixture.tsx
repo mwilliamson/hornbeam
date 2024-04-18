@@ -21,6 +21,7 @@ export default (
       allCategories={appState}
       card={card}
       onAddChildClick={() => {}}
+      onCardTextSave={() => Promise.resolve()}
     />
   </div>
 );

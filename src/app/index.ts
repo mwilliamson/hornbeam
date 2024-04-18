@@ -34,10 +34,21 @@ export interface CardDeleteRequest {
 }
 
 export interface CardEditRequest {
-  categoryId: string;
+  categoryId?: string;
   id: string;
-  parentCardId: string | null;
-  text: string;
+  parentCardId?: string | null;
+  text?: string;
+}
+
+function updateCard(card: Card, request: CardEditRequest): Card {
+  return {
+    categoryId: request.categoryId === undefined ? card.categoryId : request.categoryId,
+    createdAt: card.createdAt,
+    id: card.id,
+    number: card.number,
+    parentCardId: request.parentCardId === undefined ? card.parentCardId : request.parentCardId,
+    text: request.text === undefined ? card.text : request.text,
+  };
 }
 
 export interface Category {
@@ -138,14 +149,7 @@ export class AppState implements CardSet, CategorySet {
           return card;
         }
 
-        return {
-          categoryId: request.categoryId,
-          createdAt: card.createdAt,
-          id: request.id,
-          number: card.number,
-          parentCardId: request.parentCardId,
-          text: request.text,
-        };
+        return updateCard(card, request);
       }),
       this.nextCardNumber,
     );

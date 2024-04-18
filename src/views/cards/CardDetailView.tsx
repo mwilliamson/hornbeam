@@ -1,3 +1,4 @@
+import { useId, useState } from "react";
 import { Card, CardEvent, CategorySet, cardHistory } from "../../app";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";
@@ -5,15 +6,29 @@ import ControlLabel from "../widgets/ControlLabel";
 import InstantView from "../widgets/InstantView";
 import "./CardDetailView.scss";
 import CardView from "./CardView";
+import Input from "../widgets/Input";
 
 interface CardDetailViewProps {
   allCategories: CategorySet;
   card: Card;
   onAddChildClick: () => void;
+  onCardTextSave: (newText: string) => Promise<void>;
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
-  const {allCategories, card, onAddChildClick} = props;
+  const {allCategories, card, onAddChildClick, onCardTextSave} = props;
+
+  const textEditControlId = useId();
+  const [textEdit, setTextEdit] = useState<string | null>(null);
+
+  const handleTextSave = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (textEdit !== null) {
+      await onCardTextSave(textEdit);
+      setTextEdit(null);
+    }
+  };
 
   const category = allCategories.findCategoryById(card.categoryId);
 
@@ -37,8 +52,40 @@ export default function CardDetailView(props: CardDetailViewProps) {
       </div>
 
       <div className="CardDetailView-Properties">
-        <ControlLabel>Text</ControlLabel>
-        <ControlGroup>{card.text}</ControlGroup>
+        <form onSubmit={handleTextSave}>
+          <ControlLabel
+            buttons={
+              textEdit === null ? (
+                <Button type="button" intent="secondary" onClick={() => setTextEdit(card.text)}>
+                  Edit
+                </Button>
+              ) : (
+                <>
+                  <Button type="button" intent="secondary" onClick={() => setTextEdit(null)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" intent="primary">
+                    Save
+                  </Button>
+                </>
+              )
+            }
+          >
+            Text
+          </ControlLabel>
+          <ControlGroup>
+            {textEdit === null ? (
+              <span id={textEditControlId}>{card.text}</span>
+            ) : (
+              <Input
+                autoFocus
+                id={textEditControlId}
+                onChange={(newText) => setTextEdit(newText)}
+                value={textEdit}
+              />
+            )}
+          </ControlGroup>
+        </form>
       </div>
 
       <div className="CardDetailView-History">

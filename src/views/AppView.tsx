@@ -105,6 +105,10 @@ export default function AppView(props: AppViewProps) {
     handleCardEditClose();
   };
 
+  const handleCardTextSave = async (request: CardEditRequest) => {
+    await sendRequest(requests.cardEdit(request));
+  };
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       // TODO: use proper selection of the cards and put the event on the cards?
@@ -146,6 +150,7 @@ export default function AppView(props: AppViewProps) {
           onCardAddClose={handleCardAddClose}
           onCardEdit={handleCardEdit}
           onCardEditClose={handleCardEditClose}
+          onCardTextSave={handleCardTextSave}
           viewState={viewState}
         />
       </div>
@@ -160,6 +165,7 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onCardEdit: (values: CardEditRequest) => Promise<void>;
   onCardEditClose: () => void;
+  onCardTextSave: (request: CardEditRequest) => Promise<void>;
   viewState: ViewState;
 }
 
@@ -171,6 +177,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onCardEdit,
     onCardEditClose,
+    onCardTextSave,
     viewState,
   } = props;
 
@@ -227,6 +234,7 @@ function Sidebar(props: SidebarProps) {
         allCategories={appState}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
+        onCardTextSave={newText => onCardTextSave({id: selectedCard.id, text: newText})}
       />
     );
   } else {

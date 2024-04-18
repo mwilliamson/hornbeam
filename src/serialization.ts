@@ -18,12 +18,16 @@ const SerializedCardDeleteRequest = t.type({
   id: t.string,
 }, "SerializedCardDeleteRequest");
 
-const SerializedCardEditRequest = t.type({
-  categoryId: t.string,
-  id: t.string,
-  parentCardId: t.union([t.string, t.null]),
-  text: t.string,
-}, "SerializedCardEditRequest");
+const SerializedCardEditRequest = t.intersection([
+  t.type({
+    id: t.string,
+  }),
+  t.partial({
+    categoryId: t.string,
+    parentCardId: t.union([t.string, t.null]),
+    text: t.string,
+  }),
+], "SerializedCardEditRequest");
 
 const SerializedRequest = t.union([
   t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddRequest}),

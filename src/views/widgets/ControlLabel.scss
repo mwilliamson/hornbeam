@@ -4,4 +4,7 @@
   margin-top: spacing.$md;
   margin-bottom: spacing.$sm;
   font-weight: bold;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }

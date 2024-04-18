@@ -11,7 +11,7 @@ export default function ControlLabel(props: ControlLabelProps) {
 
   return (
     <div className="ControlLabel">
-      <label htmlFor={htmlFor}>
+      <label className="ControlLabel-Label" htmlFor={htmlFor}>
         {children}
       </label>
       {buttons !== null && <div>{buttons}</div>}

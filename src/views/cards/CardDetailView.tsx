@@ -25,6 +25,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     event.preventDefault();
 
     if (textEdit !== null) {
+      // TODO: validation
       await onCardTextSave(textEdit);
       setTextEdit(null);
     }
@@ -56,9 +57,14 @@ export default function CardDetailView(props: CardDetailViewProps) {
           <ControlLabel
             buttons={
               textEdit === null ? (
-                <Button type="button" intent="secondary" inline onClick={() => setTextEdit(card.text)}>
+                /* TODO: proper link button */
+                <a
+                  href="#"
+                  onClick={(event) => {event.preventDefault(); setTextEdit(card.text);}}
+                  style={{fontSize: 14, color: "#3182ce", textDecoration: "none"}}
+                >
                   Edit
-                </Button>
+                </a>
               ) : (
                 <>
                   <Button type="button" intent="secondary" inline onClick={() => setTextEdit(null)}>

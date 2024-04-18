@@ -15,7 +15,12 @@
   font-weight: bold;
 
   &:disabled {
-      opacity: 0.4;
+    opacity: 0.4;
+  }
+
+  &--inline {
+    font-size: 14px;
+    padding: 0.3rem 0.7rem;
   }
 }
 

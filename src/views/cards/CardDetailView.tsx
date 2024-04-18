@@ -56,15 +56,15 @@ export default function CardDetailView(props: CardDetailViewProps) {
           <ControlLabel
             buttons={
               textEdit === null ? (
-                <Button type="button" intent="secondary" onClick={() => setTextEdit(card.text)}>
+                <Button type="button" intent="secondary" inline onClick={() => setTextEdit(card.text)}>
                   Edit
                 </Button>
               ) : (
                 <>
-                  <Button type="button" intent="secondary" onClick={() => setTextEdit(null)}>
+                  <Button type="button" intent="secondary" inline onClick={() => setTextEdit(null)}>
                     Cancel
                   </Button>
-                  <Button type="submit" intent="primary">
+                  <Button type="submit" intent="primary" inline>
                     Save
                   </Button>
                 </>

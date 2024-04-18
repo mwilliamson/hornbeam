@@ -3,7 +3,8 @@ import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 
 import * as t2 from "./util/io-ts";
-import { AppUpdate, CardAddRequest, CardDeleteRequest, CardEditRequest } from "./app";
+import { AppUpdate } from "./app";
+import { CardAddRequest, CardDeleteRequest, CardEditRequest } from "./app/cards";
 import { Instant } from "@js-joda/core";
 
 const SerializedCardAddRequest = t.type({

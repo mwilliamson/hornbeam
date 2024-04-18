@@ -1,10 +1,11 @@
 import { useState } from "react";
 
-import { Card, CardSet, CategorySet } from "../../app";
-import Form from "../widgets/Form";
+import { CategorySet } from "../../app";
+import { Card, CardSet } from "../../app/cards";
 import { ValidationError } from "../../util/validation";
-import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 import { ValidationErrorsSummaryView } from "../validation-views";
+import Form from "../widgets/Form";
+import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 
 interface CardEditModalProps {
   allCards: CardSet;

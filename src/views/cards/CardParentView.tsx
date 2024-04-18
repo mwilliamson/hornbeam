@@ -1,4 +1,4 @@
-import { CardSet } from "../../app";
+import { CardSet } from "../../app/cards";
 
 interface CardParentViewProps {
   allCards: CardSet;

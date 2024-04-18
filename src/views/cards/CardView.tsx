@@ -1,6 +1,7 @@
 import classNames from "classnames";
 
-import { Card, Category } from "../../app";
+import { Category } from "../../app";
+import { Card } from "../../app/cards";
 import "./CardView.scss";
 
 interface CardViewProps {

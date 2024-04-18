@@ -1,8 +1,9 @@
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
 
-import { Card, initialAppState } from "../../app";
+import { initialAppState } from "../../app";
 import CardDetailView from "./CardDetailView";
+import { Card } from "../../app/cards";
 
 const appState = initialAppState();
 

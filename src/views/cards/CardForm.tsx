@@ -1,12 +1,13 @@
 import { useId, useState } from "react";
 
-import { CardAddRequest, CardSet, CategorySet, validateCardCategory, validateCardText } from "../../app";
+import { CategorySet } from "../../app";
+import { CardAddRequest, CardSet, validateCardCategory, validateCardText } from "../../app/cards";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
-import ControlLabel from "../widgets/ControlLabel";
-import ControlGroup from "../widgets/ControlGroup";
-import Input from "../widgets/Input";
 import { ValidationErrorsInlineView } from "../validation-views";
+import ControlGroup from "../widgets/ControlGroup";
+import ControlLabel from "../widgets/ControlLabel";
+import Input from "../widgets/Input";
 import CardParentView from "./CardParentView";
 
 export interface CardFormState {

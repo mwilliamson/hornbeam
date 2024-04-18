@@ -2,7 +2,8 @@ import { Instant } from "@js-joda/core";
 import { useEffect, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { AppState, AppUpdate, Card, CardAddRequest, CardEditRequest, Request, requests } from "../app";
+import { AppState, AppUpdate, Request, requests } from "../app";
+import { Card, CardAddRequest, CardEditRequest } from "../app/cards";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import "./AppView.scss";

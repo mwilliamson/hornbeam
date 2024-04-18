@@ -1,84 +1,4 @@
-import { Instant } from "@js-joda/core";
-import { ValidationResult } from "../util/validation";
-
-export interface Card {
-  categoryId: string;
-  createdAt: Instant;
-  id: string;
-  number: number;
-  parentCardId: string | null;
-  text: string;
-}
-
-export type CardEvent =
-  | {type: "created", instant: Instant};
-
-export function cardHistory(card: Card): ReadonlyArray<CardEvent> {
-  return [
-    {
-      type: "created",
-      instant: card.createdAt,
-    }
-  ];
-}
-
-export interface CardAddRequest {
-  categoryId: string;
-  createdAt: Instant;
-  id: string;
-  parentCardId: string | null;
-  text: string;
-}
-
-export interface CardDeleteRequest {
-  id: string;
-}
-
-export interface CardEditRequest {
-  categoryId?: string;
-  id: string;
-  parentCardId?: string | null;
-  text?: string;
-}
-
-function updateCard(card: Card, request: CardEditRequest): Card {
-  return {
-    categoryId: request.categoryId === undefined ? card.categoryId : request.categoryId,
-    createdAt: card.createdAt,
-    id: card.id,
-    number: card.number,
-    parentCardId: request.parentCardId === undefined ? card.parentCardId : request.parentCardId,
-    text: request.text === undefined ? card.text : request.text,
-  };
-}
-
-export function validateCardText(elementId: string, text: string): ValidationResult<string> {
-  if (text === "") {
-    return ValidationResult.invalid([
-      {
-        elementId,
-        inlineText: "Enter the card text.",
-        summaryText: "Card is missing text."
-      },
-    ]);
-  } else {
-    return ValidationResult.valid(text);
-  }
-}
-
-export function validateCardCategory(elementId: string, categoryId: string | null): ValidationResult<string> {
-  if (categoryId === null) {
-    return ValidationResult.invalid([
-      {
-        elementId: elementId,
-        inlineText: "Select a category.",
-        summaryText: "Card is missing a category.",
-      },
-    ]);
-  } else {
-    return ValidationResult.valid(categoryId);
-  }
-}
+import { Card, CardAddRequest, CardDeleteRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
 
 export interface Category {
   id: string;
@@ -147,14 +67,7 @@ export class AppState implements CardSet, CategorySet {
   }
 
   public cardAdd(request: CardAddRequest): AppState {
-    const card: Card = {
-      categoryId: request.categoryId,
-      createdAt: request.createdAt,
-      id: request.id,
-      number: this.nextCardNumber,
-      parentCardId: request.parentCardId,
-      text: request.text,
-    };
+    const card = createCard(request, this.nextCardNumber);
     return new AppState(
       this.updateIds,
       [...this.cards, card],
@@ -199,10 +112,6 @@ export class AppState implements CardSet, CategorySet {
   private allCategories(): ReadonlyArray<Category> {
     return categories;
   }
-}
-
-export interface CardSet {
-  findCardById: (cardId: string) => Card | null;
 }
 
 export interface CategorySet {

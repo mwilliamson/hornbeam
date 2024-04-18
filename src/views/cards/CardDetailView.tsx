@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
-import { Card, CardEvent, CardSet, CategorySet, cardHistory, validateCardText } from "../../app";
+import { CategorySet } from "../../app";
+import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";

@@ -105,7 +105,7 @@ export default function AppView(props: AppViewProps) {
     handleCardEditClose();
   };
 
-  const handleCardTextSave = async (request: CardEditRequest) => {
+  const handleCardSave = async (request: CardEditRequest) => {
     await sendRequest(requests.cardEdit(request));
   };
 
@@ -150,7 +150,7 @@ export default function AppView(props: AppViewProps) {
           onCardAddClose={handleCardAddClose}
           onCardEdit={handleCardEdit}
           onCardEditClose={handleCardEditClose}
-          onCardTextSave={handleCardTextSave}
+          onCardSave={handleCardSave}
           viewState={viewState}
         />
       </div>
@@ -165,7 +165,7 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onCardEdit: (values: CardEditRequest) => Promise<void>;
   onCardEditClose: () => void;
-  onCardTextSave: (request: CardEditRequest) => Promise<void>;
+  onCardSave: (request: CardEditRequest) => Promise<void>;
   viewState: ViewState;
 }
 
@@ -177,7 +177,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onCardEdit,
     onCardEditClose,
-    onCardTextSave,
+    onCardSave,
     viewState,
   } = props;
 
@@ -235,7 +235,8 @@ function Sidebar(props: SidebarProps) {
         allCategories={appState}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
-        onCardTextSave={newText => onCardTextSave({id: selectedCard.id, text: newText})}
+        onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}
+        onCardTextSave={newText => onCardSave({id: selectedCard.id, text: newText})}
       />
     );
   } else {

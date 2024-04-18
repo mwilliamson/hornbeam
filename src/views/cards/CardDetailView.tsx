@@ -10,17 +10,19 @@ import "./CardDetailView.scss";
 import CardView from "./CardView";
 import { ValidationErrorsInlineView } from "../validation-views";
 import CardParentView from "./CardParentView";
+import CategorySelect from "../categories/CategorySelect";
 
 interface CardDetailViewProps {
   allCards: CardSet;
   allCategories: CategorySet;
   card: Card;
   onAddChildClick: () => void;
+  onCardCategorySave: (newCategoryId: string) => Promise<void>;
   onCardTextSave: (newText: string) => Promise<void>;
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
-  const {allCards, allCategories, card, onAddChildClick, onCardTextSave} = props;
+  const {allCards, allCategories, card, onAddChildClick, onCardCategorySave, onCardTextSave} = props;
 
   const category = allCategories.findCategoryById(card.categoryId);
 
@@ -46,7 +48,11 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
         <CardParentPropertyView allCards={allCards} parentCardId={card.parentCardId} />
-        <CardCategoryPropertyView allCategories={allCategories} categoryId={card.categoryId} />
+        <CardCategoryPropertyView
+          allCategories={allCategories}
+          categoryId={card.categoryId}
+          onCardCategorySave={onCardCategorySave}
+        />
       </div>
 
       <div className="CardDetailView-History">
@@ -121,10 +127,11 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
 interface CardCategoryPropertyViewProps {
   allCategories: CategorySet;
   categoryId: string;
+  onCardCategorySave: (newCategoryId: string) => Promise<void>;
 }
 
 function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
-  const {allCategories, categoryId} = props;
+  const {allCategories, categoryId, onCardCategorySave} = props;
 
   const category = allCategories.findCategoryById(categoryId);
   if (category === null) {
@@ -133,12 +140,20 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
   }
 
   return (
-    <>
-      <ControlLabel>
-        Category
-      </ControlLabel>
-      <ControlGroup>
-        <div className="CardDetailView-CategoryCardContainer">
+    <EditableCardPropertyView
+      initialEditValue={categoryId}
+      label="Category"
+      onSave={onCardCategorySave}
+      renderControl={({id, onChange, value}) => (
+        <CategorySelect
+          availableCategories={allCategories.availableCategories()}
+          id={id}
+          onChange={onChange}
+          value={value}
+        />
+      )}
+      renderReadonly={({id}) => (
+        <div className="CardDetailView-CategoryCardContainer" id={id}>
           <div
             className="CardDetailView-CategoryCard"
             style={{backgroundColor: category.color.hex}}
@@ -146,9 +161,9 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
             {category.name}
           </div>
         </div>
-      </ControlGroup>
-    </>
-
+      )}
+      validate={validateCardText}
+    />
   );
 }
 

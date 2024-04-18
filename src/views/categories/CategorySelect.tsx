@@ -5,12 +5,13 @@ import "./CategorySelect.scss";
 
 interface CategorySelectProps {
   availableCategories: ReadonlyArray<Category>;
+  id?: string;
   onChange: (categoryId: string) => void;
   value: string | null;
 }
 
 export default function CategorySelect(props: CategorySelectProps) {
-  const {availableCategories, onChange, value} = props;
+  const {availableCategories, id, onChange, value} = props;
 
   const htmlName = useId();
 
@@ -21,7 +22,7 @@ export default function CategorySelect(props: CategorySelectProps) {
   };
 
   return (
-    <div className="CategorySelect">
+    <div className="CategorySelect" id={id}>
       {availableCategories.map(category => (
         <div key={category.id} className="CategorySelect-Category">
           <input

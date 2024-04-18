@@ -9,7 +9,6 @@ import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
 import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../util/promises";
-import { keyBy } from "../util/maps";
 import { ValidCardFormValues } from "./cards/CardForm";
 import CardAddForm from "./cards/CardAddForm";
 import CardEditForm from "./cards/CardEditForm";
@@ -128,17 +127,15 @@ export default function AppView(props: AppViewProps) {
     };
   }, [viewState.selectedCardId, sendRequest]);
 
-  const categoriesById = keyBy(state.allCategories(), category => category.id);
-
   return (
     <div className="AppView">
       <div className="AppView-Cards">
         <CardsView
+          allCategories={state}
           cards={state.cards}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
           onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
-          categoriesById={categoriesById}
         />
       </div>
       <div className="AppView-Tools">
@@ -207,8 +204,8 @@ function Sidebar(props: SidebarProps) {
   if (editCard !== null) {
     return (
       <CardEditForm
-        availableCategories={appState.availableCategories()}
         allCards={appState}
+        allCategories={appState}
         card={editCard}
         onClose={onCardEditClose}
         onCardSave={values => handleCardSave(editCard, values)}
@@ -217,8 +214,8 @@ function Sidebar(props: SidebarProps) {
   } else if (viewState.addingCard !== null) {
     return (
       <CardAddForm
-        availableCategories={appState.availableCategories()}
         allCards={appState}
+        allCategories={appState}
         initialValue={viewState.addingCard}
         onClose={onCardAddClose}
         onCardAdd={handleCardAdd}

@@ -9,7 +9,7 @@ export default {
     return (
       <CardForm
         allCards={appState}
-        availableCategories={appState.availableCategories()}
+        allCategories={appState}
         errors={[]}
         onStateChange={state => setState(state)}
         state={state}

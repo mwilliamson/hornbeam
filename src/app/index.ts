@@ -159,11 +159,11 @@ export class AppState implements CardSet, CategorySet {
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }
 
-  public allCategories(): ReadonlyArray<Category> {
+  public availableCategories(): ReadonlyArray<Category> {
     return categories;
   }
 
-  public availableCategories(): ReadonlyArray<Category> {
+  private allCategories(): ReadonlyArray<Category> {
     return categories;
   }
 }
@@ -173,6 +173,7 @@ export interface CardSet {
 }
 
 export interface CategorySet {
+  availableCategories(): ReadonlyArray<Category>;
   findCategoryById: (categoryId: string) => Category | null;
 }
 

@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 
-import { CardAddRequest, CardSet, Category } from "../../app";
+import { CardAddRequest, CardSet, CategorySet } from "../../app";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import Input from "../widgets/Input";
@@ -71,7 +71,7 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
 
 interface CardFormProps {
   allCards: CardSet;
-  availableCategories: ReadonlyArray<Category>;
+  allCategories: CategorySet;
   errors: ReadonlyArray<ValidationError>;
 
   onStateChange: (value: CardFormState) => void;
@@ -79,7 +79,7 @@ interface CardFormProps {
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {allCards, availableCategories, errors, onStateChange: onChange, state} = props;
+  const {allCards, allCategories, errors, onStateChange: onChange, state} = props;
 
   const parent = state.parentCardId === null
     ? null
@@ -110,7 +110,7 @@ export default function CardForm(props: CardFormProps) {
       <label className="CardForm-ControlLabel">Category</label>
       <div className="CardForm-Control">
         <CategorySelect
-          availableCategories={availableCategories}
+          availableCategories={allCategories.availableCategories()}
           onChange={categoryId => onChange({...state, categoryId})}
           value={state.categoryId}
         />

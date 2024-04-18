@@ -2,19 +2,19 @@ import classNames from "classnames";
 import groupBy from "lodash/groupBy";
 import React from "react";
 
-import { Card, Category } from "../app";
+import { Card, Category, CategorySet } from "../app";
 import "./CardsView.scss";
 
 interface CardsViewProps {
+  allCategories: CategorySet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardEdit: (cardId: string | null) => void;
-  categoriesById: Map<string, Category>;
 }
 
 export default function CardsView(props: CardsViewProps) {
-  const {cards, cardSelectedId, onCardSelect, onCardEdit, categoriesById} = props;
+  const {allCategories, cards, cardSelectedId, onCardSelect, onCardEdit} = props;
 
   const cardsByParentId = groupBy(
     cards.filter(card => card.parentCardId !== null),
@@ -29,13 +29,13 @@ export default function CardsView(props: CardsViewProps) {
         {cards.filter(card => card.parentCardId === null).map(card => (
           <CardTreeView
             key={card.id}
+            allCategories={allCategories}
             card={card}
             cardsByParentId={cardsByParentId}
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
             onCardEdit={onCardEdit}
-            categoriesById={categoriesById}
           />
         ))}
       </div>
@@ -44,24 +44,24 @@ export default function CardsView(props: CardsViewProps) {
 }
 
 interface CardTreeViewProps {
+  allCategories: CategorySet;
   card: Card;
   cardsByParentId: {[id: string]: ReadonlyArray<Card>};
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardEdit: (cardId: string | null) => void;
-  categoriesById: Map<string, Category>;
 }
 
 function CardTreeView(props: CardTreeViewProps) {
   const {
+    allCategories,
     card,
     cardsByParentId,
     cardTops,
     cardSelectedId,
     onCardSelect,
     onCardEdit,
-    categoriesById,
   } = props;
 
   const children = cardsByParentId[card.id] || [];
@@ -80,7 +80,7 @@ function CardTreeView(props: CardTreeViewProps) {
       <div className="CardsView-TreeView-Parent">
         <CardView
           card={card}
-          cardCategory={categoriesById.get(card.categoryId) ?? null}
+          cardCategory={allCategories.findCategoryById(card.categoryId)}
           isSelected={cardSelectedId === card.id}
           onSelect={() => onCardSelect(card.id)}
           onEdit={() => onCardEdit(card.id)}
@@ -145,13 +145,13 @@ function CardTreeView(props: CardTreeViewProps) {
             {children.map(childCard => (
               <CardTreeView
                 key={childCard.id}
+                allCategories={allCategories}
                 card={childCard}
                 cardsByParentId={cardsByParentId}
                 cardTops={cardTops}
                 cardSelectedId={cardSelectedId}
                 onCardSelect={onCardSelect}
                 onCardEdit={onCardEdit}
-                categoriesById={categoriesById}
               />
             ))}
           </div>

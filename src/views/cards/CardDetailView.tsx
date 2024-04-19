@@ -15,6 +15,7 @@ import Form from "../widgets/Form";
 import Input from "../widgets/Input";
 import InstantView from "../widgets/InstantView";
 import LinkButton from "../widgets/LinkButton";
+import PlainTextView from "../widgets/PlainTextView";
 import Textarea from "../widgets/Textarea";
 import "./CardDetailView.scss";
 import CardParentView from "./CardParentView";
@@ -346,7 +347,9 @@ function CardEventDescription(props: CardEventDescriptionProps) {
     case "created":
       return null;
     case "comment":
-      return cardEvent.comment.text;
+      return (
+        <PlainTextView value={cardEvent.comment.text} />
+      );
     default:
       return assertNever(cardEvent, null);
   }

@@ -30,10 +30,18 @@ const SerializedCardEditRequest = t.intersection([
   }),
 ], "SerializedCardEditRequest");
 
+const SerializedCategoryAddRequest = t.type({
+  createdAt: t2.instant,
+  color: t.type({presetColorId: t.string}),
+  id: t.string,
+  name: t.string,
+}, "SerializedCategoryAddRequest");
+
 const SerializedRequest = t.union([
   t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddRequest}),
   t.type({type: t.literal("cardDelete"), cardDelete: SerializedCardDeleteRequest}),
-  t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditRequest})
+  t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditRequest}),
+  t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddRequest}),
 ]);
 
 const SerializedAppUpdate = t.type({

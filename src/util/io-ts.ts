@@ -15,7 +15,7 @@ export function withDefault<T extends t.Any>(
   );
 }
 
-export const instant: t.Type<Instant, [number, number], Instant> = new t.Type(
+export const instant: t.Type<Instant, [number, number], unknown> = new t.Type(
   "Instant",
   (input: unknown): input is Instant => input instanceof Instant,
   (input, context) =>

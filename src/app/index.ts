@@ -1,20 +1,23 @@
 import { Card, CardAddRequest, CardDeleteRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
-import { Category, CategorySet, allCategories } from "./categories";
+import { Category, CategoryAddRequest, CategorySet, createCategory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 
 export class AppState implements CardSet, CategorySet, ColorSet {
   public readonly updateIds: ReadonlyArray<string>;
   public readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
+  private readonly categories: ReadonlyArray<Category>;
 
   public constructor(
     updateIds: ReadonlyArray<string>,
     cards: ReadonlyArray<Card>,
     nextCardNumber: number,
+    categories: ReadonlyArray<Category>
   ) {
     this.updateIds = updateIds;
     this.cards = cards;
     this.nextCardNumber = nextCardNumber;
+    this.categories = categories;
   }
 
   public addUpdateId(updateId: string): AppState {
@@ -22,6 +25,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       [...this.updateIds, updateId],
       this.cards,
       this.nextCardNumber,
+      this.categories,
     );
   }
 
@@ -31,6 +35,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       this.updateIds,
       [...this.cards, card],
       this.nextCardNumber + 1,
+      this.categories,
     );
   }
 
@@ -39,6 +44,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       this.updateIds,
       this.cards.filter(card => card.id !== request.id),
       this.nextCardNumber,
+      this.categories,
     );
   }
 
@@ -53,6 +59,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
         return updateCard(card, request);
       }),
       this.nextCardNumber,
+      this.categories,
     );
   }
 
@@ -68,12 +75,22 @@ export class AppState implements CardSet, CategorySet, ColorSet {
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }
 
+  public categoryAdd(request: CategoryAddRequest): AppState {
+    const category = createCategory(request);
+    return new AppState(
+      this.updateIds,
+      this.cards,
+      this.nextCardNumber,
+      [...this.categories, category],
+    );
+  }
+
   public availableCategories(): ReadonlyArray<Category> {
-    return allCategories;
+    return this.categories;
   }
 
   private allCategories(): ReadonlyArray<Category> {
-    return allCategories;
+    return this.categories;
   }
 
   public findPresetColorById(presetColorId: string): PresetColor | null {
@@ -82,7 +99,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
 }
 
 export function initialAppState(): AppState {
-  return new AppState([], [], 1);
+  return new AppState([], [], 1, []);
 }
 
 export interface AppUpdate {
@@ -93,7 +110,8 @@ export interface AppUpdate {
 export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
   | {type: "cardDelete", cardDelete: CardDeleteRequest}
-  | {type: "cardEdit", cardEdit: CardEditRequest};
+  | {type: "cardEdit", cardEdit: CardEditRequest}
+  | {type: "categoryAdd", categoryAdd: CategoryAddRequest};
 
 export const requests = {
   cardAdd(request: CardAddRequest): Request {
@@ -106,7 +124,11 @@ export const requests = {
 
   cardEdit(request: CardEditRequest): Request {
     return {type: "cardEdit", cardEdit: request};
-  }
+  },
+
+  categoryAdd(request: CategoryAddRequest): Request {
+    return {type: "categoryAdd", categoryAdd: request};
+  },
 };
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
@@ -119,6 +141,9 @@ export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
       break;
     case "cardEdit":
       state = state.cardEdit(update.request.cardEdit);
+      break;
+    case "categoryAdd":
+      state = state.categoryAdd(update.request.categoryAdd);
       break;
   }
 

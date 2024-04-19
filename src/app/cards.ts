@@ -1,6 +1,7 @@
 import { Instant } from "@js-joda/core";
 import { ValidationResult } from "../util/validation";
 import { CardStatus } from "./cardStatuses";
+import { Comment, CommentSet } from "./comments";
 
 export interface Card {
   categoryId: string;
@@ -13,14 +14,20 @@ export interface Card {
 }
 
 export type CardEvent =
-  | {type: "created", instant: Instant};
+  | {type: "created", instant: Instant}
+  | {type: "comment", instant: Instant, comment: Comment};
 
-export function cardHistory(card: Card): ReadonlyArray<CardEvent> {
+export function cardHistory(card: Card, appState: CommentSet): ReadonlyArray<CardEvent> {
   return [
     {
       type: "created",
       instant: card.createdAt,
-    }
+    },
+    ...appState.findCommentsByCardId(card.id).map(comment => ({
+      type: "comment" as const,
+      instant: comment.createdAt,
+      comment,
+    }))
   ];
 }
 

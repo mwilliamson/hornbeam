@@ -1,23 +1,28 @@
+import assertNever from "../util/assertNever";
 import { Card, CardAddRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategorySet, createCategory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
+import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
 
-export class AppState implements CardSet, CategorySet, ColorSet {
+export class AppState implements CardSet, CategorySet, ColorSet, CommentSet {
   public readonly updateIds: ReadonlyArray<string>;
   public readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
   private readonly categories: ReadonlyArray<Category>;
+  private readonly comments: ReadonlyArray<Comment>;
 
   public constructor(
     updateIds: ReadonlyArray<string>,
     cards: ReadonlyArray<Card>,
     nextCardNumber: number,
-    categories: ReadonlyArray<Category>
+    categories: ReadonlyArray<Category>,
+    comments: ReadonlyArray<Comment>,
   ) {
     this.updateIds = updateIds;
     this.cards = cards;
     this.nextCardNumber = nextCardNumber;
     this.categories = categories;
+    this.comments = comments;
   }
 
   public addUpdateId(updateId: string): AppState {
@@ -26,6 +31,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       this.cards,
       this.nextCardNumber,
       this.categories,
+      this.comments,
     );
   }
 
@@ -36,6 +42,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       [...this.cards, card],
       this.nextCardNumber + 1,
       this.categories,
+      this.comments,
     );
   }
 
@@ -51,6 +58,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       }),
       this.nextCardNumber,
       this.categories,
+      this.comments,
     );
   }
 
@@ -73,6 +81,7 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       this.cards,
       this.nextCardNumber,
       [...this.categories, category],
+      this.comments,
     );
   }
 
@@ -87,10 +96,25 @@ export class AppState implements CardSet, CategorySet, ColorSet {
   public findPresetColorById(presetColorId: string): PresetColor | null {
     return presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
   }
+
+  public commentAdd(request: CommentAddRequest): AppState {
+    const comment = createComment(request);
+    return new AppState(
+      this.updateIds,
+      this.cards,
+      this.nextCardNumber,
+      this.categories,
+      [...this.comments, comment],
+    );
+  }
+
+  public findCommentsByCardId(cardId: string): ReadonlyArray<Comment> {
+    return this.comments.filter(comment => comment.cardId === cardId);
+  }
 }
 
 export function initialAppState(): AppState {
-  return new AppState([], [], 1, []);
+  return new AppState([], [], 1, [], []);
 }
 
 export interface AppUpdate {
@@ -101,7 +125,8 @@ export interface AppUpdate {
 export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
   | {type: "cardEdit", cardEdit: CardEditRequest}
-  | {type: "categoryAdd", categoryAdd: CategoryAddRequest};
+  | {type: "categoryAdd", categoryAdd: CategoryAddRequest}
+  | {type: "commentAdd", commentAdd: CommentAddRequest};
 
 export const requests = {
   cardAdd(request: CardAddRequest): Request {
@@ -115,6 +140,10 @@ export const requests = {
   categoryAdd(request: CategoryAddRequest): Request {
     return {type: "categoryAdd", categoryAdd: request};
   },
+
+  commentAdd(request: CommentAddRequest): Request {
+    return {type: "commentAdd", commentAdd: request};
+  },
 };
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
@@ -127,6 +156,12 @@ export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
       break;
     case "categoryAdd":
       state = state.categoryAdd(update.request.categoryAdd);
+      break;
+    case "commentAdd":
+      state = state.commentAdd(update.request.commentAdd);
+      break;
+    default:
+      assertNever(update.request, null);
       break;
   }
 

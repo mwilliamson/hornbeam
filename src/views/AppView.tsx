@@ -5,6 +5,7 @@ import { uuidv7 } from "uuidv7";
 import { AppState, AppUpdate, Request, requests } from "../app";
 import { CardStatus } from "../app/cardStatuses";
 import { Card, CardAddRequest, CardEditRequest } from "../app/cards";
+import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
@@ -111,6 +112,10 @@ export default function AppView(props: AppViewProps) {
     await sendRequest(requests.cardEdit(request));
   };
 
+  const handleCommentAdd = async (request: CommentAddRequest) => {
+    await sendRequest(requests.commentAdd(request));
+  };
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       // TODO: use proper selection of the cards and put the event on the cards?
@@ -157,6 +162,7 @@ export default function AppView(props: AppViewProps) {
           onCardEdit={handleCardEdit}
           onCardEditClose={handleCardEditClose}
           onCardSave={handleCardSave}
+          onCommentAdd={handleCommentAdd}
           viewState={viewState}
         />
       </div>
@@ -172,6 +178,7 @@ interface SidebarProps {
   onCardEdit: (values: CardEditRequest) => Promise<void>;
   onCardEditClose: () => void;
   onCardSave: (request: CardEditRequest) => Promise<void>;
+  onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   viewState: ViewState;
 }
 
@@ -184,6 +191,7 @@ function Sidebar(props: SidebarProps) {
     onCardEdit,
     onCardEditClose,
     onCardSave,
+    onCommentAdd,
     viewState,
   } = props;
 
@@ -214,6 +222,15 @@ function Sidebar(props: SidebarProps) {
     });
   };
 
+  const handleCommentAdd = async ({cardId, text}: {cardId: string, text: string}) => {
+    await onCommentAdd({
+      cardId,
+      createdAt: Instant.now(),
+      id: generateId(),
+      text,
+    });
+  };
+
   if (editCard !== null) {
     return (
       <CardEditForm
@@ -240,6 +257,7 @@ function Sidebar(props: SidebarProps) {
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
         onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}
         onCardTextSave={newText => onCardSave({id: selectedCard.id, text: newText})}
+        onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
       />
     );
   } else {

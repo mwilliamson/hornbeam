@@ -39,10 +39,18 @@ const SerializedCategoryAddRequest = t.type({
   name: t.string,
 }, "SerializedCategoryAddRequest");
 
+const SerializedCommentAddRequest = t.type({
+  cardId: t.string,
+  createdAt: t2.instant,
+  id: t.string,
+  text: t.string,
+}, "SerializedCommentAddRequest");
+
 const SerializedRequest = t.union([
   t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddRequest}),
   t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditRequest}),
   t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddRequest}),
+  t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddRequest}),
 ]);
 
 const SerializedAppUpdate = t.type({

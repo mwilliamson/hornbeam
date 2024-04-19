@@ -2,6 +2,8 @@ import { useId, useState } from "react";
 import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
+import { CommentSet } from "../../app/comments";
+import assertNever from "../../util/assertNever";
 import pluralize from "../../util/pluralize";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
@@ -9,6 +11,7 @@ import { ValidationErrorsInlineView } from "../validation-views";
 import Button from "../widgets/Button";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
+import Form from "../widgets/Form";
 import Input from "../widgets/Input";
 import InstantView from "../widgets/InstantView";
 import LinkButton from "../widgets/LinkButton";
@@ -17,11 +20,12 @@ import CardParentView from "./CardParentView";
 import CardView from "./CardView";
 
 interface CardDetailViewProps {
-  appState: CardSet & CategorySet & ColorSet;
+  appState: CardSet & CategorySet & ColorSet & CommentSet;
   card: Card;
   onAddChildClick: () => void;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
   onCardTextSave: (newText: string) => Promise<void>;
+  onCommentAdd: (text: string) => Promise<void>;
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
@@ -31,6 +35,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     onAddChildClick,
     onCardCategorySave,
     onCardTextSave,
+    onCommentAdd,
   } = props;
 
   const category = appState.findCategoryById(card.categoryId);
@@ -65,7 +70,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-History">
         <h3 className="CardDetailView-History-Title">History</h3>
         <div>
-          {cardHistory(card).map((event, eventIndex) => (
+          {cardHistory(card, appState).map((event, eventIndex) => (
             <div key={eventIndex} className="CardDetailView-Event">
               <div className="CardDetailView-Event-Instant">
                 <InstantView value={event.instant} />
@@ -76,6 +81,8 @@ export default function CardDetailView(props: CardDetailViewProps) {
             </div>
           ))}
         </div>
+
+        <CommentAddForm onCommentAdd={onCommentAdd} />
       </div>
     </>
   );
@@ -295,5 +302,30 @@ function CardEventDescription(props: CardEventDescriptionProps) {
   switch (cardEvent.type) {
     case "created":
       return "Card created";
+    case "comment":
+      return cardEvent.comment.text;
+    default:
+      return assertNever(cardEvent, null);
   }
+}
+
+interface CommentAddFormProps {
+  onCommentAdd: (text: string) => Promise<void>;
+}
+
+function CommentAddForm(props: CommentAddFormProps) {
+  const {onCommentAdd} = props;
+
+  const [text, setText] = useState("");
+
+  const handleSubmit = async () => {
+    await onCommentAdd(text);
+  };
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <textarea onChange={event => setText(event.target.value)} value={text} />
+      <Form.MainButtons submitText="Add comment" />
+    </Form>
+  );
 }

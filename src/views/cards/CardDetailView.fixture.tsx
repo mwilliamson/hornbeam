@@ -25,6 +25,7 @@ export default (
       onAddChildClick={() => {}}
       onCardCategorySave={() => Promise.resolve()}
       onCardTextSave={() => Promise.resolve()}
+      onCommentAdd={() => Promise.resolve()}
     />
   </div>
 );

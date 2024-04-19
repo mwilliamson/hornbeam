@@ -40,7 +40,7 @@ export default function Form(props: FormProps) {
 }
 
 interface MainButtonsProps {
-  onCancel: () => void;
+  onCancel?: () => void;
   submitText: string;
 }
 
@@ -50,7 +50,9 @@ function MainButtons(props: MainButtonsProps) {
   return (
     <div className="Form-MainButtons">
       <div>
-        <CancelButton onClick={onCancel} />
+        {onCancel !== undefined && (
+          <CancelButton onClick={onCancel} />
+        )}
       </div>
       <div>
         <Form.Status />

@@ -15,6 +15,7 @@ import Form from "../widgets/Form";
 import Input from "../widgets/Input";
 import InstantView from "../widgets/InstantView";
 import LinkButton from "../widgets/LinkButton";
+import Textarea from "../widgets/Textarea";
 import "./CardDetailView.scss";
 import CardParentView from "./CardParentView";
 import CardView from "./CardView";
@@ -39,6 +40,8 @@ export default function CardDetailView(props: CardDetailViewProps) {
   } = props;
 
   const category = appState.findCategoryById(card.categoryId);
+
+  const addCommentControlId = useId();
 
   return (
     <>
@@ -74,8 +77,14 @@ export default function CardDetailView(props: CardDetailViewProps) {
             <CardEventView key={eventIndex} cardEvent={event} />
           ))}
         </div>
+      </div>
 
-        <CommentAddForm onCommentAdd={onCommentAdd} />
+      <div className="CardDetailView-AddComment">
+        <h3><label htmlFor={addCommentControlId}>Add comment</label></h3>
+        <CommentAddForm
+          controlId={addCommentControlId}
+          onCommentAdd={onCommentAdd}
+        />
       </div>
     </>
   );
@@ -344,11 +353,12 @@ function CardEventDescription(props: CardEventDescriptionProps) {
 }
 
 interface CommentAddFormProps {
+  controlId: string;
   onCommentAdd: (text: string) => Promise<void>;
 }
 
 function CommentAddForm(props: CommentAddFormProps) {
-  const {onCommentAdd} = props;
+  const {controlId, onCommentAdd} = props;
 
   const [text, setText] = useState("");
 
@@ -358,7 +368,13 @@ function CommentAddForm(props: CommentAddFormProps) {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <textarea onChange={event => setText(event.target.value)} value={text} />
+      <ControlGroup>
+        <Textarea
+          id={controlId}
+          onChange={commentText => setText(commentText)}
+          value={text}
+        />
+      </ControlGroup>
       <Form.MainButtons submitText="Add comment" />
     </Form>
   );

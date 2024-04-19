@@ -9,16 +9,14 @@ import Form from "../widgets/Form";
 import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 
 interface CardEditModalProps {
-  allCards: CardSet;
-  allCategories: CategorySet
-  allColors: ColorSet;
+  appState: CardSet & CategorySet & ColorSet;
   card: Card;
   onCardSave: (values: ValidCardFormValues) => Promise<void>;
   onClose: () => void;
 }
 
 export default function CardEditModal(props: CardEditModalProps) {
-  const {allCards, allCategories, allColors, card, onCardSave, onClose} = props;
+  const {appState, card, onCardSave, onClose} = props;
 
   const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
   const [formState, setFormState] = useCardFormState(card);
@@ -39,9 +37,7 @@ export default function CardEditModal(props: CardEditModalProps) {
       <h2>Edit Card</h2>
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm
-        allCards={allCards}
-        allCategories={allCategories}
-        allColors={allColors}
+        appState={appState}
         errors={errors}
         onStateChange={value => setFormState(value)}
         state={formState}

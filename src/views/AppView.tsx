@@ -31,7 +31,7 @@ const initialViewState: ViewState = {
 
 interface AppViewProps {
   sendUpdate: (update: AppUpdate) => void;
-  state: AppState;
+  appState: AppState;
 }
 
 function useSendRequest(
@@ -78,11 +78,11 @@ function useSendRequest(
 }
 
 export default function AppView(props: AppViewProps) {
-  const {sendUpdate, state} = props;
+  const {sendUpdate, appState} = props;
 
   const [viewState, setViewState] = useState(initialViewState);
 
-  const sendRequest = useSendRequest(sendUpdate, state);
+  const sendRequest = useSendRequest(sendUpdate, appState);
 
   // TODO: separate button for adding a child card?
   const handleCardAddClick = (initialCardAddRequest: Partial<CardAddRequest>) => {
@@ -140,9 +140,8 @@ export default function AppView(props: AppViewProps) {
     <div className="AppView">
       <div className="AppView-Cards">
         <CardsView
-          allCategories={state}
-          allColors={state}
-          cards={state.cards.filter(card => card.status !== CardStatus.Deleted)}
+          appState={appState}
+          cards={appState.cards.filter(card => card.status !== CardStatus.Deleted)}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
           onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
@@ -151,7 +150,7 @@ export default function AppView(props: AppViewProps) {
       </div>
       <div className="AppView-Tools">
         <Sidebar
-          appState={state}
+          appState={appState}
           onCardAdd={handleCardAdd}
           onCardAddClick={handleCardAddClick}
           onCardAddClose={handleCardAddClose}
@@ -218,9 +217,7 @@ function Sidebar(props: SidebarProps) {
   if (editCard !== null) {
     return (
       <CardEditForm
-        allCards={appState}
-        allCategories={appState}
-        allColors={appState}
+        appState={appState}
         card={editCard}
         onClose={onCardEditClose}
         onCardSave={values => handleCardSave(editCard, values)}
@@ -229,9 +226,7 @@ function Sidebar(props: SidebarProps) {
   } else if (viewState.addingCard !== null) {
     return (
       <CardAddForm
-        allCards={appState}
-        allCategories={appState}
-        allColors={appState}
+        appState={appState}
         initialValue={viewState.addingCard}
         onClose={onCardAddClose}
         onCardAdd={handleCardAdd}
@@ -240,9 +235,7 @@ function Sidebar(props: SidebarProps) {
   } else if (selectedCard !== null) {
     return (
       <CardDetailView
-        allCards={appState}
-        allCategories={appState}
-        allColors={appState}
+        appState={appState}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
         onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}

@@ -12,7 +12,7 @@ function Client() {
   };
 
   return (
-    <AppView sendUpdate={sendUpdate} state={appState} />
+    <AppView sendUpdate={sendUpdate} appState={appState} />
   );
 }
 

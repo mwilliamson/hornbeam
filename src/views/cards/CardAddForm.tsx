@@ -9,16 +9,14 @@ import Form from "../widgets/Form";
 import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 
 interface CardAddFormProps {
-  allCards: CardSet;
-  allCategories: CategorySet;
-  allColors: ColorSet;
+  appState: CardSet & CategorySet & ColorSet;
   initialValue: Partial<CardAddRequest>;
   onCardAdd: (values: ValidCardFormValues) => Promise<void>;
   onClose: () => void;
 }
 
 export default function CardAddForm(props: CardAddFormProps) {
-  const {allCards, allCategories, allColors, onCardAdd, onClose, initialValue} = props;
+  const {appState, onCardAdd, onClose, initialValue} = props;
 
   const [errors, setErrors] = useState<ReadonlyArray<ValidationError>>([]);
   const [formState, setFormState] = useCardFormState(initialValue);
@@ -39,9 +37,7 @@ export default function CardAddForm(props: CardAddFormProps) {
       <h2>Add Card</h2>
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm
-        allCards={allCards}
-        allCategories={allCategories}
-        allColors={allColors}
+        appState={appState}
         errors={errors}
         onStateChange={value => setFormState(value)}
         state={formState}

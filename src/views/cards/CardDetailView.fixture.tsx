@@ -20,9 +20,7 @@ const card: Card = {
 export default (
   <div style={{border: "1px solid black", width: 400, minHeight: 600}}>
     <CardDetailView
-      allCards={appState}
-      allCategories={appState}
-      allColors={appState}
+      appState={appState}
       card={card}
       onAddChildClick={() => {}}
       onCardCategorySave={() => Promise.resolve()}

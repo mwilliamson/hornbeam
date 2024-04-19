@@ -35,7 +35,7 @@ function Client() {
       );
     case "connected":
       return (
-        <AppView sendUpdate={state.sendAppUpdate} state={state.appState} />
+        <AppView sendUpdate={state.sendAppUpdate} appState={state.appState} />
       );
     case "connection-error":
       return (

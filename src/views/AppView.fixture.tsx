@@ -12,7 +12,7 @@ export default function AppViewFixture() {
 
   return (
     <div style={{height: "100vh", width: "100vw", margin: -20}}>
-      <AppView sendUpdate={sendUpdate} state={appState} />
+      <AppView sendUpdate={sendUpdate} appState={appState} />
     </div>
   );
 }

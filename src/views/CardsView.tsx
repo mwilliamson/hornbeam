@@ -8,8 +8,7 @@ import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 
 interface CardsViewProps {
-  allCategories: CategorySet;
-  allColors: ColorSet;
+  appState: CategorySet & ColorSet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
@@ -19,8 +18,7 @@ interface CardsViewProps {
 
 export default function CardsView(props: CardsViewProps) {
   const {
-    allCategories,
-    allColors,
+    appState,
     cards,
     cardSelectedId,
     onCardSelect,
@@ -41,8 +39,7 @@ export default function CardsView(props: CardsViewProps) {
         {cards.filter(card => card.parentCardId === null).map(card => (
           <CardTreeView
             key={card.id}
-            allCategories={allCategories}
-            allColors={allColors}
+            appState={appState}
             card={card}
             cardsByParentId={cardsByParentId}
             cardTops={cardTops}
@@ -58,8 +55,7 @@ export default function CardsView(props: CardsViewProps) {
 }
 
 interface CardTreeViewProps {
-  allCategories: CategorySet;
-  allColors: ColorSet;
+  appState: CategorySet & ColorSet;
   card: Card;
   cardsByParentId: {[id: string]: ReadonlyArray<Card>};
   cardTops: {[cardId: string]: number};
@@ -71,8 +67,7 @@ interface CardTreeViewProps {
 
 function CardTreeView(props: CardTreeViewProps) {
   const {
-    allCategories,
-    allColors,
+    appState,
     card,
     cardsByParentId,
     cardTops,
@@ -114,9 +109,9 @@ function CardTreeView(props: CardTreeViewProps) {
     <div className="CardsView-TreeView">
       <div className="CardsView-TreeView-Parent">
         <CardView
-          allColors={allColors}
+          appState={appState}
           card={card}
-          cardCategory={allCategories.findCategoryById(card.categoryId)}
+          cardCategory={appState.findCategoryById(card.categoryId)}
           isSelected={isSelected}
           onClick={handleCardClick}
           onDoubleClick={handleCardDoubleClick}
@@ -193,8 +188,7 @@ function CardTreeView(props: CardTreeViewProps) {
             {children.map(childCard => (
               <CardTreeView
                 key={childCard.id}
-                allCategories={allCategories}
-                allColors={allColors}
+                appState={appState}
                 card={childCard}
                 cardsByParentId={cardsByParentId}
                 cardTops={cardTops}

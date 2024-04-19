@@ -5,7 +5,7 @@ import { ColorSet } from "../../app/colors";
 import "./CategorySelect.scss";
 
 interface CategorySelectProps {
-  allColors: ColorSet;
+  appState: ColorSet;
   availableCategories: ReadonlyArray<Category>;
   id?: string;
   onChange: (categoryId: string) => void;
@@ -13,7 +13,7 @@ interface CategorySelectProps {
 }
 
 export default function CategorySelect(props: CategorySelectProps) {
-  const {availableCategories, allColors, id, onChange, value} = props;
+  const {availableCategories, appState, id, onChange, value} = props;
 
   const htmlName = useId();
 
@@ -38,7 +38,7 @@ export default function CategorySelect(props: CategorySelectProps) {
           />
           <label
             className="CategorySelect-CategoryLabel"
-            style={categoryBackgroundColorStyle(category, allColors)}
+            style={categoryBackgroundColorStyle(category, appState)}
             htmlFor={htmlName + "_" + category.id}
           >
             {category.name}

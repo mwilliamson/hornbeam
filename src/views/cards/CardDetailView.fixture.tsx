@@ -21,6 +21,7 @@ export default (
     <CardDetailView
       allCards={appState}
       allCategories={appState}
+      allColors={appState}
       card={card}
       onAddChildClick={() => {}}
       onCardCategorySave={() => Promise.resolve()}

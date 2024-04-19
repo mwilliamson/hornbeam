@@ -3,11 +3,13 @@ import React from "react";
 
 import { Card } from "../app/cards";
 import { CategorySet } from "../app/categories";
+import { ColorSet } from "../app/colors";
 import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 
 interface CardsViewProps {
   allCategories: CategorySet;
+  allColors: ColorSet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
@@ -18,6 +20,7 @@ interface CardsViewProps {
 export default function CardsView(props: CardsViewProps) {
   const {
     allCategories,
+    allColors,
     cards,
     cardSelectedId,
     onCardSelect,
@@ -39,6 +42,7 @@ export default function CardsView(props: CardsViewProps) {
           <CardTreeView
             key={card.id}
             allCategories={allCategories}
+            allColors={allColors}
             card={card}
             cardsByParentId={cardsByParentId}
             cardTops={cardTops}
@@ -55,6 +59,7 @@ export default function CardsView(props: CardsViewProps) {
 
 interface CardTreeViewProps {
   allCategories: CategorySet;
+  allColors: ColorSet;
   card: Card;
   cardsByParentId: {[id: string]: ReadonlyArray<Card>};
   cardTops: {[cardId: string]: number};
@@ -67,6 +72,7 @@ interface CardTreeViewProps {
 function CardTreeView(props: CardTreeViewProps) {
   const {
     allCategories,
+    allColors,
     card,
     cardsByParentId,
     cardTops,
@@ -108,6 +114,7 @@ function CardTreeView(props: CardTreeViewProps) {
     <div className="CardsView-TreeView">
       <div className="CardsView-TreeView-Parent">
         <CardView
+          allColors={allColors}
           card={card}
           cardCategory={allCategories.findCategoryById(card.categoryId)}
           isSelected={isSelected}
@@ -187,6 +194,7 @@ function CardTreeView(props: CardTreeViewProps) {
               <CardTreeView
                 key={childCard.id}
                 allCategories={allCategories}
+                allColors={allColors}
                 card={childCard}
                 cardsByParentId={cardsByParentId}
                 cardTops={cardTops}

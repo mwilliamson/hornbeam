@@ -1,9 +1,11 @@
 import { useId } from "react";
 
-import { Category } from "../../app/categories";
+import { Category, categoryBackgroundColorStyle } from "../../app/categories";
+import { ColorSet } from "../../app/colors";
 import "./CategorySelect.scss";
 
 interface CategorySelectProps {
+  allColors: ColorSet;
   availableCategories: ReadonlyArray<Category>;
   id?: string;
   onChange: (categoryId: string) => void;
@@ -11,7 +13,7 @@ interface CategorySelectProps {
 }
 
 export default function CategorySelect(props: CategorySelectProps) {
-  const {availableCategories, id, onChange, value} = props;
+  const {availableCategories, allColors, id, onChange, value} = props;
 
   const htmlName = useId();
 
@@ -36,7 +38,7 @@ export default function CategorySelect(props: CategorySelectProps) {
           />
           <label
             className="CategorySelect-CategoryLabel"
-            style={{backgroundColor: category.color.hex}}
+            style={categoryBackgroundColorStyle(category, allColors)}
             htmlFor={htmlName + "_" + category.id}
           >
             {category.name}

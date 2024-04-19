@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
-import { CategorySet } from "../../app/categories";
+import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
+import { ColorSet } from "../../app/colors";
 import pluralize from "../../util/pluralize";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
@@ -18,6 +19,7 @@ import CardView from "./CardView";
 interface CardDetailViewProps {
   allCards: CardSet;
   allCategories: CategorySet;
+  allColors: ColorSet;
   card: Card;
   onAddChildClick: () => void;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
@@ -25,7 +27,15 @@ interface CardDetailViewProps {
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
-  const {allCards, allCategories, card, onAddChildClick, onCardCategorySave, onCardTextSave} = props;
+  const {
+    allCards,
+    allCategories,
+    allColors,
+    card,
+    onAddChildClick,
+    onCardCategorySave,
+    onCardTextSave,
+  } = props;
 
   const category = allCategories.findCategoryById(card.categoryId);
 
@@ -34,6 +44,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Header">
         <div>
           <CardView
+            allColors={allColors}
             card={card}
             cardCategory={category}
           />
@@ -45,6 +56,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <CardParentPropertyView allCards={allCards} parentCardId={card.parentCardId} />
         <CardCategoryPropertyView
           allCategories={allCategories}
+          allColors={allColors}
           categoryId={card.categoryId}
           onCardCategorySave={onCardCategorySave}
         />
@@ -125,12 +137,13 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
 
 interface CardCategoryPropertyViewProps {
   allCategories: CategorySet;
+  allColors: ColorSet;
   categoryId: string;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
 }
 
 function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
-  const {allCategories, categoryId, onCardCategorySave} = props;
+  const {allCategories, allColors, categoryId, onCardCategorySave} = props;
 
   const category = allCategories.findCategoryById(categoryId);
   if (category === null) {
@@ -146,6 +159,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
       renderControl={({id, onChange, value}) => (
         <CategorySelect
           availableCategories={allCategories.availableCategories()}
+          allColors={allColors}
           id={id}
           onChange={onChange}
           value={value}
@@ -155,7 +169,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
         <div className="CardDetailView-CategoryCardContainer" id={id}>
           <div
             className="CardDetailView-CategoryCard"
-            style={{backgroundColor: category.color.hex}}
+            style={categoryBackgroundColorStyle(category, allColors)}
           >
             {category.name}
           </div>

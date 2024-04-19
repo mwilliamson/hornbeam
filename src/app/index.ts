@@ -1,7 +1,8 @@
 import { Card, CardAddRequest, CardDeleteRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategorySet, allCategories } from "./categories";
+import { ColorSet, PresetColor, presetColors } from "./colors";
 
-export class AppState implements CardSet, CategorySet {
+export class AppState implements CardSet, CategorySet, ColorSet {
   public readonly updateIds: ReadonlyArray<string>;
   public readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
@@ -73,6 +74,10 @@ export class AppState implements CardSet, CategorySet {
 
   private allCategories(): ReadonlyArray<Category> {
     return allCategories;
+  }
+
+  public findPresetColorById(presetColorId: string): PresetColor | null {
+    return presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
   }
 }
 

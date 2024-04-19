@@ -1,10 +1,12 @@
 import classNames from "classnames";
 
 import { Card } from "../../app/cards";
-import { Category } from "../../app/categories";
+import { Category, categoryBackgroundColorStyle } from "../../app/categories";
+import { ColorSet } from "../../app/colors";
 import "./CardView.scss";
 
 interface CardViewProps {
+  allColors: ColorSet;
   card: Card;
   cardCategory: Category | null;
   isSelected?: boolean;
@@ -13,14 +15,12 @@ interface CardViewProps {
 }
 
 export default function CardView(props: CardViewProps) {
-  const {card, cardCategory, isSelected, onClick, onDoubleClick} = props;
-
-  const backgroundColor = cardCategory === null ? undefined : cardCategory.color.hex;
+  const {allColors, card, cardCategory, isSelected, onClick, onDoubleClick} = props;
 
   return (
     <div
       className={classNames("CardView", {"CardView--selected": isSelected})}
-      style={{backgroundColor}}
+      style={categoryBackgroundColorStyle(cardCategory, allColors)}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >

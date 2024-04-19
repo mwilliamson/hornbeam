@@ -9,6 +9,7 @@ import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
 import Input from "../widgets/Input";
 import CardParentView from "./CardParentView";
+import { ColorSet } from "../../app/colors";
 
 export interface CardFormState {
   controlIds: {
@@ -58,6 +59,7 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
 interface CardFormProps {
   allCards: CardSet;
   allCategories: CategorySet;
+  allColors: ColorSet;
   errors: ReadonlyArray<ValidationError>;
 
   onStateChange: (value: CardFormState) => void;
@@ -65,7 +67,7 @@ interface CardFormProps {
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {allCards, allCategories, errors, onStateChange: onChange, state} = props;
+  const {allCards, allCategories, allColors, errors, onStateChange: onChange, state} = props;
 
   const {controlIds: {text: textControlId, category: categoryControlId}} = state;
 
@@ -92,6 +94,7 @@ export default function CardForm(props: CardFormProps) {
       <ControlLabel>Category</ControlLabel>
       <ControlGroup>
         <CategorySelect
+          allColors={allColors}
           availableCategories={allCategories.availableCategories()}
           onChange={categoryId => onChange({...state, categoryId})}
           value={state.categoryId}

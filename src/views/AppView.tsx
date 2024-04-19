@@ -137,6 +137,7 @@ export default function AppView(props: AppViewProps) {
       <div className="AppView-Cards">
         <CardsView
           allCategories={state}
+          allColors={state}
           cards={state.cards}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
@@ -215,6 +216,7 @@ function Sidebar(props: SidebarProps) {
       <CardEditForm
         allCards={appState}
         allCategories={appState}
+        allColors={appState}
         card={editCard}
         onClose={onCardEditClose}
         onCardSave={values => handleCardSave(editCard, values)}
@@ -225,6 +227,7 @@ function Sidebar(props: SidebarProps) {
       <CardAddForm
         allCards={appState}
         allCategories={appState}
+        allColors={appState}
         initialValue={viewState.addingCard}
         onClose={onCardAddClose}
         onCardAdd={handleCardAdd}
@@ -235,6 +238,7 @@ function Sidebar(props: SidebarProps) {
       <CardDetailView
         allCards={appState}
         allCategories={appState}
+        allColors={appState}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
         onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}

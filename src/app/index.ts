@@ -1,4 +1,4 @@
-import { Card, CardAddRequest, CardDeleteRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
+import { Card, CardAddRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategorySet, createCategory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 
@@ -35,15 +35,6 @@ export class AppState implements CardSet, CategorySet, ColorSet {
       this.updateIds,
       [...this.cards, card],
       this.nextCardNumber + 1,
-      this.categories,
-    );
-  }
-
-  public cardDelete(request: CardDeleteRequest): AppState {
-    return new AppState(
-      this.updateIds,
-      this.cards.filter(card => card.id !== request.id),
-      this.nextCardNumber,
       this.categories,
     );
   }
@@ -109,17 +100,12 @@ export interface AppUpdate {
 
 export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
-  | {type: "cardDelete", cardDelete: CardDeleteRequest}
   | {type: "cardEdit", cardEdit: CardEditRequest}
   | {type: "categoryAdd", categoryAdd: CategoryAddRequest};
 
 export const requests = {
   cardAdd(request: CardAddRequest): Request {
     return {type: "cardAdd", cardAdd: request};
-  },
-
-  cardDelete(request: CardDeleteRequest): Request {
-    return {type: "cardDelete", cardDelete: request};
   },
 
   cardEdit(request: CardEditRequest): Request {
@@ -135,9 +121,6 @@ export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
   switch (update.request.type) {
     case "cardAdd":
       state = state.cardAdd(update.request.cardAdd);
-      break;
-    case "cardDelete":
-      state = state.cardDelete(update.request.cardDelete);
       break;
     case "cardEdit":
       state = state.cardEdit(update.request.cardEdit);

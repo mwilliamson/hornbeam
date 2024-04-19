@@ -13,6 +13,7 @@ const card: Card = {
   id: uuidv7(),
   number: 42,
   parentCardId: null,
+  status: null,
   text: "Show history in card detail view"
 };
 

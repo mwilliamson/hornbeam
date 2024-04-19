@@ -1,5 +1,6 @@
 import { Instant } from "@js-joda/core";
 import { ValidationResult } from "../util/validation";
+import { CardStatus } from "./cardStatuses";
 
 export interface Card {
   categoryId: string;
@@ -7,6 +8,7 @@ export interface Card {
   id: string;
   number: number;
   parentCardId: string | null;
+  status: CardStatus | null;
   text: string;
 }
 
@@ -37,18 +39,16 @@ export function createCard(request: CardAddRequest, cardNumber: number): Card {
     id: request.id,
     number: cardNumber,
     parentCardId: request.parentCardId,
+    status: null,
     text: request.text,
   };
-}
-
-export interface CardDeleteRequest {
-  id: string;
 }
 
 export interface CardEditRequest {
   categoryId?: string;
   id: string;
   parentCardId?: string | null;
+  status?: CardStatus | null;
   text?: string;
 }
 
@@ -59,6 +59,7 @@ export function updateCard(card: Card, request: CardEditRequest): Card {
     id: card.id,
     number: card.number,
     parentCardId: request.parentCardId === undefined ? card.parentCardId : request.parentCardId,
+    status: request.status === undefined ? card.status : request.status,
     text: request.text === undefined ? card.text : request.text,
   };
 }

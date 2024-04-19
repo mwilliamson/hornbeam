@@ -3,18 +3,19 @@ import { useEffect, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
 import { AppState, AppUpdate, Request, requests } from "../app";
+import { CardStatus } from "../app/cardStatuses";
 import { Card, CardAddRequest, CardEditRequest } from "../app/cards";
 import { generateId } from "../app/ids";
 import "../scss/style.scss";
+import isInputEvent from "../util/isInputEvent";
+import { Deferred, createDeferred } from "../util/promises";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
-import isInputEvent from "../util/isInputEvent";
-import { Deferred, createDeferred } from "../util/promises";
-import { ValidCardFormValues } from "./cards/CardForm";
 import CardAddForm from "./cards/CardAddForm";
-import CardEditForm from "./cards/CardEditForm";
 import CardDetailView from "./cards/CardDetailView";
+import CardEditForm from "./cards/CardEditForm";
+import { ValidCardFormValues } from "./cards/CardForm";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
@@ -120,7 +121,10 @@ export default function AppView(props: AppViewProps) {
       if (event.key === "Delete" || event.key === "Backspace") {
         if (viewState.selectedCardId !== null) {
           // TODO: wait
-          sendRequest(requests.cardDelete({id: viewState.selectedCardId}));
+          sendRequest(requests.cardEdit({
+            id: viewState.selectedCardId,
+            status: CardStatus.Deleted,
+          }));
         }
       }
     }
@@ -138,7 +142,7 @@ export default function AppView(props: AppViewProps) {
         <CardsView
           allCategories={state}
           allColors={state}
-          cards={state.cards}
+          cards={state.cards.filter(card => card.status !== CardStatus.Deleted)}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
           onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}

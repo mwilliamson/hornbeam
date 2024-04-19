@@ -71,14 +71,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <h3 className="CardDetailView-History-Title">History</h3>
         <div>
           {cardHistory(card, appState).map((event, eventIndex) => (
-            <div key={eventIndex} className="CardDetailView-Event">
-              <div className="CardDetailView-Event-Instant">
-                <InstantView value={event.instant} />
-              </div>
-              <div className="CardDetailView-Event-Description">
-                <CardEventDescription cardEvent={event} />
-              </div>
-            </div>
+            <CardEventView key={eventIndex} cardEvent={event} />
           ))}
         </div>
 
@@ -292,6 +285,47 @@ function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyView
   );
 }
 
+interface CardEventViewProps {
+  cardEvent: CardEvent;
+}
+
+function CardEventView(props: CardEventViewProps) {
+  const {cardEvent} = props;
+
+  return (
+    <div className="CardDetailView-Event">
+      <div className="CardDetailView-Event-Header">
+        <div className="CardDetailView-Event-Type">
+          <CardEventTypeView cardEvent={cardEvent} />
+        </div>
+        <div className="CardDetailView-Event-Instant">
+          <InstantView value={cardEvent.instant} />
+        </div>
+      </div>
+      <div className="CardDetailView-Event-Description">
+        <CardEventDescription cardEvent={cardEvent} />
+      </div>
+    </div>
+  );
+}
+
+interface CardEventTypeViewProps {
+  cardEvent: CardEvent;
+}
+
+function CardEventTypeView(props: CardEventTypeViewProps) {
+  const {cardEvent} = props;
+
+  switch (cardEvent.type) {
+    case "created":
+      return "Card created";
+    case "comment":
+      return "Comment";
+    default:
+      return assertNever(cardEvent, null);
+  }
+}
+
 interface CardEventDescriptionProps {
   cardEvent: CardEvent;
 }
@@ -301,7 +335,7 @@ function CardEventDescription(props: CardEventDescriptionProps) {
 
   switch (cardEvent.type) {
     case "created":
-      return "Card created";
+      return null;
     case "comment":
       return cardEvent.comment.text;
     default:

@@ -38,7 +38,17 @@ $event-border: 1px solid #999;
   padding: spacing.$md 0;
 }
 
+.CardDetailView-Event-Header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-size: text.$font-size-sm;
+}
+
+.CardDetailView-Event-Type {
+  font-weight: bold;
+}
+
 .CardDetailView-Event-Instant {
   color: text.$color-faded;
-  font-size: text.$font-size-sm;
 }

@@ -1,0 +1,21 @@
+@use "../scss/spacing";
+
+.TimeTravelSlider {
+  background-color: #fff;
+  padding: spacing.$md;
+  display: flex;
+  flex-direction: row;
+  gap: spacing.$md;
+}
+
+.TimeTravelSlider-Label {
+  flex: 0 0 auto;
+}
+
+.TimeTravelSlider-Slider {
+  flex: 1 1 auto;
+
+  & > input {
+    width: 100%;
+  }
+}

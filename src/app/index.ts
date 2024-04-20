@@ -20,7 +20,15 @@ export class AppState {
   }
 
   public latestSnapshot(): AppSnapshot {
-    return this.snapshots[this.snapshots.length - 1];
+    return this.snapshots[this.latestSnapshotIndex()];
+  }
+
+  public latestSnapshotIndex(): number {
+    return this.snapshots.length - 1;
+  }
+
+  public snapshot(snapshotIndex: number): AppSnapshot {
+    return this.snapshots[snapshotIndex];
   }
 }
 

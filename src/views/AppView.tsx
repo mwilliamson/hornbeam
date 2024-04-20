@@ -17,15 +17,20 @@ import ToolsView from "./ToolsView";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
+import TimeTravelSidebar from "./TimeTravelSidebar";
+import TimeTravelSlider from "./TimeTravelSlider";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
   selectedCardId: string | null;
+  // TODO: should probably be a union (e.g. can't add a card and time travel at the same time)
+  timeTravelSnapshotIndex: number | null;
 }
 
 const initialViewState: ViewState = {
   addingCard: null,
   selectedCardId: null,
+  timeTravelSnapshotIndex: null,
 };
 
 interface AppViewProps {
@@ -104,6 +109,27 @@ export default function AppView(props: AppViewProps) {
     await sendRequest(requests.commentAdd(request));
   };
 
+  const handleTimeTravelStart = () => {
+    setViewState({
+      ...viewState,
+      timeTravelSnapshotIndex: appState.latestSnapshotIndex(),
+    });
+  };
+
+  const handleTimeTravelStop = () => {
+    setViewState({
+      ...viewState,
+      timeTravelSnapshotIndex: null,
+    });
+  };
+
+  const handleTimeTravelSnapshotIndexChange = (newSnapshotIndex: number) => {
+    setViewState({
+      ...viewState,
+      timeTravelSnapshotIndex: newSnapshotIndex,
+    });
+  };
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       // TODO: use proper selection of the cards and put the event on the cards?
@@ -130,27 +156,42 @@ export default function AppView(props: AppViewProps) {
     };
   }, [viewState.selectedCardId, sendRequest]);
 
-  const latestSnapshot = appState.latestSnapshot();
+  const snapshot = viewState.timeTravelSnapshotIndex === null
+    ? appState.latestSnapshot()
+    : appState.snapshot(viewState.timeTravelSnapshotIndex);
 
   return (
     <div className="AppView">
-      <div className="AppView-Cards">
-        <CardsView
-          appSnapshot={appState.latestSnapshot()}
-          cards={latestSnapshot.cards.filter(card => card.status !== CardStatus.Deleted)}
-          cardSelectedId={viewState.selectedCardId}
-          onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
-          onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
-        />
+      <div className="AppView-Left">
+        <div className="AppView-Cards">
+          <CardsView
+            appSnapshot={appState.latestSnapshot()}
+            cards={snapshot.cards.filter(card => card.status !== CardStatus.Deleted)}
+            cardSelectedId={viewState.selectedCardId}
+            onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
+            onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
+          />
+        </div>
+        {viewState.timeTravelSnapshotIndex !== null && (
+          <div className="AppView-TimeTravelSlider">
+            <TimeTravelSlider
+              currentSnapshotIndex={viewState.timeTravelSnapshotIndex}
+              maxSnapshotIndex={appState.latestSnapshotIndex()}
+              onCurrentSnapshotIndexChange={handleTimeTravelSnapshotIndexChange}
+            />
+          </div>
+        )}
       </div>
       <div className="AppView-Tools">
         <Sidebar
-          appSnapshot={latestSnapshot}
+          appSnapshot={snapshot}
           onCardAdd={handleCardAdd}
           onCardAddClick={handleCardAddClick}
           onCardAddClose={handleCardAddClose}
           onCardSave={handleCardSave}
           onCommentAdd={handleCommentAdd}
+          onTimeTravelStart={handleTimeTravelStart}
+          onTimeTravelStop={handleTimeTravelStop}
           viewState={viewState}
         />
       </div>
@@ -165,6 +206,8 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onCardSave: (request: CardEditRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
+  onTimeTravelStart: () => void;
+  onTimeTravelStop: () => void;
   viewState: ViewState;
 }
 
@@ -176,6 +219,8 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onCardSave,
     onCommentAdd,
+    onTimeTravelStart,
+    onTimeTravelStop,
     viewState,
   } = props;
 
@@ -202,7 +247,14 @@ function Sidebar(props: SidebarProps) {
     });
   };
 
-  if (viewState.addingCard !== null) {
+  if (viewState.timeTravelSnapshotIndex !== null) {
+    return (
+      <TimeTravelSidebar
+        onTimeTravelStop={onTimeTravelStop}
+        timeTravelSnapshotIndex={viewState.timeTravelSnapshotIndex}
+      />
+    );
+  } else if (viewState.addingCard !== null) {
     return (
       <CardAddForm
         appSnapshot={appSnapshot}
@@ -237,7 +289,10 @@ function Sidebar(props: SidebarProps) {
     );
   } else {
     return (
-      <ToolsView onCardAddClick={() => onCardAddClick({})} />
+      <ToolsView
+        onCardAddClick={() => onCardAddClick({})}
+        onTimeTravelStart={onTimeTravelStart}
+      />
     );
   }
 }

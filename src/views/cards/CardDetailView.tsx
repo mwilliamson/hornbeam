@@ -404,6 +404,7 @@ function CommentAddForm(props: CommentAddFormProps) {
 
   const handleSubmit = async () => {
     await onCommentAdd(text);
+    setText("");
   };
 
   return (

@@ -86,7 +86,6 @@ export default function AppView(props: AppViewProps) {
 
   const sendRequest = useSendRequest(sendUpdate, appState);
 
-  // TODO: separate button for adding a child card?
   const handleCardAddClick = (initialCardAddRequest: Partial<CardAddRequest>) => {
     setViewState({...viewState, addingCard: initialCardAddRequest});
   };

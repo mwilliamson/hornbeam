@@ -10,6 +10,7 @@ import * as t2 from "./util/io-ts";
 
 const SerializedCardStatus = t.keyof({
   [CardStatus.Deleted]: null,
+  [CardStatus.Done]: null,
 });
 
 const SerializedCardAddRequest = t.type({

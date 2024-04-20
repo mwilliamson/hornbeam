@@ -115,6 +115,7 @@ export default function AppView(props: AppViewProps) {
         if (viewState.selectedCardId !== null) {
           // TODO: wait
           sendRequest(requests.cardEdit({
+            createdAt: Instant.now(),
             id: viewState.selectedCardId,
             status: CardStatus.Deleted,
           }));
@@ -216,9 +217,21 @@ function Sidebar(props: SidebarProps) {
         appSnapshot={appSnapshot}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
-        onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}
-        onCardStatusSave={newStatus => onCardSave({id: selectedCard.id, status: newStatus})}
-        onCardTextSave={newText => onCardSave({id: selectedCard.id, text: newText})}
+        onCardCategorySave={newCategoryId => onCardSave({
+          createdAt: Instant.now(),
+          id: selectedCard.id,
+          categoryId: newCategoryId,
+        })}
+        onCardStatusSave={newStatus => onCardSave({
+          createdAt: Instant.now(),
+          id: selectedCard.id,
+          status: newStatus,
+        })}
+        onCardTextSave={newText => onCardSave({
+          createdAt: Instant.now(),
+          id: selectedCard.id,
+          text: newText,
+        })}
         onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
       />
     );

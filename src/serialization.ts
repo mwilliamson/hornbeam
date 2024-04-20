@@ -23,6 +23,7 @@ const SerializedCardAddRequest = t.type({
 
 const SerializedCardEditRequest = t.intersection([
   t.type({
+    createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
     id: t.string,
   }),
   t.partial({

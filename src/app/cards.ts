@@ -53,6 +53,7 @@ export function createCard(request: CardAddRequest, cardNumber: number): Card {
 
 export interface CardEditRequest {
   categoryId?: string;
+  createdAt: Instant;
   id: string;
   parentCardId?: string | null;
   status?: CardStatus | null;

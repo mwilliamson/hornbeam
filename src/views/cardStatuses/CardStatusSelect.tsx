@@ -1,12 +1,13 @@
 import { CardStatus, allCardStatuses } from "../../app/cardStatuses";
 
 interface CardStatusSelectProps {
+  id?: string;
   onChange: (value: CardStatus | null) => void;
   value: CardStatus | null;
 }
 
 export default function CardStatusSelect(props: CardStatusSelectProps) {
-  const {onChange, value} = props;
+  const {id, onChange, value} = props;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = event.target.value === ""
@@ -17,7 +18,7 @@ export default function CardStatusSelect(props: CardStatusSelectProps) {
   };
 
   return (
-    <select onChange={handleChange} value={value ?? ""}>
+    <select id={id} onChange={handleChange} value={value ?? ""}>
       <option value=""></option>
       {allCardStatuses.map(cardStatus => (
         <option key={cardStatus} value={cardStatus}>{cardStatus}</option>

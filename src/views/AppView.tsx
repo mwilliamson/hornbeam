@@ -16,19 +16,16 @@ import CardsView from "./CardsView";
 import ToolsView from "./ToolsView";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
-import CardEditForm from "./cards/CardEditForm";
 import { ValidCardFormValues } from "./cards/CardForm";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
   selectedCardId: string | null;
-  editCardId: string | null;
 }
 
 const initialViewState: ViewState = {
   addingCard: null,
   selectedCardId: null,
-  editCardId: null,
 };
 
 interface AppViewProps {
@@ -99,15 +96,6 @@ export default function AppView(props: AppViewProps) {
     handleCardAddClose();
   };
 
-  const handleCardEditClose = () => {
-    setViewState({...viewState, editCardId: null});
-  };
-
-  const handleCardEdit = async (request: CardEditRequest) => {
-    await sendRequest(requests.cardEdit(request));
-    handleCardEditClose();
-  };
-
   const handleCardSave = async (request: CardEditRequest) => {
     await sendRequest(requests.cardEdit(request));
   };
@@ -151,7 +139,6 @@ export default function AppView(props: AppViewProps) {
           cards={latestSnapshot.cards.filter(card => card.status !== CardStatus.Deleted)}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
-          onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
           onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
         />
       </div>
@@ -161,8 +148,6 @@ export default function AppView(props: AppViewProps) {
           onCardAdd={handleCardAdd}
           onCardAddClick={handleCardAddClick}
           onCardAddClose={handleCardAddClose}
-          onCardEdit={handleCardEdit}
-          onCardEditClose={handleCardEditClose}
           onCardSave={handleCardSave}
           onCommentAdd={handleCommentAdd}
           viewState={viewState}
@@ -177,8 +162,6 @@ interface SidebarProps {
   onCardAdd: (values: CardAddRequest) => Promise<void>;
   onCardAddClick: (initialCard: Partial<Card>) => void;
   onCardAddClose: () => void;
-  onCardEdit: (values: CardEditRequest) => Promise<void>;
-  onCardEditClose: () => void;
   onCardSave: (request: CardEditRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   viewState: ViewState;
@@ -190,16 +173,10 @@ function Sidebar(props: SidebarProps) {
     onCardAdd,
     onCardAddClick,
     onCardAddClose,
-    onCardEdit,
-    onCardEditClose,
     onCardSave,
     onCommentAdd,
     viewState,
   } = props;
-
-  const editCard = viewState.editCardId === null
-    ? null
-    : appSnapshot.findCardById(viewState.editCardId);
 
   const selectedCard = viewState.selectedCardId === null
     ? null
@@ -215,15 +192,6 @@ function Sidebar(props: SidebarProps) {
     });
   };
 
-  const handleCardSave = async (card: Card, {categoryId, text}: ValidCardFormValues) => {
-    await onCardEdit({
-      categoryId,
-      id: card.id,
-      parentCardId: card.parentCardId,
-      text,
-    });
-  };
-
   const handleCommentAdd = async ({cardId, text}: {cardId: string, text: string}) => {
     await onCommentAdd({
       cardId,
@@ -233,16 +201,7 @@ function Sidebar(props: SidebarProps) {
     });
   };
 
-  if (editCard !== null) {
-    return (
-      <CardEditForm
-        appSnapshot={appSnapshot}
-        card={editCard}
-        onClose={onCardEditClose}
-        onCardSave={values => handleCardSave(editCard, values)}
-      />
-    );
-  } else if (viewState.addingCard !== null) {
+  if (viewState.addingCard !== null) {
     return (
       <CardAddForm
         appSnapshot={appSnapshot}

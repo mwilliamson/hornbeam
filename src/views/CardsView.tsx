@@ -12,7 +12,6 @@ interface CardsViewProps {
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
-  onCardEdit: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
 }
 
@@ -22,7 +21,6 @@ export default function CardsView(props: CardsViewProps) {
     cards,
     cardSelectedId,
     onCardSelect,
-    onCardEdit,
     onCardAddChildClick,
   } = props;
 
@@ -45,7 +43,6 @@ export default function CardsView(props: CardsViewProps) {
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
-            onCardEdit={onCardEdit}
             onCardAddChildClick={onCardAddChildClick}
           />
         ))}
@@ -61,7 +58,6 @@ interface CardTreeViewProps {
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
-  onCardEdit: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
 }
 
@@ -73,7 +69,6 @@ function CardTreeView(props: CardTreeViewProps) {
     cardTops,
     cardSelectedId,
     onCardSelect,
-    onCardEdit,
     onCardAddChildClick,
   } = props;
 
@@ -93,11 +88,6 @@ function CardTreeView(props: CardTreeViewProps) {
     onCardSelect(card.id);
   };
 
-  const handleCardDoubleClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    onCardEdit(card.id);
-  };
-
   const handleAddChildClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onCardAddChildClick(card.id);
@@ -114,7 +104,6 @@ function CardTreeView(props: CardTreeViewProps) {
           cardCategory={appSnapshot.findCategoryById(card.categoryId)}
           isSelected={isSelected}
           onClick={handleCardClick}
-          onDoubleClick={handleCardDoubleClick}
         />
         {isSelected && (
           <div className="CardsView-AddChildContainer">
@@ -194,7 +183,6 @@ function CardTreeView(props: CardTreeViewProps) {
                 cardTops={cardTops}
                 cardSelectedId={cardSelectedId}
                 onCardSelect={onCardSelect}
-                onCardEdit={onCardEdit}
                 onCardAddChildClick={onCardAddChildClick}
               />
             ))}

@@ -34,7 +34,7 @@ export default function CardAddForm(props: CardAddFormProps) {
 
   return (
     <Form className="p-md" onSubmit={handleSubmit}>
-      <h2>Add Card</h2>
+      <h2>Add card</h2>
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm
         appSnapshot={appSnapshot}
@@ -42,7 +42,7 @@ export default function CardAddForm(props: CardAddFormProps) {
         onStateChange={value => setFormState(value)}
         state={formState}
       />
-      <Form.MainButtons onCancel={onClose} submitText="Add Card" />
+      <Form.MainButtons onCancel={onClose} submitText="Add card" />
     </Form>
   );
 }

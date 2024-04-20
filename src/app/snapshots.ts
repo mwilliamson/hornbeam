@@ -1,3 +1,4 @@
+import { Instant } from "@js-joda/core";
 import assertNever from "../util/assertNever";
 import { Card, CardAddRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategorySet, createCategory } from "./categories";
@@ -128,6 +129,21 @@ export const requests = {
     return {type: "commentAdd", commentAdd: request};
   },
 };
+
+export function requestCreatedAt(request: Request): Instant {
+  switch (request.type) {
+    case "cardAdd":
+      return request.cardAdd.createdAt;
+    case "cardEdit":
+      return request.cardEdit.createdAt;
+    case "categoryAdd":
+      return request.categoryAdd.createdAt;
+    case "commentAdd":
+      return request.commentAdd.createdAt;
+    default:
+      return assertNever(request, Instant.now());
+  }
+}
 
 export function applySnapshotUpdate(snapshot: AppSnapshot, update: AppUpdate): AppSnapshot {
   switch (update.request.type) {

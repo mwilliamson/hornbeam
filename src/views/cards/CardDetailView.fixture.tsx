@@ -60,6 +60,7 @@ export default (
       card={card}
       onAddChildClick={() => {}}
       onCardCategorySave={() => Promise.resolve()}
+      onCardStatusSave={() => Promise.resolve()}
       onCardTextSave={() => Promise.resolve()}
       onCommentAdd={() => Promise.resolve()}
     />

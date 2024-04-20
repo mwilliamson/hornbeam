@@ -256,6 +256,7 @@ function Sidebar(props: SidebarProps) {
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
         onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}
+        onCardStatusSave={newStatus => onCardSave({id: selectedCard.id, status: newStatus})}
         onCardTextSave={newText => onCardSave({id: selectedCard.id, text: newText})}
         onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
       />

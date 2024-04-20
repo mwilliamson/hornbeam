@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { CardStatus } from "../../app/cardStatuses";
 import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
@@ -6,6 +7,8 @@ import { CommentSet } from "../../app/comments";
 import assertNever from "../../util/assertNever";
 import pluralize from "../../util/pluralize";
 import { ValidationError, ValidationResult } from "../../util/validation";
+import CardStatusLabel from "../cardStatuses/CardStatusLabel";
+import CardStatusSelect from "../cardStatuses/CardStatusSelect";
 import CategorySelect from "../categories/CategorySelect";
 import { ValidationErrorsInlineView } from "../validation-views";
 import Button from "../widgets/Button";
@@ -27,6 +30,7 @@ interface CardDetailViewProps {
   onAddChildClick: () => void;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
   onCardTextSave: (newText: string) => Promise<void>;
+  onCardStatusSave: (newStatus: CardStatus | null) => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
 }
 
@@ -36,6 +40,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     card,
     onAddChildClick,
     onCardCategorySave,
+    onCardStatusSave,
     onCardTextSave,
     onCommentAdd,
   } = props;
@@ -63,6 +68,10 @@ export default function CardDetailView(props: CardDetailViewProps) {
           appState={appState}
           categoryId={card.categoryId}
           onCardCategorySave={onCardCategorySave}
+        />
+        <CardStatusPropertyView
+          status={card.status}
+          onCardStatusSave={onCardStatusSave}
         />
         <CardChildrenView
           appState={appState}
@@ -180,6 +189,34 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
         </div>
       )}
       validate={validateCardText}
+    />
+  );
+}
+
+interface CardStatusPropertyViewProps {
+  status: CardStatus | null;
+  onCardStatusSave: (newStatus: CardStatus | null) => Promise<void>;
+}
+
+function CardStatusPropertyView(props: CardStatusPropertyViewProps) {
+  const {status, onCardStatusSave} = props;
+
+  return (
+    <EditableCardPropertyView
+      initialEditValue={status}
+      label="Status"
+      onSave={onCardStatusSave}
+      renderControl={({id, onChange, value}) => (
+        <CardStatusSelect
+          id={id}
+          onChange={onChange}
+          value={value}
+        />
+      )}
+      renderReadonly={({id}) => (
+        <span id={id}><CardStatusLabel value={status} /></span>
+      )}
+      validate={(controlId, newStatus) => ValidationResult.valid(newStatus)}
     />
   );
 }

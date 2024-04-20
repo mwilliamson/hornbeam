@@ -1,14 +1,14 @@
-import { initialAppState } from "../../app";
+import { initialAppSnapshot } from "../../app/snapshots";
 import CardForm, { useCardFormState } from "./CardForm";
 
 export default {
   Blank() {
-    const appState = initialAppState();
+    const appSnapshot = initialAppSnapshot();
     const [state, setState] = useCardFormState({});
 
     return (
       <CardForm
-        appState={appState}
+        appSnapshot={appSnapshot}
         errors={[]}
         onStateChange={state => setState(state)}
         state={state}

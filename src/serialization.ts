@@ -3,7 +3,7 @@ import { isLeft } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 
-import { AppUpdate } from "./app";
+import { AppUpdate } from "./app/snapshots";
 import { CardStatus } from "./app/cardStatuses";
 import { CardAddRequest, CardEditRequest } from "./app/cards";
 import * as t2 from "./util/io-ts";

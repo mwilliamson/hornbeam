@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { applyAppUpdate, AppState, AppUpdate, initialAppState } from "../app";
+import { applyAppUpdate, AppState, initialAppState } from "../app";
+import { AppUpdate } from "../app/snapshots";
 import AppView from "./AppView";
 
 export default function AppViewFixture() {

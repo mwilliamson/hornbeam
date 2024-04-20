@@ -8,7 +8,7 @@ import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 
 interface CardsViewProps {
-  appState: CategorySet & ColorSet;
+  appSnapshot: CategorySet & ColorSet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
@@ -18,7 +18,7 @@ interface CardsViewProps {
 
 export default function CardsView(props: CardsViewProps) {
   const {
-    appState,
+    appSnapshot,
     cards,
     cardSelectedId,
     onCardSelect,
@@ -39,7 +39,7 @@ export default function CardsView(props: CardsViewProps) {
         {cards.filter(card => card.parentCardId === null).map(card => (
           <CardTreeView
             key={card.id}
-            appState={appState}
+            appSnapshot={appSnapshot}
             card={card}
             cardsByParentId={cardsByParentId}
             cardTops={cardTops}
@@ -55,7 +55,7 @@ export default function CardsView(props: CardsViewProps) {
 }
 
 interface CardTreeViewProps {
-  appState: CategorySet & ColorSet;
+  appSnapshot: CategorySet & ColorSet;
   card: Card;
   cardsByParentId: {[id: string]: ReadonlyArray<Card>};
   cardTops: {[cardId: string]: number};
@@ -67,7 +67,7 @@ interface CardTreeViewProps {
 
 function CardTreeView(props: CardTreeViewProps) {
   const {
-    appState,
+    appSnapshot,
     card,
     cardsByParentId,
     cardTops,
@@ -109,9 +109,9 @@ function CardTreeView(props: CardTreeViewProps) {
     <div className="CardsView-TreeView">
       <div className="CardsView-TreeView-Parent">
         <CardView
-          appState={appState}
+          appSnapshot={appSnapshot}
           card={card}
-          cardCategory={appState.findCategoryById(card.categoryId)}
+          cardCategory={appSnapshot.findCategoryById(card.categoryId)}
           isSelected={isSelected}
           onClick={handleCardClick}
           onDoubleClick={handleCardDoubleClick}
@@ -188,7 +188,7 @@ function CardTreeView(props: CardTreeViewProps) {
             {children.map(childCard => (
               <CardTreeView
                 key={childCard.id}
-                appState={appState}
+                appSnapshot={appSnapshot}
                 card={childCard}
                 cardsByParentId={cardsByParentId}
                 cardTops={cardTops}

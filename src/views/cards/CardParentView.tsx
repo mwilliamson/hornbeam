@@ -1,16 +1,16 @@
 import { CardSet } from "../../app/cards";
 
 interface CardParentViewProps {
-  appState: CardSet;
+  appSnapshot: CardSet;
   parentCardId: string | null;
 }
 
 export default function CardParentView(props: CardParentViewProps) {
-  const {appState, parentCardId} = props;
+  const {appSnapshot, parentCardId} = props;
 
   const parent = parentCardId === null
     ? null
-    : appState.findCardById(parentCardId);
+    : appSnapshot.findCardById(parentCardId);
 
   return parent === null ? "None" : `${parent.text} (#${parent.number})`;
 }

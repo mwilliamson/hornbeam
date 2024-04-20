@@ -25,7 +25,7 @@ import CardParentView from "./CardParentView";
 import CardView from "./CardView";
 
 interface CardDetailViewProps {
-  appState: CardSet & CategorySet & ColorSet & CommentSet;
+  appSnapshot: CardSet & CategorySet & ColorSet & CommentSet;
   card: Card;
   onAddChildClick: () => void;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
@@ -36,7 +36,7 @@ interface CardDetailViewProps {
 
 export default function CardDetailView(props: CardDetailViewProps) {
   const {
-    appState,
+    appSnapshot,
     card,
     onAddChildClick,
     onCardCategorySave,
@@ -45,7 +45,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     onCommentAdd,
   } = props;
 
-  const category = appState.findCategoryById(card.categoryId);
+  const category = appSnapshot.findCategoryById(card.categoryId);
 
   const addCommentControlId = useId();
 
@@ -54,7 +54,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Header">
         <div>
           <CardView
-            appState={appState}
+            appSnapshot={appSnapshot}
             card={card}
             cardCategory={category}
           />
@@ -63,9 +63,9 @@ export default function CardDetailView(props: CardDetailViewProps) {
 
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
-        <CardParentPropertyView appState={appState} parentCardId={card.parentCardId} />
+        <CardParentPropertyView appSnapshot={appSnapshot} parentCardId={card.parentCardId} />
         <CardCategoryPropertyView
-          appState={appState}
+          appSnapshot={appSnapshot}
           categoryId={card.categoryId}
           onCardCategorySave={onCardCategorySave}
         />
@@ -74,7 +74,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
           onCardStatusSave={onCardStatusSave}
         />
         <CardChildrenView
-          appState={appState}
+          appSnapshot={appSnapshot}
           cardId={card.id}
           onAddChildClick={onAddChildClick}
         />
@@ -83,7 +83,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-History">
         <h3 className="CardDetailView-History-Title">History</h3>
         <div>
-          {cardHistory(card, appState).map((event, eventIndex) => (
+          {cardHistory(card, appSnapshot).map((event, eventIndex) => (
             <CardEventView key={eventIndex} cardEvent={event} />
           ))}
         </div>
@@ -130,12 +130,12 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
 }
 
 interface CardParentPropertyViewProps {
-  appState: CardSet;
+  appSnapshot: CardSet;
   parentCardId: string | null
 }
 
 function CardParentPropertyView(props: CardParentPropertyViewProps) {
-  const {appState, parentCardId} = props;
+  const {appSnapshot, parentCardId} = props;
 
   return (
     <>
@@ -143,22 +143,22 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
         Parent
       </ControlLabel>
       <ControlGroup>
-        <CardParentView appState={appState} parentCardId={parentCardId} />
+        <CardParentView appSnapshot={appSnapshot} parentCardId={parentCardId} />
       </ControlGroup>
     </>
   );
 }
 
 interface CardCategoryPropertyViewProps {
-  appState: CategorySet & ColorSet;
+  appSnapshot: CategorySet & ColorSet;
   categoryId: string;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
 }
 
 function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
-  const {appState, categoryId, onCardCategorySave} = props;
+  const {appSnapshot, categoryId, onCardCategorySave} = props;
 
-  const category = appState.findCategoryById(categoryId);
+  const category = appSnapshot.findCategoryById(categoryId);
   if (category === null) {
     // TODO: log error
     return null;
@@ -171,8 +171,8 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
       onSave={onCardCategorySave}
       renderControl={({id, onChange, value}) => (
         <CategorySelect
-          appState={appState}
-          availableCategories={appState.availableCategories()}
+          appSnapshot={appSnapshot}
+          availableCategories={appSnapshot.availableCategories()}
           id={id}
           onChange={onChange}
           value={value}
@@ -182,7 +182,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
         <div className="CardDetailView-CategoryCardContainer" id={id}>
           <div
             className="CardDetailView-CategoryCard"
-            style={categoryBackgroundColorStyle(category, appState)}
+            style={categoryBackgroundColorStyle(category, appSnapshot)}
           >
             {category.name}
           </div>
@@ -222,15 +222,15 @@ function CardStatusPropertyView(props: CardStatusPropertyViewProps) {
 }
 
 interface CardChildrenViewProps {
-  appState: CardSet;
+  appSnapshot: CardSet;
   cardId: string;
   onAddChildClick: () => void;
 }
 
 function CardChildrenView(props: CardChildrenViewProps) {
-  const {appState, cardId, onAddChildClick} = props;
+  const {appSnapshot, cardId, onAddChildClick} = props;
 
-  const childCount = appState.countCardChildren(cardId);
+  const childCount = appSnapshot.countCardChildren(cardId);
 
   return (
     <>

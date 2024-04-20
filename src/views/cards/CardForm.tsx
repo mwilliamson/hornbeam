@@ -57,7 +57,7 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
 }
 
 interface CardFormProps {
-  appState: CardSet & CategorySet & ColorSet;
+  appSnapshot: CardSet & CategorySet & ColorSet;
   errors: ReadonlyArray<ValidationError>;
 
   onStateChange: (value: CardFormState) => void;
@@ -65,7 +65,7 @@ interface CardFormProps {
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {appState, errors, onStateChange: onChange, state} = props;
+  const {appSnapshot, errors, onStateChange: onChange, state} = props;
 
   const {controlIds: {text: textControlId, category: categoryControlId}} = state;
 
@@ -87,13 +87,13 @@ export default function CardForm(props: CardFormProps) {
         Parent
       </ControlLabel>
       <ControlGroup>
-        <CardParentView appState={appState} parentCardId={state.parentCardId} />
+        <CardParentView appSnapshot={appSnapshot} parentCardId={state.parentCardId} />
       </ControlGroup>
       <ControlLabel>Category</ControlLabel>
       <ControlGroup>
         <CategorySelect
-          appState={appState}
-          availableCategories={appState.availableCategories()}
+          appSnapshot={appSnapshot}
+          availableCategories={appSnapshot.availableCategories()}
           onChange={categoryId => onChange({...state, categoryId})}
           value={state.categoryId}
         />

@@ -2,11 +2,12 @@ import { Instant } from "@js-joda/core";
 import { useEffect, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { AppState, AppUpdate, Request, requests } from "../app";
+import { AppState } from "../app";
 import { CardStatus } from "../app/cardStatuses";
 import { Card, CardAddRequest, CardEditRequest } from "../app/cards";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
+import { AppSnapshot, AppUpdate, Request, requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../util/promises";
@@ -141,12 +142,14 @@ export default function AppView(props: AppViewProps) {
     };
   }, [viewState.selectedCardId, sendRequest]);
 
+  const latestSnapshot = appState.latestSnapshot();
+
   return (
     <div className="AppView">
       <div className="AppView-Cards">
         <CardsView
-          appState={appState}
-          cards={appState.cards.filter(card => card.status !== CardStatus.Deleted)}
+          appSnapshot={appState.latestSnapshot()}
+          cards={latestSnapshot.cards.filter(card => card.status !== CardStatus.Deleted)}
           cardSelectedId={viewState.selectedCardId}
           onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
           onCardEdit={(cardId) => setViewState({...viewState, editCardId: cardId})}
@@ -155,7 +158,7 @@ export default function AppView(props: AppViewProps) {
       </div>
       <div className="AppView-Tools">
         <Sidebar
-          appState={appState}
+          appSnapshot={latestSnapshot}
           onCardAdd={handleCardAdd}
           onCardAddClick={handleCardAddClick}
           onCardAddClose={handleCardAddClose}
@@ -171,7 +174,7 @@ export default function AppView(props: AppViewProps) {
 }
 
 interface SidebarProps {
-  appState: AppState;
+  appSnapshot: AppSnapshot;
   onCardAdd: (values: CardAddRequest) => Promise<void>;
   onCardAddClick: (initialCard: Partial<Card>) => void;
   onCardAddClose: () => void;
@@ -184,7 +187,7 @@ interface SidebarProps {
 
 function Sidebar(props: SidebarProps) {
   const {
-    appState,
+    appSnapshot,
     onCardAdd,
     onCardAddClick,
     onCardAddClose,
@@ -197,11 +200,11 @@ function Sidebar(props: SidebarProps) {
 
   const editCard = viewState.editCardId === null
     ? null
-    : appState.findCardById(viewState.editCardId);
+    : appSnapshot.findCardById(viewState.editCardId);
 
   const selectedCard = viewState.selectedCardId === null
     ? null
-    : appState.findCardById(viewState.selectedCardId);
+    : appSnapshot.findCardById(viewState.selectedCardId);
 
   const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
     await onCardAdd({
@@ -234,7 +237,7 @@ function Sidebar(props: SidebarProps) {
   if (editCard !== null) {
     return (
       <CardEditForm
-        appState={appState}
+        appSnapshot={appSnapshot}
         card={editCard}
         onClose={onCardEditClose}
         onCardSave={values => handleCardSave(editCard, values)}
@@ -243,7 +246,7 @@ function Sidebar(props: SidebarProps) {
   } else if (viewState.addingCard !== null) {
     return (
       <CardAddForm
-        appState={appState}
+        appSnapshot={appSnapshot}
         initialValue={viewState.addingCard}
         onClose={onCardAddClose}
         onCardAdd={handleCardAdd}
@@ -252,7 +255,7 @@ function Sidebar(props: SidebarProps) {
   } else if (selectedCard !== null) {
     return (
       <CardDetailView
-        appState={appState}
+        appSnapshot={appSnapshot}
         card={selectedCard}
         onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
         onCardCategorySave={newCategoryId => onCardSave({id: selectedCard.id, categoryId: newCategoryId})}

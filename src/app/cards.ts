@@ -17,13 +17,13 @@ export type CardEvent =
   | {type: "created", instant: Instant}
   | {type: "comment", instant: Instant, comment: Comment};
 
-export function cardHistory(card: Card, appState: CommentSet): ReadonlyArray<CardEvent> {
+export function cardHistory(card: Card, appSnapshot: CommentSet): ReadonlyArray<CardEvent> {
   return [
     {
       type: "created",
       instant: card.createdAt,
     },
-    ...appState.findCommentsByCardId(card.id).map(comment => ({
+    ...appSnapshot.findCommentsByCardId(card.id).map(comment => ({
       type: "comment" as const,
       instant: comment.createdAt,
       comment,

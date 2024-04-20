@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 
-import { applyAppUpdate, AppState, AppUpdate, initialAppState } from "./app";
+import { applyAppUpdate, AppState, initialAppState } from "./app";
+import { AppUpdate } from "./app/snapshots";
 import AppView from "./views/AppView";
 
 function Client() {

@@ -4,6 +4,7 @@ import { Card } from "../../app/cards";
 import { Category, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
 import "./CardView.scss";
+import CardStatusLabel from "../cardStatuses/CardStatusLabel";
 
 interface CardViewProps {
   appSnapshot: ColorSet;
@@ -28,11 +29,13 @@ export default function CardView(props: CardViewProps) {
         {card.text}
       </div>
       <div className="CardView-Details">
-        <div className="CardView-Number">
-          #{card.number}
-        </div>
-        <div className="CardView-Category">
+        <div>
           {cardCategory === null ? null : cardCategory.name}
+        </div>
+        <div>
+          {card.status === null ? null : (
+            <CardStatusLabel value={card.status} />
+          )}
         </div>
       </div>
     </div>

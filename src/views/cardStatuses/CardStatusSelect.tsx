@@ -1,4 +1,5 @@
 import { CardStatus, allCardStatuses } from "../../app/cardStatuses";
+import CardStatusLabel from "./CardStatusLabel";
 
 interface CardStatusSelectProps {
   id?: string;
@@ -21,7 +22,9 @@ export default function CardStatusSelect(props: CardStatusSelectProps) {
     <select id={id} onChange={handleChange} value={value ?? ""}>
       <option value=""></option>
       {allCardStatuses.map(cardStatus => (
-        <option key={cardStatus} value={cardStatus}>{cardStatus}</option>
+        <option key={cardStatus} value={cardStatus}>
+          <CardStatusLabel value={cardStatus} />
+        </option>
       ))}
     </select>
   );

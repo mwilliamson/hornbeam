@@ -1,3 +1,4 @@
+import { Category, categoryBackgroundColorStyle } from "../app/categories";
 import { AppSnapshot } from "../app/snapshots";
 import "./SettingsView.scss";
 
@@ -23,17 +24,41 @@ export default function SettingsView(props: SettingsViewProps) {
         </thead>
         <tbody>
           {categories.map(category => (
-            <tr key={category.id}>
-              <td>
-                {category.name}
-              </td>
-              <td>
-                {appSnapshot.findPresetColorById(category.color.presetColorId)?.name}
-              </td>
-            </tr>
+            <CategoryTableRow
+              key={category.id}
+              appSnapshot={appSnapshot}
+              category={category}
+            />
           ))}
         </tbody>
       </table>
     </section>
+  );
+}
+
+interface CategoryTableRowProps {
+  appSnapshot: AppSnapshot;
+  category: Category;
+}
+
+function CategoryTableRow(props: CategoryTableRowProps) {
+  const {appSnapshot, category} = props;
+
+  const color = appSnapshot.findPresetColorById(category.color.presetColorId);
+
+  return (
+    <tr>
+      <td>
+        {category.name}
+      </td>
+      <td>
+        <span
+          className="SettingsView-CategoryColor"
+          style={categoryBackgroundColorStyle(category, appSnapshot)}
+        >
+          {color === null ? null : color.name}
+        </span>
+      </td>
+    </tr>
   );
 }

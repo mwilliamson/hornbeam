@@ -1,3 +1,4 @@
+@use "../scss/categories";
 @use "../scss/spacing";
 
 .SettingsView-CategoriesTable {
@@ -13,4 +14,10 @@
   & thead > tr > th {
     border-bottom: 1px solid #000;
   }
+}
+
+.SettingsView-CategoryColor {
+  @include categories.category-card;
+
+  padding: spacing.$sm;
 }

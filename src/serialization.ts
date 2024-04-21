@@ -5,7 +5,6 @@ import { PathReporter } from "io-ts/PathReporter";
 
 import { AppUpdate } from "./app/snapshots";
 import { CardStatus } from "./app/cardStatuses";
-import { CardAddRequest, CardEditRequest } from "./app/cards";
 import * as t2 from "./util/io-ts";
 
 const SerializedCardStatus = t.keyof({
@@ -65,10 +64,6 @@ const SerializedAppUpdate = t.type({
   updateId: t.string,
   request: SerializedRequest,
 }, "SerializedAppUpdate");
-
-type SerializedRequest =
-  | {type: "cardAdd", cardAdd: CardAddRequest}
-  | {type: "cardEdit", cardEdit: CardEditRequest};
 
 export function serializeAppUpdate(update: AppUpdate): t.OutputOf<typeof SerializedAppUpdate> {
   return SerializedAppUpdate.encode(update);

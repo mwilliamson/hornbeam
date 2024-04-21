@@ -12,7 +12,6 @@
     },
     "dependencies": {
         "@js-joda/core": "^5.6.2",
-        "@js-joda/locale_en": "^4.8.11",
         "classnames": "^2.5.1",
         "dotenv": "^16.4.5",
         "fp-ts": "^2.16.5",

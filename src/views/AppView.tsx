@@ -4,7 +4,7 @@ import { uuidv7 } from "uuidv7";
 
 import { AppState } from "../app";
 import { CardStatus } from "../app/cardStatuses";
-import { Card, CardAddRequest, CardEditRequest } from "../app/cards";
+import { Card, CardAddRequest, CardEditRequest, CardMoveRequest } from "../app/cards";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
 import { AppSnapshot, AppUpdate, Request, requests } from "../app/snapshots";
@@ -103,6 +103,10 @@ export default function AppView(props: AppViewProps) {
   const handleCardAdd = async (request: CardAddRequest) => {
     await sendRequest(requests.cardAdd(request));
     handleCardAddClose();
+  };
+
+  const handleCardMove = async (request: CardMoveRequest) => {
+    await sendRequest(requests.cardMove(request));
   };
 
   const handleCardSave = async (request: CardEditRequest) => {
@@ -208,6 +212,7 @@ export default function AppView(props: AppViewProps) {
           onCardAdd={handleCardAdd}
           onCardAddClick={handleCardAddClick}
           onCardAddClose={handleCardAddClose}
+          onCardMove={handleCardMove}
           onCardSave={handleCardSave}
           onCategoryAdd={handleCategoryAdd}
           onCategoryReorder={handleCategoryReorder}
@@ -227,6 +232,7 @@ interface SidebarProps {
   onCardAdd: (values: CardAddRequest) => Promise<void>;
   onCardAddClick: (initialCard: Partial<Card>) => void;
   onCardAddClose: () => void;
+  onCardMove: (request: CardMoveRequest) => Promise<void>;
   onCardSave: (request: CardEditRequest) => Promise<void>;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
   onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
@@ -243,6 +249,7 @@ function Sidebar(props: SidebarProps) {
     onCardAdd,
     onCardAddClick,
     onCardAddClose,
+    onCardMove,
     onCardSave,
     onCategoryAdd,
     onCategoryReorder,
@@ -310,6 +317,11 @@ function Sidebar(props: SidebarProps) {
           createdAt: Instant.now(),
           id: selectedCard.id,
           categoryId: newCategoryId,
+        })}
+        onCardMove={(direction) => onCardMove({
+          createdAt: Instant.now(),
+          direction,
+          id: selectedCard.id,
         })}
         onCardParentSave={newParentId => onCardSave({
           createdAt: Instant.now(),

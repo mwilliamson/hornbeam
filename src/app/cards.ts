@@ -72,6 +72,12 @@ export function updateCard(card: Card, request: CardEditRequest): Card {
   };
 }
 
+export interface CardMoveRequest {
+  createdAt: Instant;
+  direction: "up" | "down";
+  id: string;
+}
+
 export function validateCardText(elementId: string, text: string): ValidationResult<string> {
   if (text === "") {
     return ValidationResult.invalid([

@@ -1,6 +1,6 @@
 import { Instant } from "@js-joda/core";
 import assertNever from "../util/assertNever";
-import { Card, CardAddRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
+import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, createCategory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
@@ -42,6 +42,53 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
         }
 
         return updateCard(card, request);
+      }),
+      this.nextCardNumber,
+      this.categories,
+      this.comments,
+    );
+  }
+
+  public cardMove(request: CardMoveRequest): AppSnapshot {
+    const card = this.findCardById(request.id);
+
+    if (card === null) {
+      return this;
+    }
+
+    const siblingCards = this.cards
+      .filter(otherCard => otherCard.parentCardId === card.parentCardId);
+
+    const siblingIndex = siblingCards.findIndex(siblingCard => siblingCard.id === card.id);
+
+    let swapWithCard: Card;
+
+    switch (request.direction) {
+      case "up":
+        if (siblingIndex === 0) {
+          return this;
+        }
+        swapWithCard = siblingCards[siblingIndex - 1];
+        break;
+      case "down":
+        if (siblingIndex === siblingCards.length - 1) {
+          return this;
+        }
+        swapWithCard = siblingCards[siblingIndex + 1];
+        break;
+      default:
+        return assertNever(request.direction, this);
+    }
+
+    return new AppSnapshot(
+      this.cards.map(otherCard => {
+        if (otherCard.id === card.id) {
+          return swapWithCard;
+        } else if (otherCard.id === swapWithCard.id) {
+          return card;
+        } else {
+          return otherCard;
+        }
       }),
       this.nextCardNumber,
       this.categories,
@@ -133,6 +180,7 @@ export interface AppUpdate {
 export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
   | {type: "cardEdit", cardEdit: CardEditRequest}
+  | {type: "cardMove", cardMove: CardMoveRequest}
   | {type: "categoryAdd", categoryAdd: CategoryAddRequest}
   | {type: "categoryReorder", categoryReorder: CategoryReorderRequest}
   | {type: "commentAdd", commentAdd: CommentAddRequest};
@@ -144,6 +192,10 @@ export const requests = {
 
   cardEdit(request: CardEditRequest): Request {
     return {type: "cardEdit", cardEdit: request};
+  },
+
+  cardMove(request: CardMoveRequest): Request {
+    return {type: "cardMove", cardMove: request};
   },
 
   categoryAdd(request: CategoryAddRequest): Request {
@@ -165,6 +217,8 @@ export function requestCreatedAt(request: Request): Instant {
       return request.cardAdd.createdAt;
     case "cardEdit":
       return request.cardEdit.createdAt;
+    case "cardMove":
+      return request.cardMove.createdAt;
     case "categoryAdd":
       return request.categoryAdd.createdAt;
     case "categoryReorder":
@@ -182,6 +236,8 @@ export function applySnapshotUpdate(snapshot: AppSnapshot, update: AppUpdate): A
       return snapshot.cardAdd(update.request.cardAdd);
     case "cardEdit":
       return snapshot.cardEdit(update.request.cardEdit);
+    case "cardMove":
+      return snapshot.cardMove(update.request.cardMove);
     case "categoryAdd":
       return snapshot.categoryAdd(update.request.categoryAdd);
     case "categoryReorder":

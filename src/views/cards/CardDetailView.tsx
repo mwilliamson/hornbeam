@@ -30,6 +30,7 @@ interface CardDetailViewProps {
   card: Card;
   onAddChildClick: () => void;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
+  onCardMove: (direction: "up" | "down") => Promise<void>;
   onCardParentSave: (newParentId: string | null) => Promise<void>;
   onCardTextSave: (newText: string) => Promise<void>;
   onCardStatusSave: (newStatus: CardStatus | null) => Promise<void>;
@@ -42,6 +43,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     card,
     onAddChildClick,
     onCardCategorySave,
+    onCardMove,
     onCardParentSave,
     onCardStatusSave,
     onCardTextSave,
@@ -68,6 +70,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
         <CardParentPropertyView
           appSnapshot={appSnapshot}
+          onCardMove={onCardMove}
           parentCardId={card.parentCardId}
           onCardParentSave={onCardParentSave}
         />
@@ -138,15 +141,28 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
 
 interface CardParentPropertyViewProps {
   appSnapshot: CardSet;
+  onCardMove: (direction: "up" | "down") => Promise<void>;
   parentCardId: string | null
   onCardParentSave: (newParentCardId: string | null) => Promise<void>;
 }
 
 function CardParentPropertyView(props: CardParentPropertyViewProps) {
-  const {appSnapshot, parentCardId, onCardParentSave} = props;
+  const {appSnapshot, onCardMove, parentCardId, onCardParentSave} = props;
 
   return (
     <EditableCardPropertyView
+      extraControls={
+        <>
+          <LinkButton onClick={() => onCardMove("up")}>
+            ↑
+          </LinkButton>
+          {" "}
+          <LinkButton onClick={() => onCardMove("down")}>
+            ↓
+          </LinkButton>
+          {" "}
+        </>
+      }
       initialEditValue={parentCardId}
       label="Parent"
       onSave={onCardParentSave}
@@ -272,6 +288,7 @@ function CardChildrenView(props: CardChildrenViewProps) {
 }
 
 interface EditableCardPropertyViewProps<TEdit, TValid> {
+  extraControls?: React.ReactNode;
   initialEditValue: TEdit;
   label: React.ReactNode;
   onSave: (value: TValid) => Promise<void>;
@@ -281,7 +298,7 @@ interface EditableCardPropertyViewProps<TEdit, TValid> {
 }
 
 function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyViewProps<TEdit, TValid>) {
-  const {initialEditValue, label, onSave, renderControl, renderReadonly, validate} = props;
+  const {extraControls, initialEditValue, label, onSave, renderControl, renderReadonly, validate} = props;
 
   const controlId = useId();
   const [editState, setEditState] = useState<{value: TEdit, errors: ReadonlyArray<ValidationError>} | null>(null);
@@ -314,9 +331,12 @@ function EditableCardPropertyView<TEdit, TValid>(props: EditableCardPropertyView
       <ControlLabel
         buttons={
           editState === null ? (
-            <LinkButton onClick={handleEditClick}>
-              Edit
-            </LinkButton>
+            <>
+              {extraControls}
+              <LinkButton onClick={handleEditClick}>
+                Edit
+              </LinkButton>
+            </>
           ) : (
             <>
               <Button type="button" intent="secondary" inline onClick={handleCancelClick}>

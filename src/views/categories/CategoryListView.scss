@@ -1,7 +1,7 @@
-@use "../scss/categories";
-@use "../scss/spacing";
+@use "../../scss/categories";
+@use "../../scss/spacing";
 
-.SettingsView-CategoriesTable {
+.CategoryListView {
   border-collapse: collapse;
   margin-top: spacing.$md;
   width: 100%;
@@ -16,7 +16,7 @@
   }
 }
 
-.SettingsView-CategoryColor {
+.CategoryListView-CategoryColor {
   @include categories.category-card;
 
   padding: spacing.$sm;

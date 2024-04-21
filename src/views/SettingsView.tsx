@@ -2,9 +2,9 @@ import { Instant } from "@js-joda/core";
 import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { Category, CategoryAddRequest, categoryBackgroundColorStyle } from "../app/categories";
+import { CategoryAddRequest } from "../app/categories";
 import { AppSnapshot } from "../app/snapshots";
-import "./SettingsView.scss";
+import CategoryListView from "./categories/CategoryListView";
 import ColorSelect from "./colors/ColorSelect";
 import ControlGroup from "./widgets/ControlGroup";
 import ControlLabel from "./widgets/ControlLabel";
@@ -20,62 +20,17 @@ interface SettingsViewProps {
 export default function SettingsView(props: SettingsViewProps) {
   const {appSnapshot, onCategoryAdd} = props;
 
-  const categories = appSnapshot.allCategories();
-
   return (
     <section className="m-md">
       <h3>Categories</h3>
 
-      <table className="SettingsView-CategoriesTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Colour</th>
-          </tr>
-        </thead>
-        <tbody>
-          {categories.map(category => (
-            <CategoryTableRow
-              key={category.id}
-              appSnapshot={appSnapshot}
-              category={category}
-            />
-          ))}
-        </tbody>
-      </table>
+      <CategoryListView appSnapshot={appSnapshot} />
 
       <AddCategorySection
         appSnapshot={appSnapshot}
         onCategoryAdd={onCategoryAdd}
       />
     </section>
-  );
-}
-
-interface CategoryTableRowProps {
-  appSnapshot: AppSnapshot;
-  category: Category;
-}
-
-function CategoryTableRow(props: CategoryTableRowProps) {
-  const {appSnapshot, category} = props;
-
-  const color = appSnapshot.findPresetColorById(category.color.presetColorId);
-
-  return (
-    <tr>
-      <td>
-        {category.name}
-      </td>
-      <td>
-        <span
-          className="SettingsView-CategoryColor"
-          style={categoryBackgroundColorStyle(category, appSnapshot)}
-        >
-          {color === null ? null : color.name}
-        </span>
-      </td>
-    </tr>
   );
 }
 

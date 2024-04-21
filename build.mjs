@@ -37,7 +37,9 @@ const context = await esbuild.context({
 
         build.onEnd(async (result) => {
           console.log(`Build finished with ${result.errors.length} errors`);
-          await fs.writeFile("build.json", JSON.stringify(result.metafile));
+          if (result.metafile !== undefined) {
+            await fs.writeFile("build.json", JSON.stringify(result.metafile));
+          }
         })
       }
     }

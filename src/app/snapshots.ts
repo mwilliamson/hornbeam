@@ -1,9 +1,10 @@
 import { Instant } from "@js-joda/core";
 import assertNever from "../util/assertNever";
 import { Card, CardAddRequest, CardEditRequest, CardSet, createCard, updateCard } from "./cards";
-import { Category, CategoryAddRequest, CategorySet, createCategory } from "./categories";
+import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, createCategory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
+import { reorder } from "../util/arrays";
 
 export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   public readonly cards: ReadonlyArray<Card>;
@@ -70,6 +71,21 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
+  public categoryReorder(request: CategoryReorderRequest): AppSnapshot {
+    const newCategories = reorder(
+      this.categories,
+      category => category.id,
+      request.ids,
+    );
+
+    return new AppSnapshot(
+      this.cards,
+      this.nextCardNumber,
+      newCategories,
+      this.comments,
+    );
+  }
+
   public availableCategories(): ReadonlyArray<Category> {
     return this.categories;
   }
@@ -114,6 +130,7 @@ export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
   | {type: "cardEdit", cardEdit: CardEditRequest}
   | {type: "categoryAdd", categoryAdd: CategoryAddRequest}
+  | {type: "categoryReorder", categoryReorder: CategoryReorderRequest}
   | {type: "commentAdd", commentAdd: CommentAddRequest};
 
 export const requests = {
@@ -129,6 +146,10 @@ export const requests = {
     return {type: "categoryAdd", categoryAdd: request};
   },
 
+  categoryReorder(request: CategoryReorderRequest): Request {
+    return {type: "categoryReorder", categoryReorder: request};
+  },
+
   commentAdd(request: CommentAddRequest): Request {
     return {type: "commentAdd", commentAdd: request};
   },
@@ -142,6 +163,8 @@ export function requestCreatedAt(request: Request): Instant {
       return request.cardEdit.createdAt;
     case "categoryAdd":
       return request.categoryAdd.createdAt;
+    case "categoryReorder":
+      return request.categoryReorder.createdAt;
     case "commentAdd":
       return request.commentAdd.createdAt;
     default:
@@ -157,6 +180,8 @@ export function applySnapshotUpdate(snapshot: AppSnapshot, update: AppUpdate): A
       return snapshot.cardEdit(update.request.cardEdit);
     case "categoryAdd":
       return snapshot.categoryAdd(update.request.categoryAdd);
+    case "categoryReorder":
+      return snapshot.categoryReorder(update.request.categoryReorder);
     case "commentAdd":
       return snapshot.commentAdd(update.request.commentAdd);
     default:

@@ -20,7 +20,7 @@ import ToolsView from "./ToolsView";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
-import { CategoryAddRequest } from "../app/categories";
+import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
@@ -111,6 +111,10 @@ export default function AppView(props: AppViewProps) {
 
   const handleCategoryAdd = async (request: CategoryAddRequest) => {
     await sendRequest(requests.categoryAdd(request));
+  };
+
+  const handleCategoryReorder = async (request: CategoryReorderRequest) => {
+    await sendRequest(requests.categoryReorder(request));
   };
 
   const handleCommentAdd = async (request: CommentAddRequest) => {
@@ -206,6 +210,7 @@ export default function AppView(props: AppViewProps) {
           onCardAddClose={handleCardAddClose}
           onCardSave={handleCardSave}
           onCategoryAdd={handleCategoryAdd}
+          onCategoryReorder={handleCategoryReorder}
           onCommentAdd={handleCommentAdd}
           onSettingsClick={handleSettingsClick}
           onTimeTravelStart={handleTimeTravelStart}
@@ -224,6 +229,7 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onCardSave: (request: CardEditRequest) => Promise<void>;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
+  onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   onSettingsClick: () => void;
   onTimeTravelStart: () => void;
@@ -239,6 +245,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onCardSave,
     onCategoryAdd,
+    onCategoryReorder,
     onCommentAdd,
     onSettingsClick,
     onTimeTravelStart,
@@ -274,6 +281,7 @@ function Sidebar(props: SidebarProps) {
       <SettingsView
         appSnapshot={appSnapshot}
         onCategoryAdd={onCategoryAdd}
+        onCategoryReorder={onCategoryReorder}
       />
     );
   } else if (viewState.timeTravelSnapshotIndex !== null) {

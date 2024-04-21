@@ -8,21 +8,6 @@ export interface Category {
   color: {presetColorId: string};
 }
 
-export interface CategoryAddRequest {
-  createdAt: Instant;
-  color: {presetColorId: string};
-  id: string;
-  name: string;
-}
-
-export function createCategory(request: CategoryAddRequest): Category {
-  return {
-    color: request.color,
-    id: request.id,
-    name: request.name,
-  };
-}
-
 export function categoryBackgroundColorStyle(
   category: Category | null,
   allColors: ColorSet,
@@ -40,6 +25,26 @@ export function categoryBackgroundColor(
 
   return allColors.findPresetColorById(category.color.presetColorId)
     ?? presetColorWhite;
+}
+
+export interface CategoryAddRequest {
+  createdAt: Instant;
+  color: {presetColorId: string};
+  id: string;
+  name: string;
+}
+
+export function createCategory(request: CategoryAddRequest): Category {
+  return {
+    color: request.color,
+    id: request.id,
+    name: request.name,
+  };
+}
+
+export interface CategoryReorderRequest {
+  createdAt: Instant;
+  ids: ReadonlyArray<string>;
 }
 
 export interface CategorySet {

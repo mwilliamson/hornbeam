@@ -41,6 +41,11 @@ const SerializedCategoryAddRequest = t.type({
   name: t.string,
 }, "SerializedCategoryAddRequest");
 
+const SerializedCategoryReorderRequest = t.type({
+  createdAt: t2.instant,
+  ids: t.readonlyArray(t.string),
+}, "SerializedCategoryReorderRequest");
+
 const SerializedCommentAddRequest = t.type({
   cardId: t.string,
   createdAt: t2.instant,
@@ -52,6 +57,7 @@ const SerializedRequest = t.union([
   t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddRequest}),
   t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditRequest}),
   t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddRequest}),
+  t.type({type: t.literal("categoryReorder"), categoryReorder: SerializedCategoryReorderRequest}),
   t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddRequest}),
 ]);
 

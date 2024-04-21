@@ -2,7 +2,7 @@ import { Instant } from "@js-joda/core";
 import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { CategoryAddRequest } from "../app/categories";
+import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
 import { AppSnapshot } from "../app/snapshots";
 import CategoryListView from "./categories/CategoryListView";
 import ColorSelect from "./colors/ColorSelect";
@@ -15,16 +15,23 @@ import LinkButton from "./widgets/LinkButton";
 interface SettingsViewProps {
   appSnapshot: AppSnapshot;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
+  onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
 }
 
 export default function SettingsView(props: SettingsViewProps) {
-  const {appSnapshot, onCategoryAdd} = props;
+  const {appSnapshot, onCategoryAdd, onCategoryReorder} = props;
 
   return (
     <section className="m-md">
       <h3>Categories</h3>
 
-      <CategoryListView appSnapshot={appSnapshot} />
+      <CategoryListView
+        appSnapshot={appSnapshot}
+        onReorder={ids => onCategoryReorder({
+          createdAt: Instant.now(),
+          ids,
+        })}
+      />
 
       <AddCategorySection
         appSnapshot={appSnapshot}

@@ -20,6 +20,7 @@ import ToolsView from "./ToolsView";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
+import { CategoryAddRequest } from "../app/categories";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
@@ -106,6 +107,10 @@ export default function AppView(props: AppViewProps) {
 
   const handleCardSave = async (request: CardEditRequest) => {
     await sendRequest(requests.cardEdit(request));
+  };
+
+  const handleCategoryAdd = async (request: CategoryAddRequest) => {
+    await sendRequest(requests.categoryAdd(request));
   };
 
   const handleCommentAdd = async (request: CommentAddRequest) => {
@@ -199,6 +204,7 @@ export default function AppView(props: AppViewProps) {
           onCardAddClick={handleCardAddClick}
           onCardAddClose={handleCardAddClose}
           onCardSave={handleCardSave}
+          onCategoryAdd={handleCategoryAdd}
           onCommentAdd={handleCommentAdd}
           onSettingsClick={handleSettingsClick}
           onTimeTravelStart={handleTimeTravelStart}
@@ -216,6 +222,7 @@ interface SidebarProps {
   onCardAddClick: (initialCard: Partial<Card>) => void;
   onCardAddClose: () => void;
   onCardSave: (request: CardEditRequest) => Promise<void>;
+  onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   onSettingsClick: () => void;
   onTimeTravelStart: () => void;
@@ -230,6 +237,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClick,
     onCardAddClose,
     onCardSave,
+    onCategoryAdd,
     onCommentAdd,
     onSettingsClick,
     onTimeTravelStart,
@@ -264,6 +272,7 @@ function Sidebar(props: SidebarProps) {
     return (
       <SettingsView
         appSnapshot={appSnapshot}
+        onCategoryAdd={onCategoryAdd}
       />
     );
   } else if (viewState.timeTravelSnapshotIndex !== null) {

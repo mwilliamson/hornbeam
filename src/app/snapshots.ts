@@ -78,6 +78,10 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.categories;
   }
 
+  public allPresetColors(): ReadonlyArray<PresetColor> {
+    return presetColors;
+  }
+
   public findPresetColorById(presetColorId: string): PresetColor | null {
     return presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
   }

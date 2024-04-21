@@ -64,5 +64,6 @@ export const presetColorWhite = new PresetColor({
 });
 
 export interface ColorSet {
+  allPresetColors(): ReadonlyArray<PresetColor>;
   findPresetColorById: (presetColorId: string) => PresetColor | null;
 }

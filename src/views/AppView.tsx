@@ -153,6 +153,7 @@ export default function AppView(props: AppViewProps) {
       }
 
       if (event.key === "Delete" || event.key === "Backspace") {
+        // TODO: prevent during time travel
         if (viewState.selectedCardId !== null) {
           // TODO: wait
           sendRequest(requests.cardEdit({

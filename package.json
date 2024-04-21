@@ -21,6 +21,7 @@
         "lodash": "^4.17.21",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-select": "^5.8.0",
         "simple-sync": "github:mwilliamson/simple-sync#f0a188528739626d0e98db778522cd4c083481f1",
         "spin.js": "^4.1.1",
         "uuidv7": "^0.6.3"

@@ -49,6 +49,10 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
+  public allCards(): ReadonlyArray<Card> {
+    return this.cards;
+  }
+
   public countCardChildren(cardId: string): number {
     return this.cards.filter(card => card.parentCardId === cardId).length;
   }

@@ -101,6 +101,7 @@ export function validateCardCategory(elementId: string, categoryId: string | nul
 }
 
 export interface CardSet {
+  allCards: () => ReadonlyArray<Card>;
   countCardChildren: (cardId: string) => number;
   findCardById: (cardId: string) => Card | null;
 }

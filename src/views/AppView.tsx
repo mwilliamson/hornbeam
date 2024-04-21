@@ -311,6 +311,11 @@ function Sidebar(props: SidebarProps) {
           id: selectedCard.id,
           categoryId: newCategoryId,
         })}
+        onCardParentSave={newParentId => onCardSave({
+          createdAt: Instant.now(),
+          id: selectedCard.id,
+          parentCardId: newParentId,
+        })}
         onCardStatusSave={newStatus => onCardSave({
           createdAt: Instant.now(),
           id: selectedCard.id,

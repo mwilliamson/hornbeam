@@ -22,6 +22,7 @@ import PlainTextView from "../widgets/PlainTextView";
 import Textarea from "../widgets/Textarea";
 import "./CardDetailView.scss";
 import CardParentView from "./CardParentView";
+import CardSelect from "./CardSelect";
 import CardView from "./CardView";
 
 interface CardDetailViewProps {
@@ -29,6 +30,7 @@ interface CardDetailViewProps {
   card: Card;
   onAddChildClick: () => void;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
+  onCardParentSave: (newParentId: string | null) => Promise<void>;
   onCardTextSave: (newText: string) => Promise<void>;
   onCardStatusSave: (newStatus: CardStatus | null) => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
@@ -40,6 +42,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     card,
     onAddChildClick,
     onCardCategorySave,
+    onCardParentSave,
     onCardStatusSave,
     onCardTextSave,
     onCommentAdd,
@@ -63,7 +66,11 @@ export default function CardDetailView(props: CardDetailViewProps) {
 
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
-        <CardParentPropertyView appSnapshot={appSnapshot} parentCardId={card.parentCardId} />
+        <CardParentPropertyView
+          appSnapshot={appSnapshot}
+          parentCardId={card.parentCardId}
+          onCardParentSave={onCardParentSave}
+        />
         <CardCategoryPropertyView
           appSnapshot={appSnapshot}
           categoryId={card.categoryId}
@@ -132,20 +139,34 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
 interface CardParentPropertyViewProps {
   appSnapshot: CardSet;
   parentCardId: string | null
+  onCardParentSave: (newParentCardId: string | null) => Promise<void>;
 }
 
 function CardParentPropertyView(props: CardParentPropertyViewProps) {
-  const {appSnapshot, parentCardId} = props;
+  const {appSnapshot, parentCardId, onCardParentSave} = props;
 
   return (
-    <>
-      <ControlLabel>
-        Parent
-      </ControlLabel>
-      <ControlGroup>
-        <CardParentView appSnapshot={appSnapshot} parentCardId={parentCardId} />
-      </ControlGroup>
-    </>
+    <EditableCardPropertyView
+      initialEditValue={parentCardId}
+      label="Parent"
+      onSave={onCardParentSave}
+      renderControl={({id, onChange, value}) => (
+        <CardSelect
+          appSnapshot={appSnapshot}
+          id={id}
+          onChange={onChange}
+          value={value}
+        />
+      )}
+      renderReadonly={({id}) => (
+        <CardParentView
+          appSnapshot={appSnapshot}
+          id={id}
+          parentCardId={parentCardId}
+        />
+      )}
+      validate={(controlId, value) => ValidationResult.valid(value)}
+    />
   );
 }
 

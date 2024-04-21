@@ -1,5 +1,6 @@
 import * as esbuild from "esbuild";
 import { sassPlugin } from "esbuild-sass-plugin";
+import fs from "fs/promises";
 import util from "util";
 
 const args = util.parseArgs({
@@ -15,6 +16,7 @@ const context = await esbuild.context({
   entryPoints: ["src/client.tsx", "src/demo.tsx", "src/cosmos.tsx"],
   bundle: true,
   outdir: "public/",
+  metafile: true,
   mainFields: ["module", "browser", "main"],
   plugins: [
     {
@@ -33,8 +35,9 @@ const context = await esbuild.context({
           console.log("Starting build...");
         });
 
-        build.onEnd(result => {
+        build.onEnd(async (result) => {
           console.log(`Build finished with ${result.errors.length} errors`);
+          await fs.writeFile("build.json", JSON.stringify(result.metafile));
         })
       }
     }

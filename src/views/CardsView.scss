@@ -23,7 +23,6 @@
 .CardsView-Cards {
   min-height: 100%;
   min-width: 100%;
-  @include CardsView-CardsRow;
 }
 
 .CardsView-TreeView {
@@ -61,6 +60,6 @@
   border-radius: 0 0.5em 0.5em 0;
 }
 
-.CardsView-TreeView-Children {
+.CardsView-CardList {
   @include CardsView-CardsRow;
 }

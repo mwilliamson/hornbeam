@@ -34,18 +34,15 @@ export default function CardsView(props: CardsViewProps) {
   return (
     <div className="CardsView">
       <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
-        {cards.filter(card => card.parentCardId === null).map(card => (
-          <CardTreeView
-            key={card.id}
-            appSnapshot={appSnapshot}
-            card={card}
-            cardsByParentId={cardsByParentId}
-            cardTops={cardTops}
-            cardSelectedId={cardSelectedId}
-            onCardSelect={onCardSelect}
-            onCardAddChildClick={onCardAddChildClick}
-          />
-        ))}
+        <CardList
+          appSnapshot={appSnapshot}
+          cards={cards.filter(card => card.parentCardId === null)}
+          cardsByParentId={cardsByParentId}
+          cardTops={cardTops}
+          cardSelectedId={cardSelectedId}
+          onCardSelect={onCardSelect}
+          onCardAddChildClick={onCardAddChildClick}
+        />
       </div>
     </div>
   );
@@ -116,22 +113,56 @@ function CardTreeView(props: CardTreeViewProps) {
             childCards={children}
             parentCard={card}
           />
-          <div className="CardsView-TreeView-Children">
-            {children.map(childCard => (
-              <CardTreeView
-                key={childCard.id}
-                appSnapshot={appSnapshot}
-                card={childCard}
-                cardsByParentId={cardsByParentId}
-                cardTops={cardTops}
-                cardSelectedId={cardSelectedId}
-                onCardSelect={onCardSelect}
-                onCardAddChildClick={onCardAddChildClick}
-              />
-            ))}
-          </div>
+          <CardList
+            appSnapshot={appSnapshot}
+            cards={children}
+            cardsByParentId={cardsByParentId}
+            cardTops={cardTops}
+            cardSelectedId={cardSelectedId}
+            onCardSelect={onCardSelect}
+            onCardAddChildClick={onCardAddChildClick}
+          />
         </>
       )}
+    </div>
+  );
+}
+
+interface CardListProps {
+  appSnapshot: CategorySet & ColorSet;
+  cards: ReadonlyArray<Card>;
+  cardsByParentId: {[id: string]: ReadonlyArray<Card>};
+  cardTops: {[cardId: string]: number};
+  cardSelectedId: string | null;
+  onCardSelect: (cardId: string | null) => void;
+  onCardAddChildClick: (cardId: string) => void;
+}
+
+function CardList(props: CardListProps) {
+  const {
+    appSnapshot,
+    cards,
+    cardsByParentId,
+    cardTops,
+    cardSelectedId,
+    onCardSelect,
+    onCardAddChildClick,
+  } = props;
+
+  return (
+    <div className="CardsView-CardList">
+      {cards.map(card => (
+        <CardTreeView
+          key={card.id}
+          appSnapshot={appSnapshot}
+          card={card}
+          cardsByParentId={cardsByParentId}
+          cardTops={cardTops}
+          cardSelectedId={cardSelectedId}
+          onCardSelect={onCardSelect}
+          onCardAddChildClick={onCardAddChildClick}
+        />
+      ))}
     </div>
   );
 }

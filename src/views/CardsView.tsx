@@ -73,15 +73,6 @@ function CardTreeView(props: CardTreeViewProps) {
   } = props;
 
   const children = cardsByParentId[card.id] || [];
-  const lastChild = children.length === 0 ? null : children[children.length - 1];
-
-  const parentChildGap = 100;
-  const branchStroke = "#666";
-  const branchY = (childCard: Card) => {
-    const cardTop = cardTops[childCard.id] - cardTops[card.id];
-    return Math.floor(cardTop + cardHeight / 2) + 0.5;
-  };
-  const branchesHeight = lastChild === null ? 0 : branchY(lastChild) + 1;
 
   const handleCardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -120,59 +111,11 @@ function CardTreeView(props: CardTreeViewProps) {
       </div>
       {children.length > 0 && (
         <>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox={`0 0 ${parentChildGap} ${branchesHeight}`}
-            width={parentChildGap}
-            height={branchesHeight}
-          >
-            {children.map((childCard, childCardIndex) => {
-              const y = branchY(childCard);
-
-              if (childCardIndex === 0) {
-                return (
-                  <line
-                    key={childCard.id}
-                    x1={0}
-                    y1={y}
-                    x2={parentChildGap}
-                    y2={y}
-                    stroke={branchStroke}
-                  />
-                );
-              } else if (childCardIndex === children.length - 1) {
-                return (
-                  <React.Fragment key={childCard.id}>
-                    <line
-                      x1={parentChildGap / 2}
-                      y1={y}
-                      x2={parentChildGap}
-                      y2={y}
-                      stroke={branchStroke}
-                    />
-                    <line
-                      x1={parentChildGap / 2}
-                      y1={branchY(children[0])}
-                      x2={parentChildGap / 2}
-                      y2={y}
-                      stroke={branchStroke}
-                    />
-                  </React.Fragment>
-                );
-              } else {
-                return (
-                  <line
-                    key={childCard.id}
-                    x1={parentChildGap / 2}
-                    y1={y}
-                    x2={parentChildGap}
-                    y2={y}
-                    stroke={branchStroke}
-                  />
-                );
-              }
-            })}
-          </svg>
+          <Branches
+            cardTops={cardTops}
+            childCards={children}
+            parentCard={card}
+          />
           <div className="CardsView-TreeView-Children">
             {children.map(childCard => (
               <CardTreeView
@@ -190,6 +133,84 @@ function CardTreeView(props: CardTreeViewProps) {
         </>
       )}
     </div>
+  );
+}
+
+interface BranchesProps {
+  cardTops: {[cardId: string]: number};
+  childCards: ReadonlyArray<Card>;
+  parentCard: Card;
+}
+
+function Branches(props: BranchesProps) {
+  const {cardTops, childCards, parentCard} = props;
+
+  const lastChild = childCards.length === 0
+    ? null
+    : childCards[childCards.length - 1];
+
+  const parentChildGap = 100;
+  const branchStroke = "#666";
+  const branchY = (childCard: Card) => {
+    const cardTop = cardTops[childCard.id] - cardTops[parentCard.id];
+    return Math.floor(cardTop + cardHeight / 2) + 0.5;
+  };
+  const branchesHeight = lastChild === null ? 0 : branchY(lastChild) + 1;
+
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${parentChildGap} ${branchesHeight}`}
+      width={parentChildGap}
+      height={branchesHeight}
+    >
+      {childCards.map((childCard, childCardIndex) => {
+        const y = branchY(childCard);
+
+        if (childCardIndex === 0) {
+          return (
+            <line
+              key={childCard.id}
+              x1={0}
+              y1={y}
+              x2={parentChildGap}
+              y2={y}
+              stroke={branchStroke}
+            />
+          );
+        } else if (childCardIndex === childCards.length - 1) {
+          return (
+            <React.Fragment key={childCard.id}>
+              <line
+                x1={parentChildGap / 2}
+                y1={y}
+                x2={parentChildGap}
+                y2={y}
+                stroke={branchStroke}
+              />
+              <line
+                x1={parentChildGap / 2}
+                y1={branchY(childCards[0])}
+                x2={parentChildGap / 2}
+                y2={y}
+                stroke={branchStroke}
+              />
+            </React.Fragment>
+          );
+        } else {
+          return (
+            <line
+              key={childCard.id}
+              x1={parentChildGap / 2}
+              y1={y}
+              x2={parentChildGap}
+              y2={y}
+              stroke={branchStroke}
+            />
+          );
+        }
+      })}
+    </svg>
   );
 }
 

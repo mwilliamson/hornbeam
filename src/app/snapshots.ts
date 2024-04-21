@@ -74,7 +74,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.categories;
   }
 
-  private allCategories(): ReadonlyArray<Category> {
+  public allCategories(): ReadonlyArray<Category> {
     return this.categories;
   }
 

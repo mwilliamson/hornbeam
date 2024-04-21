@@ -1,0 +1,16 @@
+@use "../scss/spacing";
+
+.SettingsView-CategoriesTable {
+  border-collapse: collapse;
+  margin-top: spacing.$md;
+  width: 100%;
+
+  & th, & td {
+    text-align: left;
+    padding: spacing.$sm;
+  }
+
+  & thead > tr > th {
+    border-bottom: 1px solid #000;
+  }
+}

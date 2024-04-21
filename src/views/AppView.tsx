@@ -13,12 +13,13 @@ import isInputEvent from "../util/isInputEvent";
 import { Deferred, createDeferred } from "../util/promises";
 import "./AppView.scss";
 import CardsView from "./CardsView";
+import SettingsView from "./SettingsView";
+import TimeTravelSidebar from "./TimeTravelSidebar";
+import TimeTravelSlider from "./TimeTravelSlider";
 import ToolsView from "./ToolsView";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
-import TimeTravelSidebar from "./TimeTravelSidebar";
-import TimeTravelSlider from "./TimeTravelSlider";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
@@ -259,7 +260,13 @@ function Sidebar(props: SidebarProps) {
     });
   };
 
-  if (viewState.timeTravelSnapshotIndex !== null) {
+  if (viewState.viewSettings) {
+    return (
+      <SettingsView
+        appSnapshot={appSnapshot}
+      />
+    );
+  } else if (viewState.timeTravelSnapshotIndex !== null) {
     return (
       <TimeTravelSidebar
         onTimeTravelStop={onTimeTravelStop}

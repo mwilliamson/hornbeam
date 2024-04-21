@@ -1,21 +1,21 @@
 @use "../../scss/cards";
 @use "../../scss/categories";
 
-.CategorySelect {
+.CardRadioButtons {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
   gap: cards.$card-gap;
 }
 
-.CategorySelect-CategoryLabel {
+.CardRadioButtons-OptionLabel {
   @include categories.category-card;
 
-  .CategorySelect-Category:has(:checked) & {
+  .CardRadioButtons-Option:has(:checked) & {
     @include cards.card--selected;
   }
 }
 
-.CategorySelect-Input {
+.CardRadioButtons-Input {
   position: absolute;
   clip: rect(0, 0, 0, 0);
   pointer-events: none;

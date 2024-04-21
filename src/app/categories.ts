@@ -30,7 +30,7 @@ export function categoryBackgroundColorStyle(
   return categoryBackgroundColor(category, allColors).backgroundColorStyle();
 }
 
-function categoryBackgroundColor(
+export function categoryBackgroundColor(
   category: Category | null,
   allColors: ColorSet,
 ): PresetColor {

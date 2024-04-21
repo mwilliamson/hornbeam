@@ -1,8 +1,6 @@
-import { useId } from "react";
-
-import { Category, categoryBackgroundColorStyle } from "../../app/categories";
+import { Category, categoryBackgroundColor } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
-import "./CategorySelect.scss";
+import CardRadioButtons from "../widgets/CardRadioButtons";
 
 interface CategorySelectProps {
   appSnapshot: ColorSet;
@@ -15,36 +13,14 @@ interface CategorySelectProps {
 export default function CategorySelect(props: CategorySelectProps) {
   const {availableCategories, appSnapshot, id, onChange, value} = props;
 
-  const htmlName = useId();
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      onChange(event.target.value);
-    }
-  };
-
   return (
-    <div className="CategorySelect" id={id}>
-      {availableCategories.map(category => (
-        <div key={category.id} className="CategorySelect-Category">
-          <input
-            type="radio"
-            checked={category.id === value}
-            onChange={handleChange}
-            name={htmlName}
-            id={htmlName + "_" + category.id}
-            value={category.id}
-            className="CategorySelect-Input"
-          />
-          <label
-            className="CategorySelect-CategoryLabel"
-            style={categoryBackgroundColorStyle(category, appSnapshot)}
-            htmlFor={htmlName + "_" + category.id}
-          >
-            {category.name}
-          </label>
-        </div>
-      ))}
-    </div>
+    <CardRadioButtons
+      id={id}
+      onChange={onChange}
+      options={availableCategories}
+      optionColor={option => categoryBackgroundColor(option, appSnapshot).color}
+      optionLabel={option => option.name}
+      value={value}
+    />
   );
 }

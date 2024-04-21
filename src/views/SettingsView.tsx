@@ -111,6 +111,7 @@ function AddCategorySection(props: AddCategorySectionProps) {
         name: validCategoryAddRequest.name,
         id: uuidv7(),
       });
+      setState(null);
     }
   };
 

@@ -4,11 +4,12 @@ import ControlGroup from "./widgets/ControlGroup";
 
 interface ToolsViewProps {
   onCardAddClick: () => void;
+  onSettingsClick: () => void;
   onTimeTravelStart: () => void;
 }
 
 export default function ToolsView(props: ToolsViewProps) {
-  const {onCardAddClick, onTimeTravelStart} = props;
+  const {onCardAddClick, onSettingsClick, onTimeTravelStart} = props;
 
   return (
     <div className="ToolsView">
@@ -21,6 +22,12 @@ export default function ToolsView(props: ToolsViewProps) {
       <ControlGroup>
         <Button type="button" intent="primary" onClick={onTimeTravelStart}>
           Time travel
+        </Button>
+      </ControlGroup>
+
+      <ControlGroup>
+        <Button type="button" intent="primary" onClick={onSettingsClick}>
+          Settings
         </Button>
       </ControlGroup>
     </div>

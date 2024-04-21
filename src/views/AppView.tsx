@@ -25,12 +25,14 @@ interface ViewState {
   selectedCardId: string | null;
   // TODO: should probably be a union (e.g. can't add a card and time travel at the same time)
   timeTravelSnapshotIndex: number | null;
+  viewSettings: boolean;
 }
 
 const initialViewState: ViewState = {
   addingCard: null,
   selectedCardId: null,
   timeTravelSnapshotIndex: null,
+  viewSettings: false,
 };
 
 interface AppViewProps {
@@ -107,6 +109,13 @@ export default function AppView(props: AppViewProps) {
 
   const handleCommentAdd = async (request: CommentAddRequest) => {
     await sendRequest(requests.commentAdd(request));
+  };
+
+  const handleSettingsClick = () => {
+    setViewState({
+      ...viewState,
+      viewSettings: true,
+    });
   };
 
   const handleTimeTravelStart = () => {
@@ -190,6 +199,7 @@ export default function AppView(props: AppViewProps) {
           onCardAddClose={handleCardAddClose}
           onCardSave={handleCardSave}
           onCommentAdd={handleCommentAdd}
+          onSettingsClick={handleSettingsClick}
           onTimeTravelStart={handleTimeTravelStart}
           onTimeTravelStop={handleTimeTravelStop}
           viewState={viewState}
@@ -206,6 +216,7 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onCardSave: (request: CardEditRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
+  onSettingsClick: () => void;
   onTimeTravelStart: () => void;
   onTimeTravelStop: () => void;
   viewState: ViewState;
@@ -219,6 +230,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onCardSave,
     onCommentAdd,
+    onSettingsClick,
     onTimeTravelStart,
     onTimeTravelStop,
     viewState,
@@ -291,6 +303,7 @@ function Sidebar(props: SidebarProps) {
     return (
       <ToolsView
         onCardAddClick={() => onCardAddClick({})}
+        onSettingsClick={onSettingsClick}
         onTimeTravelStart={onTimeTravelStart}
       />
     );

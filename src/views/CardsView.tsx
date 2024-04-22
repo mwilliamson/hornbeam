@@ -1,6 +1,6 @@
-import groupBy from "lodash/groupBy";
 import React from "react";
 
+import { CardTree, cardsToTrees } from "../app/cardTrees";
 import { Card } from "../app/cards";
 import { CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
@@ -24,20 +24,16 @@ export default function CardsView(props: CardsViewProps) {
     onCardAddChildClick,
   } = props;
 
-  const cardsByParentId = groupBy(
-    cards.filter(card => card.parentCardId !== null),
-    card => card.parentCardId,
-  );
+  const cardTrees = cardsToTrees(cards);
 
-  const cardTops = calculateCardTops(cards, cardsByParentId);
+  const cardTops = calculateCardTops(cardTrees);
 
   return (
     <div className="CardsView">
       <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
         <CardList
           appSnapshot={appSnapshot}
-          cards={cards.filter(card => card.parentCardId === null)}
-          cardsByParentId={cardsByParentId}
+          cardTrees={cardTrees}
           cardTops={cardTops}
           cardSelectedId={cardSelectedId}
           onCardSelect={onCardSelect}
@@ -50,8 +46,7 @@ export default function CardsView(props: CardsViewProps) {
 
 interface CardTreeViewProps {
   appSnapshot: CategorySet & ColorSet;
-  card: Card;
-  cardsByParentId: {[id: string]: ReadonlyArray<Card>};
+  cardTree: CardTree;
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
@@ -61,15 +56,14 @@ interface CardTreeViewProps {
 function CardTreeView(props: CardTreeViewProps) {
   const {
     appSnapshot,
-    card,
-    cardsByParentId,
+    cardTree,
     cardTops,
     cardSelectedId,
     onCardSelect,
     onCardAddChildClick,
   } = props;
 
-  const children = cardsByParentId[card.id] || [];
+  const {card} = cardTree;
 
   const handleCardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
@@ -106,17 +100,16 @@ function CardTreeView(props: CardTreeViewProps) {
           </div>
         )}
       </div>
-      {children.length > 0 && (
+      {cardTree.children.length > 0 && (
         <>
           <Branches
             cardTops={cardTops}
-            childCards={children}
+            childCardTrees={cardTree.children}
             parentCard={card}
           />
           <CardList
             appSnapshot={appSnapshot}
-            cards={children}
-            cardsByParentId={cardsByParentId}
+            cardTrees={cardTree.children}
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
@@ -130,8 +123,7 @@ function CardTreeView(props: CardTreeViewProps) {
 
 interface CardListProps {
   appSnapshot: CategorySet & ColorSet;
-  cards: ReadonlyArray<Card>;
-  cardsByParentId: {[id: string]: ReadonlyArray<Card>};
+  cardTrees: ReadonlyArray<CardTree>;
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
@@ -141,8 +133,7 @@ interface CardListProps {
 function CardList(props: CardListProps) {
   const {
     appSnapshot,
-    cards,
-    cardsByParentId,
+    cardTrees,
     cardTops,
     cardSelectedId,
     onCardSelect,
@@ -151,12 +142,11 @@ function CardList(props: CardListProps) {
 
   return (
     <div className="CardsView-CardList">
-      {cards.map(card => (
+      {cardTrees.map(cardTree => (
         <CardTreeView
-          key={card.id}
+          key={cardTree.card.id}
           appSnapshot={appSnapshot}
-          card={card}
-          cardsByParentId={cardsByParentId}
+          cardTree={cardTree}
           cardTops={cardTops}
           cardSelectedId={cardSelectedId}
           onCardSelect={onCardSelect}
@@ -169,16 +159,16 @@ function CardList(props: CardListProps) {
 
 interface BranchesProps {
   cardTops: {[cardId: string]: number};
-  childCards: ReadonlyArray<Card>;
+  childCardTrees: ReadonlyArray<CardTree>;
   parentCard: Card;
 }
 
 function Branches(props: BranchesProps) {
-  const {cardTops, childCards, parentCard} = props;
+  const {cardTops, childCardTrees, parentCard} = props;
 
-  const lastChild = childCards.length === 0
+  const lastChild = childCardTrees.length === 0
     ? null
-    : childCards[childCards.length - 1];
+    : childCardTrees[childCardTrees.length - 1];
 
   const parentChildGap = 100;
   const branchStroke = "#666";
@@ -186,7 +176,7 @@ function Branches(props: BranchesProps) {
     const cardTop = cardTops[childCard.id] - cardTops[parentCard.id];
     return Math.floor(cardTop + cardHeight / 2) + 0.5;
   };
-  const branchesHeight = lastChild === null ? 0 : branchY(lastChild) + 1;
+  const branchesHeight = lastChild === null ? 0 : branchY(lastChild.card) + 1;
 
   return (
     <svg
@@ -195,7 +185,8 @@ function Branches(props: BranchesProps) {
       width={parentChildGap}
       height={branchesHeight}
     >
-      {childCards.map((childCard, childCardIndex) => {
+      {childCardTrees.map((childCardTree, childCardIndex) => {
+        const childCard = childCardTree.card;
         const y = branchY(childCard);
 
         if (childCardIndex === 0) {
@@ -209,7 +200,7 @@ function Branches(props: BranchesProps) {
               stroke={branchStroke}
             />
           );
-        } else if (childCardIndex === childCards.length - 1) {
+        } else if (childCardIndex === childCardTrees.length - 1) {
           return (
             <React.Fragment key={childCard.id}>
               <line
@@ -221,7 +212,7 @@ function Branches(props: BranchesProps) {
               />
               <line
                 x1={parentChildGap / 2}
-                y1={branchY(childCards[0])}
+                y1={branchY(childCardTrees[0].card)}
                 x2={parentChildGap / 2}
                 y2={y}
                 stroke={branchStroke}
@@ -246,8 +237,7 @@ function Branches(props: BranchesProps) {
 }
 
 function calculateCardTops(
-  cards: ReadonlyArray<Card>,
-  cardsByParentId: {[id: string]: ReadonlyArray<Card>}
+  cardTrees: ReadonlyArray<CardTree>,
 ): {[cardId: string]: number} {
   // TODO: if we're going to calculate positions here, should we just position
   // the cards absolutely? Probably.
@@ -257,24 +247,20 @@ function calculateCardTops(
 
   let y = 0;
 
-  const handleCard = (card: Card) => {
-    cardTops[card.id] = y;
+  const handleCardTree = (cardTree: CardTree) => {
+    cardTops[cardTree.card.id] = y;
 
-    const childCards = cardsByParentId[card.id] ?? [];
-
-    if (childCards.length === 0) {
+    if (cardTree.children.length === 0) {
       y += cardHeight + siblingGap;
     } else {
-      for (const childCard of childCards) {
-        handleCard(childCard);
+      for (const childCardTree of cardTree.children) {
+        handleCardTree(childCardTree);
       }
     }
   };
 
-  for (const card of cards) {
-    if (card.parentCardId === null) {
-      handleCard(card);
-    }
+  for (const cardTree of cardTrees) {
+    handleCardTree(cardTree);
   }
 
   return cardTops;

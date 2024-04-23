@@ -4,6 +4,7 @@ import { CardTree, cardsToTrees } from "../app/cardTrees";
 import { Card } from "../app/cards";
 import { CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
+import { Lens } from "../app/lenses";
 import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 
@@ -11,6 +12,7 @@ interface CardsViewProps {
   appSnapshot: CategorySet & ColorSet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
+  lens: Lens;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
 }
@@ -20,11 +22,12 @@ export default function CardsView(props: CardsViewProps) {
     appSnapshot,
     cards,
     cardSelectedId,
+    lens,
     onCardSelect,
     onCardAddChildClick,
   } = props;
 
-  const cardTrees = cardsToTrees(cards);
+  const cardTrees = cardsToTrees(cards, lens);
 
   const cardTops = calculateCardTops(cardTrees);
 

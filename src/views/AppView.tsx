@@ -21,6 +21,7 @@ import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
 import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
+import { defaultLens } from "../app/lenses";
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
@@ -190,8 +191,9 @@ export default function AppView(props: AppViewProps) {
         <div className="AppView-Cards">
           <CardsView
             appSnapshot={appState.latestSnapshot()}
-            cards={snapshot.cards.filter(card => card.status !== CardStatus.Deleted)}
+            cards={snapshot.cards}
             cardSelectedId={viewState.selectedCardId}
+            lens={defaultLens}
             onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
             onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
           />

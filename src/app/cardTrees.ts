@@ -1,8 +1,8 @@
 import { groupBy, partition } from "lodash";
 
+import { mapNotNull } from "../util/arrays";
 import { Card } from "./cards";
 import { CardCondition, Lens } from "./lenses";
-import { mapNotNull } from "../util/arrays";
 
 export interface CardTree {
   card: Card;

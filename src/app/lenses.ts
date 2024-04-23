@@ -5,7 +5,7 @@ export interface Lens {
   rule: LensRule;
 }
 
-type LensRule =
+export type LensRule =
   | {type: "exclude", condition: CardCondition}
 
 export const defaultLens: Lens = {
@@ -19,5 +19,5 @@ export const defaultLens: Lens = {
   },
 };
 
-type CardCondition =
+export type CardCondition =
   | {type: "status:notIn", statuses: ReadonlyArray<CardStatus | null>}

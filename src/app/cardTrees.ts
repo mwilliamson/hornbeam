@@ -1,7 +1,7 @@
 import { groupBy, partition } from "lodash";
 
 import { Card } from "./cards";
-import { Lens } from "./lenses";
+import { CardCondition, Lens } from "./lenses";
 import { mapNotNull } from "../util/arrays";
 
 export interface CardTree {
@@ -18,7 +18,7 @@ export function cardsToTrees(cards: ReadonlyArray<Card>, lens: Lens): ReadonlyAr
   const cardsByParentId = groupBy(nonTopLevelCards, card => card.parentCardId);
 
   const cardToTree = (card: Card): CardTree | null => {
-    if (lens.rule.condition.statuses.includes(card.status)) {
+    if (cardMatchesCondition(card, lens.rule.condition)) {
       return null;
     }
 
@@ -29,4 +29,8 @@ export function cardsToTrees(cards: ReadonlyArray<Card>, lens: Lens): ReadonlyAr
   };
 
   return mapNotNull(topLevelCards, cardToTree);
+}
+
+function cardMatchesCondition(card: Card, condition: CardCondition): boolean {
+  return condition.statuses.includes(card.status);
 }

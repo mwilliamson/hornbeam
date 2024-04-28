@@ -3,24 +3,21 @@ import CardStatusLabel from "./CardStatusLabel";
 
 interface CardStatusSelectProps {
   id?: string;
-  onChange: (value: CardStatus | null) => void;
-  value: CardStatus | null;
+  onChange: (value: CardStatus) => void;
+  value: CardStatus;
 }
 
 export default function CardStatusSelect(props: CardStatusSelectProps) {
   const {id, onChange, value} = props;
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = event.target.value === ""
-      ? null
-      : event.target.value as CardStatus;
+    const newValue = event.target.value as CardStatus;
 
     onChange(newValue);
   };
 
   return (
     <select id={id} onChange={handleChange} value={value ?? ""}>
-      <option value=""></option>
       {allCardStatuses.map(cardStatus => (
         <option key={cardStatus} value={cardStatus}>
           <CardStatusLabel value={cardStatus} />

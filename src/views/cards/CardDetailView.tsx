@@ -33,7 +33,7 @@ interface CardDetailViewProps {
   onCardMove: (direction: "up" | "down") => Promise<void>;
   onCardParentSave: (newParentId: string | null) => Promise<void>;
   onCardTextSave: (newText: string) => Promise<void>;
-  onCardStatusSave: (newStatus: CardStatus | null) => Promise<void>;
+  onCardStatusSave: (newStatus: CardStatus) => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
 }
 
@@ -231,8 +231,8 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
 }
 
 interface CardStatusPropertyViewProps {
-  status: CardStatus | null;
-  onCardStatusSave: (newStatus: CardStatus | null) => Promise<void>;
+  status: CardStatus;
+  onCardStatusSave: (newStatus: CardStatus) => Promise<void>;
 }
 
 function CardStatusPropertyView(props: CardStatusPropertyViewProps) {

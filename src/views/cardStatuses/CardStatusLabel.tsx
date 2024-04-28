@@ -2,15 +2,15 @@ import { CardStatus } from "../../app/cardStatuses";
 import assertNever from "../../util/assertNever";
 
 interface CardStatusLabelProps {
-  value: CardStatus | null;
+  value: CardStatus;
 }
 
 export default function CardStatusLabel(props: CardStatusLabelProps) {
   const {value} = props;
 
   switch (value) {
-    case null:
-      return "None";
+    case CardStatus.None:
+      return null;
     case CardStatus.Deleted:
       return "Deleted";
     case CardStatus.Done:

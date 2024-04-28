@@ -10,6 +10,7 @@ import * as t2 from "./util/io-ts";
 const SerializedCardStatus = t.keyof({
   [CardStatus.Deleted]: null,
   [CardStatus.Done]: null,
+  [CardStatus.None]: null,
 });
 
 const SerializedCardAddRequest = t.type({
@@ -28,7 +29,7 @@ const SerializedCardEditRequest = t.intersection([
   t.partial({
     categoryId: t.string,
     parentCardId: t.union([t.string, t.null]),
-    status: t.union([SerializedCardStatus, t.null]),
+    status: SerializedCardStatus,
     text: t.string,
   }),
 ], "SerializedCardEditRequest");

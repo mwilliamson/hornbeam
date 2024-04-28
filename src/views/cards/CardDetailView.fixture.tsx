@@ -4,6 +4,7 @@ import { uuidv7 } from "uuidv7";
 import { initialAppSnapshot } from "../../app/snapshots";
 import CardDetailView from "./CardDetailView";
 import { Card } from "../../app/cards";
+import { CardStatus } from "../../app/cardStatuses";
 
 const appSnapshot = initialAppSnapshot()
   .categoryAdd({
@@ -49,7 +50,7 @@ const card: Card = {
   id: uuidv7(),
   number: 42,
   parentCardId: null,
-  status: null,
+  status: CardStatus.None,
   text: "Show history in card detail view"
 };
 

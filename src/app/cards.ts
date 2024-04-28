@@ -9,7 +9,7 @@ export interface Card {
   id: string;
   number: number;
   parentCardId: string | null;
-  status: CardStatus | null;
+  status: CardStatus;
   text: string;
 }
 
@@ -46,7 +46,7 @@ export function createCard(request: CardAddRequest, cardNumber: number): Card {
     id: request.id,
     number: cardNumber,
     parentCardId: request.parentCardId,
-    status: null,
+    status: CardStatus.None,
     text: request.text,
   };
 }
@@ -56,7 +56,7 @@ export interface CardEditRequest {
   createdAt: Instant;
   id: string;
   parentCardId?: string | null;
-  status?: CardStatus | null;
+  status?: CardStatus;
   text?: string;
 }
 

@@ -23,6 +23,7 @@ import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
+import ExpanderIcon from "./widgets/ExpanderIcon";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -443,7 +444,8 @@ function CollapsiblePane(props: CollapsiblePaneProps) {
   return (
     <section className="AppView-CollapsiblePane">
       <h2 className="AppView-CollapsiblePane-Header" onClick={() => setIsCollapsed(!isCollapsed)}>
-        {isCollapsed ? "+" : "-"} {header}
+        <ExpanderIcon isCollapsed={isCollapsed} />
+        {header}
       </h2>
 
       <div className="AppView-CollapsiblePane-Body" hidden={isCollapsed}>

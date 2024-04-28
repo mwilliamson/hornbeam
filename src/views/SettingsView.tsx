@@ -8,6 +8,7 @@ import { AppSnapshot } from "../app/snapshots";
 import "./SettingsView.scss";
 import CategoryListView from "./categories/CategoryListView";
 import ColorSelect from "./colors/ColorSelect";
+import Button from "./widgets/Button";
 import ControlGroup from "./widgets/ControlGroup";
 import ControlLabel from "./widgets/ControlLabel";
 import Form from "./widgets/Form";
@@ -89,9 +90,14 @@ function AddCategorySection(props: AddCategorySectionProps) {
 
   return state === null ? (
     <ControlGroup>
-      <LinkButton onClick={() => setState({name: "", presetColorId: null})}>
+      <Button
+        type="button"
+        intent="secondary"
+        onClick={() => setState({name: "", presetColorId: null})}
+        fullWidth
+      >
         Add category
-      </LinkButton>
+      </Button>
     </ControlGroup>
   ) : (
     <section>

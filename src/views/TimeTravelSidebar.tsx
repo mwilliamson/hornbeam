@@ -10,7 +10,7 @@ export default function TimeTravelSidebar(props: TimeTravelSidebarProps) {
   const {onTimeTravelStop} = props;
 
   return (
-    <div>
+    <div className="mt-md">
       <ControlGroup>
         <Button intent="secondary" type="button" onClick={onTimeTravelStop} fullWidth>
           Stop time travel

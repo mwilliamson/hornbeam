@@ -25,7 +25,7 @@ export default function SettingsView(props: SettingsViewProps) {
   const {appSnapshot, onBack, onCategoryAdd, onCategoryReorder} = props;
 
   return (
-    <section className="m-md">
+    <section>
       <ControlGroup>
         <LinkButton onClick={onBack}>
           <ChevronLeft className="SettingsView-BackChevron" size={18} />

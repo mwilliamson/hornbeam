@@ -324,70 +324,80 @@ function Sidebar(props: SidebarProps) {
 
   if (viewState.viewSettings) {
     return (
-      <SettingsView
-        appSnapshot={appSnapshot}
-        onBack={onSettingsClose}
-        onCategoryAdd={onCategoryAdd}
-        onCategoryReorder={onCategoryReorder}
-      />
+      <Pane header="Settings">
+        <SettingsView
+          appSnapshot={appSnapshot}
+          onBack={onSettingsClose}
+          onCategoryAdd={onCategoryAdd}
+          onCategoryReorder={onCategoryReorder}
+        />
+      </Pane>
     );
   } else if (viewState.timeTravelSnapshotIndex !== null) {
     return (
-      <TimeTravelSidebar
-        onTimeTravelStop={onTimeTravelStop}
-        timeTravelSnapshotIndex={viewState.timeTravelSnapshotIndex}
-      />
+      <Pane header="Time travel">
+        <TimeTravelSidebar
+          onTimeTravelStop={onTimeTravelStop}
+          timeTravelSnapshotIndex={viewState.timeTravelSnapshotIndex}
+        />
+      </Pane>
     );
   } else if (viewState.addingCard !== null) {
     return (
-      <CardAddForm
-        appSnapshot={appSnapshot}
-        initialValue={viewState.addingCard}
-        onClose={onCardAddClose}
-        onCardAdd={handleCardAdd}
-      />
+      <Pane header="Add card">
+        <CardAddForm
+          appSnapshot={appSnapshot}
+          initialValue={viewState.addingCard}
+          onClose={onCardAddClose}
+          onCardAdd={handleCardAdd}
+        />
+      </Pane>
     );
   } else if (selectedCard !== null) {
     return (
-      <CardDetailView
-        appSnapshot={appSnapshot}
-        card={selectedCard}
-        onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
-        onCardCategorySave={newCategoryId => onCardSave({
-          createdAt: Instant.now(),
-          id: selectedCard.id,
-          categoryId: newCategoryId,
-        })}
-        onCardMove={(direction) => onCardMove({
-          createdAt: Instant.now(),
-          direction,
-          id: selectedCard.id,
-        })}
-        onCardParentSave={newParentId => onCardSave({
-          createdAt: Instant.now(),
-          id: selectedCard.id,
-          parentCardId: newParentId,
-        })}
-        onCardStatusSave={newStatus => onCardSave({
-          createdAt: Instant.now(),
-          id: selectedCard.id,
-          status: newStatus,
-        })}
-        onCardTextSave={newText => onCardSave({
-          createdAt: Instant.now(),
-          id: selectedCard.id,
-          text: newText,
-        })}
-        onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
-      />
+      <Pane header="Selected card">
+        <CardDetailView
+          appSnapshot={appSnapshot}
+          card={selectedCard}
+          onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
+          onCardCategorySave={newCategoryId => onCardSave({
+            createdAt: Instant.now(),
+            id: selectedCard.id,
+            categoryId: newCategoryId,
+          })}
+          onCardMove={(direction) => onCardMove({
+            createdAt: Instant.now(),
+            direction,
+            id: selectedCard.id,
+          })}
+          onCardParentSave={newParentId => onCardSave({
+            createdAt: Instant.now(),
+            id: selectedCard.id,
+            parentCardId: newParentId,
+          })}
+          onCardStatusSave={newStatus => onCardSave({
+            createdAt: Instant.now(),
+            id: selectedCard.id,
+            status: newStatus,
+          })}
+          onCardTextSave={newText => onCardSave({
+            createdAt: Instant.now(),
+            id: selectedCard.id,
+            text: newText,
+          })}
+          onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
+        />
+      </Pane>
     );
   } else {
     return (
-      <ToolsView
-        onCardAddClick={() => onCardAddClick({})}
-        onSettingsClick={onSettingsClick}
-        onTimeTravelStart={onTimeTravelStart}
-      />
+      <Pane header="Overview">
+        <ToolsView
+          onCardAddClick={() => onCardAddClick({})}
+          onSettingsClick={onSettingsClick}
+          onTimeTravelStart={onTimeTravelStart}
+        />
+      </Pane>
     );
   }
 }
@@ -421,7 +431,7 @@ function CardFiltersView(props: CardFiltersViewProps) {
   };
 
   return (
-    <CollapsiblePane header="Filters">
+    <Pane collapsible header="Filters">
       <h3>Status</h3>
       <ControlGroup>
         {allCardStatuses.map(cardStatus => (
@@ -438,24 +448,25 @@ function CardFiltersView(props: CardFiltersViewProps) {
           </label>
         ))}
       </ControlGroup>
-    </CollapsiblePane>
+    </Pane>
   );
 }
 
-interface CollapsiblePaneProps {
+interface PaneProps {
   children: React.ReactNode;
+  collapsible?: boolean;
   header: React.ReactNode;
 }
 
-function CollapsiblePane(props: CollapsiblePaneProps) {
-  const {children, header} = props;
+function Pane(props: PaneProps) {
+  const {children, collapsible = false, header} = props;
 
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(collapsible);
 
   return (
     <section className="AppView-CollapsiblePane">
       <h2 className="AppView-CollapsiblePane-Header" onClick={() => setIsCollapsed(!isCollapsed)}>
-        <ExpanderIcon isCollapsed={isCollapsed} />
+        {collapsible && <ExpanderIcon isCollapsed={isCollapsed} />}
         {header}
       </h2>
 

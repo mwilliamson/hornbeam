@@ -33,8 +33,7 @@ export default function CardAddForm(props: CardAddFormProps) {
   };
 
   return (
-    <Form className="p-md" onSubmit={handleSubmit}>
-      <h2>Add card</h2>
+    <Form onSubmit={handleSubmit}>
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm
         appSnapshot={appSnapshot}

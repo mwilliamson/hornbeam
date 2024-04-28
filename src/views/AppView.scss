@@ -36,3 +36,26 @@
   flex-direction: column;
   justify-content: space-between;
 }
+
+.AppView-Sidebar-Main {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.AppView-Sidebar-CardFilters {
+  flex: 0 0 auto;
+}
+
+.AppView-CollapsiblePane-Header {
+  padding: spacing.$sm spacing.$md;
+  font-size: 1rem;
+  background-color: #666;
+  color: #fff;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.AppView-CollapsiblePane-Body {
+  padding: spacing.$sm spacing.$md;
+}

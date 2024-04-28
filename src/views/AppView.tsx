@@ -227,7 +227,7 @@ export default function AppView(props: AppViewProps) {
         )}
       </div>
       <div className="AppView-Sidebar">
-        <div>
+        <div className="AppView-Sidebar-Main">
           <Sidebar
             appSnapshot={snapshot}
             onCardAdd={handleCardAdd}
@@ -244,7 +244,7 @@ export default function AppView(props: AppViewProps) {
             viewState={viewState}
           />
         </div>
-        <div>
+        <div className="AppView-Sidebar-CardFilters">
           <CardFiltersView
             cardFilters={viewState.cardFilters}
             onCardFiltersChange={handleCardFiltersChange}
@@ -409,13 +409,11 @@ function CardFiltersView(props: CardFiltersViewProps) {
   };
 
   return (
-    <section className="p-md">
-      <h2>Filters</h2>
-
+    <CollapsiblePane header="Filters">
       <h3>Status</h3>
-      {allCardStatuses.map(cardStatus => (
-        <ControlGroup key={cardStatus}>
-          <label>
+      <ControlGroup>
+        {allCardStatuses.map(cardStatus => (
+          <label key={cardStatus} style={{display: "block"}}>
             <input
               type="checkbox"
               checked={cardFilters.cardStatuses.has(cardStatus)}
@@ -426,8 +424,31 @@ function CardFiltersView(props: CardFiltersViewProps) {
             {" "}
             <CardStatusLabel showNone value={cardStatus} />
           </label>
-        </ControlGroup>
-      ))}
+        ))}
+      </ControlGroup>
+    </CollapsiblePane>
+  );
+}
+
+interface CollapsiblePaneProps {
+  children: React.ReactNode;
+  header: React.ReactNode;
+}
+
+function CollapsiblePane(props: CollapsiblePaneProps) {
+  const {children, header} = props;
+
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  return (
+    <section className="AppView-CollapsiblePane">
+      <h2 className="AppView-CollapsiblePane-Header" onClick={() => setIsCollapsed(!isCollapsed)}>
+        {isCollapsed ? "+" : "-"} {header}
+      </h2>
+
+      <div className="AppView-CollapsiblePane-Body" hidden={isCollapsed}>
+        {children}
+      </div>
     </section>
   );
 }

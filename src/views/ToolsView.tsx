@@ -14,19 +14,19 @@ export default function ToolsView(props: ToolsViewProps) {
   return (
     <div className="ToolsView">
       <ControlGroup>
-        <Button type="button" intent="secondary" onClick={onCardAddClick}>
+        <Button type="button" intent="secondary" onClick={onCardAddClick} fullWidth>
           Add card
         </Button>
       </ControlGroup>
 
       <ControlGroup>
-        <Button type="button" intent="secondary" onClick={onTimeTravelStart}>
+        <Button type="button" intent="secondary" onClick={onTimeTravelStart} fullWidth>
           Time travel
         </Button>
       </ControlGroup>
 
       <ControlGroup>
-        <Button type="button" intent="secondary" onClick={onSettingsClick}>
+        <Button type="button" intent="secondary" onClick={onSettingsClick} fullWidth>
           Settings
         </Button>
       </ControlGroup>

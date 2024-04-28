@@ -14,7 +14,7 @@ export default function TimeTravelSidebar(props: TimeTravelSidebarProps) {
       <h2>Time travel</h2>
 
       <ControlGroup>
-        <Button intent="secondary" type="button" onClick={onTimeTravelStop}>
+        <Button intent="secondary" type="button" onClick={onTimeTravelStop} fullWidth>
           Stop time travel
         </Button>
       </ControlGroup>

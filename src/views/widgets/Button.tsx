@@ -6,6 +6,7 @@ type ButtonIntent = "primary" | "secondary";
 interface ButtonProps {
   children?: React.ReactNode;
   disabled?: boolean;
+  fullWidth?: boolean;
   inline?: boolean;
   intent: ButtonIntent;
   onClick?: () => void;
@@ -14,7 +15,7 @@ interface ButtonProps {
 }
 
 export default function Button(props: ButtonProps) {
-  const {children, disabled, inline, intent, onClick, type, value} = props;
+  const {children, disabled, fullWidth, inline, intent, onClick, type, value} = props;
 
   const handleClick = onClick === undefined ? undefined : (event: React.SyntheticEvent) => {
     event.preventDefault();
@@ -25,7 +26,10 @@ export default function Button(props: ButtonProps) {
     <button
       className={classNames(
         `Button Button--intent-${intent} Button--variant-solid`,
-        {"Button--inline": inline},
+        {
+          "Button--inline": inline,
+          "Button--full-width": fullWidth,
+        },
       )}
       disabled={disabled}
       onClick={handleClick}

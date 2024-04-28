@@ -25,11 +25,14 @@
   flex: 0 0 auto;
 }
 
-.AppView-Tools {
+.AppView-Sidebar {
   background-color: #fff;
   flex: 0 0 auto;
   border-left: 1px solid black;
   height: 100%;
   overflow: auto;
   width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }

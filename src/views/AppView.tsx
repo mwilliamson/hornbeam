@@ -1,10 +1,11 @@
 import { Instant } from "@js-joda/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
 import { AppState } from "../app";
-import { CardStatus } from "../app/cardStatuses";
+import { CardStatus, allCardStatuses } from "../app/cardStatuses";
 import { Card, CardAddRequest, CardEditRequest, CardMoveRequest } from "../app/cards";
+import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
 import { AppSnapshot, AppUpdate, Request, requests } from "../app/snapshots";
@@ -17,14 +18,19 @@ import SettingsView from "./SettingsView";
 import TimeTravelSidebar from "./TimeTravelSidebar";
 import TimeTravelSlider from "./TimeTravelSlider";
 import ToolsView from "./ToolsView";
+import CardStatusLabel from "./cardStatuses/CardStatusLabel";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
-import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
-import { defaultLens } from "../app/lenses";
+import ControlGroup from "./widgets/ControlGroup";
+
+interface CardFilters {
+  cardStatuses: ReadonlySet<CardStatus>;
+}
 
 interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
+  cardFilters: CardFilters;
   selectedCardId: string | null;
   // TODO: should probably be a union (e.g. can't add a card and time travel at the same time)
   timeTravelSnapshotIndex: number | null;
@@ -33,6 +39,9 @@ interface ViewState {
 
 const initialViewState: ViewState = {
   addingCard: null,
+  cardFilters: {
+    cardStatuses: new Set(allCardStatuses.filter(cardStatus => cardStatus !== CardStatus.Deleted)),
+  },
   selectedCardId: null,
   timeTravelSnapshotIndex: null,
   viewSettings: false,
@@ -154,6 +163,13 @@ export default function AppView(props: AppViewProps) {
     });
   };
 
+  const handleCardFiltersChange = (newCardFilters: CardFilters) => {
+    setViewState({
+      ...viewState,
+      cardFilters: newCardFilters,
+    });
+  };
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       // TODO: use proper selection of the cards and put the event on the cards?
@@ -185,15 +201,17 @@ export default function AppView(props: AppViewProps) {
     ? appState.latestSnapshot()
     : appState.snapshot(viewState.timeTravelSnapshotIndex);
 
+  const cards = snapshot.allCards()
+    .filter(card => viewState.cardFilters.cardStatuses.has(card.status));
+
   return (
     <div className="AppView">
       <div className="AppView-Left">
         <div className="AppView-Cards">
           <CardsView
             appSnapshot={appState.latestSnapshot()}
-            cards={snapshot.cards}
+            cards={cards}
             cardSelectedId={viewState.selectedCardId}
-            lens={defaultLens}
             onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
             onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
           />
@@ -208,22 +226,30 @@ export default function AppView(props: AppViewProps) {
           </div>
         )}
       </div>
-      <div className="AppView-Tools">
-        <Sidebar
-          appSnapshot={snapshot}
-          onCardAdd={handleCardAdd}
-          onCardAddClick={handleCardAddClick}
-          onCardAddClose={handleCardAddClose}
-          onCardMove={handleCardMove}
-          onCardSave={handleCardSave}
-          onCategoryAdd={handleCategoryAdd}
-          onCategoryReorder={handleCategoryReorder}
-          onCommentAdd={handleCommentAdd}
-          onSettingsClick={handleSettingsClick}
-          onTimeTravelStart={handleTimeTravelStart}
-          onTimeTravelStop={handleTimeTravelStop}
-          viewState={viewState}
-        />
+      <div className="AppView-Sidebar">
+        <div>
+          <Sidebar
+            appSnapshot={snapshot}
+            onCardAdd={handleCardAdd}
+            onCardAddClick={handleCardAddClick}
+            onCardAddClose={handleCardAddClose}
+            onCardMove={handleCardMove}
+            onCardSave={handleCardSave}
+            onCategoryAdd={handleCategoryAdd}
+            onCategoryReorder={handleCategoryReorder}
+            onCommentAdd={handleCommentAdd}
+            onSettingsClick={handleSettingsClick}
+            onTimeTravelStart={handleTimeTravelStart}
+            onTimeTravelStop={handleTimeTravelStop}
+            viewState={viewState}
+          />
+        </div>
+        <div>
+          <CardFiltersView
+            cardFilters={viewState.cardFilters}
+            onCardFiltersChange={handleCardFiltersChange}
+          />
+        </div>
       </div>
     </div>
   );
@@ -352,4 +378,56 @@ function Sidebar(props: SidebarProps) {
       />
     );
   }
+}
+
+interface CardFiltersViewProps {
+  cardFilters: CardFilters;
+  onCardFiltersChange: (cardFilters: CardFilters) => void;
+}
+
+function CardFiltersView(props: CardFiltersViewProps) {
+  const {cardFilters, onCardFiltersChange} = props;
+
+  const controlId = useId();
+
+  const handleCardStatusChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    cardStatus: CardStatus,
+  ) => {
+    const cardStatuses = new Set(cardFilters.cardStatuses);
+
+    if (event.target.checked) {
+      cardStatuses.add(cardStatus);
+    } else {
+      cardStatuses.delete(cardStatus);
+    }
+
+    onCardFiltersChange({
+      ...cardFilters,
+      cardStatuses,
+    });
+  };
+
+  return (
+    <section className="p-md">
+      <h2>Filters</h2>
+
+      <h3>Status</h3>
+      {allCardStatuses.map(cardStatus => (
+        <ControlGroup key={cardStatus}>
+          <label>
+            <input
+              type="checkbox"
+              checked={cardFilters.cardStatuses.has(cardStatus)}
+              name={controlId}
+              onChange={event => handleCardStatusChange(event, cardStatus)}
+              value={cardStatus}
+            />
+            {" "}
+            <CardStatusLabel showNone value={cardStatus} />
+          </label>
+        </ControlGroup>
+      ))}
+    </section>
+  );
 }

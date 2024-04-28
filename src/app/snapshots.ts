@@ -7,7 +7,7 @@ import { Comment, CommentAddRequest, CommentSet, createComment } from "./comment
 import { reorder } from "../util/arrays";
 
 export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
-  public readonly cards: ReadonlyArray<Card>;
+  private readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
   private readonly categories: ReadonlyArray<Category>;
   private readonly comments: ReadonlyArray<Comment>;

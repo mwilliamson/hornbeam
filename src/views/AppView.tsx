@@ -143,6 +143,13 @@ export default function AppView(props: AppViewProps) {
     });
   };
 
+  const handleSettingsClose = () => {
+    setViewState({
+      ...viewState,
+      viewSettings: false,
+    });
+  };
+
   const handleTimeTravelStart = () => {
     setViewState({
       ...viewState,
@@ -240,6 +247,7 @@ export default function AppView(props: AppViewProps) {
             onCategoryReorder={handleCategoryReorder}
             onCommentAdd={handleCommentAdd}
             onSettingsClick={handleSettingsClick}
+            onSettingsClose={handleSettingsClose}
             onTimeTravelStart={handleTimeTravelStart}
             onTimeTravelStop={handleTimeTravelStop}
             viewState={viewState}
@@ -267,6 +275,7 @@ interface SidebarProps {
   onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   onSettingsClick: () => void;
+  onSettingsClose: () => void;
   onTimeTravelStart: () => void;
   onTimeTravelStop: () => void;
   viewState: ViewState;
@@ -284,6 +293,7 @@ function Sidebar(props: SidebarProps) {
     onCategoryReorder,
     onCommentAdd,
     onSettingsClick,
+    onSettingsClose,
     onTimeTravelStart,
     onTimeTravelStop,
     viewState,
@@ -316,6 +326,7 @@ function Sidebar(props: SidebarProps) {
     return (
       <SettingsView
         appSnapshot={appSnapshot}
+        onBack={onSettingsClose}
         onCategoryAdd={onCategoryAdd}
         onCategoryReorder={onCategoryReorder}
       />

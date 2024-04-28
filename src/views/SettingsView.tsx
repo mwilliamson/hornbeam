@@ -2,8 +2,10 @@ import { Instant } from "@js-joda/core";
 import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
+import { ChevronLeft } from "lucide-react";
 import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
 import { AppSnapshot } from "../app/snapshots";
+import "./SettingsView.scss";
 import CategoryListView from "./categories/CategoryListView";
 import ColorSelect from "./colors/ColorSelect";
 import ControlGroup from "./widgets/ControlGroup";
@@ -14,15 +16,23 @@ import LinkButton from "./widgets/LinkButton";
 
 interface SettingsViewProps {
   appSnapshot: AppSnapshot;
+  onBack: () => void;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
   onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
 }
 
 export default function SettingsView(props: SettingsViewProps) {
-  const {appSnapshot, onCategoryAdd, onCategoryReorder} = props;
+  const {appSnapshot, onBack, onCategoryAdd, onCategoryReorder} = props;
 
   return (
     <section className="m-md">
+      <ControlGroup>
+        <LinkButton onClick={onBack}>
+          <ChevronLeft className="SettingsView-BackChevron" size={18} />
+          Back
+        </LinkButton>
+      </ControlGroup>
+
       <h3>Categories</h3>
 
       <CategoryListView

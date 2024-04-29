@@ -12,6 +12,8 @@ const args = util.parseArgs({
   strict: true,
 });
 
+await fs.cp("node_modules/@fontsource-variable/source-sans-3/files", "public/fonts", {recursive: true});
+
 const context = await esbuild.context({
   entryPoints: ["src/client.tsx", "src/demo.tsx", "src/cosmos.tsx"],
   bundle: true,
@@ -22,8 +24,10 @@ const context = await esbuild.context({
     {
       name: "woff2",
       setup(build) {
-        build.onResolve({filter: /fonts\/.*woff2$/}, ({path}) => {
-          return {path, external: true, namespace: "provided"};
+        build.onResolve({filter: /\/source-sans-3-.*\.woff2$/}, ({path, resolveDir}) => {
+          const result = /\/(source-sans-3-.*\.woff2)$/.exec(path);
+          const name = result[1];
+          return {path: `/fonts/${name}`, external: true, namespace: "provided"};
         });
       }
     },

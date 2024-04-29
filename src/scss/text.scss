@@ -1,4 +1,6 @@
-$font-family: "Source Sans Pro";
+@use "../../node_modules/@fontsource-variable/source-sans-3/index.css";
+
+$font-family: "Source Sans 3 Variable";
 $font-size-sm: 14px;
 $font-size-lg: 20px;
 $color-faded: #444;

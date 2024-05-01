@@ -33,6 +33,7 @@ interface ViewState {
   addingCard: Partial<CardAddRequest> | null,
   cardFilters: CardFilters;
   selectedCardId: string | null;
+  selectedSubboardRootId: string | null;
   // TODO: should probably be a union (e.g. can't add a card and time travel at the same time)
   timeTravelSnapshotIndex: number | null;
   viewSettings: boolean;
@@ -44,6 +45,7 @@ const initialViewState: ViewState = {
     cardStatuses: new Set(allCardStatuses.filter(cardStatus => cardStatus !== CardStatus.Deleted)),
   },
   selectedCardId: null,
+  selectedSubboardRootId: null,
   timeTravelSnapshotIndex: null,
   viewSettings: false,
 };
@@ -178,6 +180,13 @@ export default function AppView(props: AppViewProps) {
     });
   };
 
+  const handleSubboardOpen = (subboardRootId: string | null) => {
+    setViewState({
+      ...viewState,
+      selectedSubboardRootId: subboardRootId,
+    });
+  };
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       // TODO: use proper selection of the cards and put the event on the cards?
@@ -222,6 +231,8 @@ export default function AppView(props: AppViewProps) {
             cardSelectedId={viewState.selectedCardId}
             onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
             onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
+            onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}
+            selectedSubboardRootId={viewState.selectedSubboardRootId}
           />
         </div>
         {viewState.timeTravelSnapshotIndex !== null && (
@@ -248,6 +259,7 @@ export default function AppView(props: AppViewProps) {
             onCommentAdd={handleCommentAdd}
             onSettingsClick={handleSettingsClick}
             onSettingsClose={handleSettingsClose}
+            onSubboardOpen={handleSubboardOpen}
             onTimeTravelStart={handleTimeTravelStart}
             onTimeTravelStop={handleTimeTravelStop}
             viewState={viewState}
@@ -276,6 +288,7 @@ interface SidebarProps {
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   onSettingsClick: () => void;
   onSettingsClose: () => void;
+  onSubboardOpen: (subboardRootId: string | null) => void;
   onTimeTravelStart: () => void;
   onTimeTravelStop: () => void;
   viewState: ViewState;
@@ -294,6 +307,7 @@ function Sidebar(props: SidebarProps) {
     onCommentAdd,
     onSettingsClick,
     onSettingsClose,
+    onSubboardOpen,
     onTimeTravelStart,
     onTimeTravelStop,
     viewState,
@@ -371,6 +385,8 @@ function Sidebar(props: SidebarProps) {
             id: selectedCard.id,
           })}
           onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
+          onSubboardOpen={onSubboardOpen}
+          selectedSubboardRootId={viewState.selectedSubboardRootId}
         />
       </Pane>
     );
@@ -380,6 +396,11 @@ function Sidebar(props: SidebarProps) {
         <ToolsView
           onCardAddClick={() => onCardAddClick({})}
           onSettingsClick={onSettingsClick}
+          onSubboardClose={
+            viewState.selectedSubboardRootId === null
+              ? undefined
+              : () => onSubboardOpen(null)
+          }
           onTimeTravelStart={onTimeTravelStart}
         />
       </Pane>

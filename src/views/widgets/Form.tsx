@@ -56,7 +56,9 @@ function MainButtons(props: MainButtonsProps) {
       </div>
       <div>
         <Form.Status />
-        <Form.SubmitButton>{submitText}</Form.SubmitButton>
+        <Form.SubmitButton>
+          {submitText}
+        </Form.SubmitButton>
       </div>
     </div>
   );

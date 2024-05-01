@@ -64,6 +64,8 @@ export default (
       onCardEdit={() => Promise.resolve()}
       onCardMove={() => Promise.resolve()}
       onCommentAdd={() => Promise.resolve()}
+      onSubboardOpen={() => {}}
+      selectedSubboardRootId={null}
     />
   </div>
 );

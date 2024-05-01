@@ -5,11 +5,12 @@ import ControlGroup from "./widgets/ControlGroup";
 interface ToolsViewProps {
   onCardAddClick: () => void;
   onSettingsClick: () => void;
+  onSubboardClose?: () => void;
   onTimeTravelStart: () => void;
 }
 
 export default function ToolsView(props: ToolsViewProps) {
-  const {onCardAddClick, onSettingsClick, onTimeTravelStart} = props;
+  const {onCardAddClick, onSettingsClick, onSubboardClose, onTimeTravelStart} = props;
 
   return (
     <div className="ToolsView">
@@ -30,6 +31,14 @@ export default function ToolsView(props: ToolsViewProps) {
           Settings
         </Button>
       </ControlGroup>
+
+      {onSubboardClose !== undefined && (
+        <ControlGroup>
+          <Button type="button" intent="secondary" onClick={onSubboardClose} fullWidth>
+            Close subboard
+          </Button>
+        </ControlGroup>
+      )}
     </div>
   );
 }

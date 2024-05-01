@@ -8,7 +8,10 @@ export interface CardTree {
   children: ReadonlyArray<CardTree>;
 }
 
-export function cardsToTrees(cards: ReadonlyArray<Card>): ReadonlyArray<CardTree> {
+export function cardsToTrees(
+  cards: ReadonlyArray<Card>,
+  selectedSubboardRootId: string | null,
+): ReadonlyArray<CardTree> {
   const [topLevelCards, nonTopLevelCards] = partition(
     cards,
     card => card.parentCardId === null,
@@ -16,12 +19,33 @@ export function cardsToTrees(cards: ReadonlyArray<Card>): ReadonlyArray<CardTree
 
   const cardsByParentId = groupBy(nonTopLevelCards, card => card.parentCardId);
 
-  const cardToTree = (card: Card): CardTree | null => {
+  const cardToTree = (card: Card): CardTree => {
+    const children = card.isSubboardRoot
+      ? []
+      : cardChildrenToTrees(card);
+
     return {
       card,
-      children: mapNotNull(cardsByParentId[card.id] ?? [], cardToTree),
+      children,
     };
   };
 
-  return mapNotNull(topLevelCards, cardToTree);
+  const cardChildrenToTrees = (card: Card): ReadonlyArray<CardTree> => {
+    return (cardsByParentId[card.id] ?? []).map(cardToTree);
+  };
+
+  const selectedSubboardRoot = selectedSubboardRootId === null
+    ? null
+    : cards.find(card => card.isSubboardRoot && card.id === selectedSubboardRootId) ?? null;
+
+  if (selectedSubboardRoot === null) {
+    return mapNotNull(topLevelCards, cardToTree);
+  } else {
+    return [
+      {
+        card: selectedSubboardRoot,
+        children: cardChildrenToTrees(selectedSubboardRoot),
+      }
+    ];
+  }
 }

@@ -13,6 +13,8 @@ interface CardsViewProps {
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
+  onSubboardOpen: (subboardRootId: string) => void;
+  selectedSubboardRootId: string | null;
 }
 
 export default function CardsView(props: CardsViewProps) {
@@ -22,9 +24,11 @@ export default function CardsView(props: CardsViewProps) {
     cardSelectedId,
     onCardSelect,
     onCardAddChildClick,
+    onSubboardOpen,
+    selectedSubboardRootId,
   } = props;
 
-  const cardTrees = cardsToTrees(cards);
+  const cardTrees = cardsToTrees(cards, selectedSubboardRootId);
 
   const cardTops = calculateCardTops(cardTrees);
 
@@ -38,6 +42,7 @@ export default function CardsView(props: CardsViewProps) {
           cardSelectedId={cardSelectedId}
           onCardSelect={onCardSelect}
           onCardAddChildClick={onCardAddChildClick}
+          onSubboardOpen={onSubboardOpen}
         />
       </div>
     </div>
@@ -51,6 +56,7 @@ interface CardTreeViewProps {
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
+  onSubboardOpen: (subboardRootId: string) => void;
 }
 
 function CardTreeView(props: CardTreeViewProps) {
@@ -61,6 +67,7 @@ function CardTreeView(props: CardTreeViewProps) {
     cardSelectedId,
     onCardSelect,
     onCardAddChildClick,
+    onSubboardOpen,
   } = props;
 
   const {card} = cardTree;
@@ -68,6 +75,13 @@ function CardTreeView(props: CardTreeViewProps) {
   const handleCardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onCardSelect(card.id);
+  };
+
+  const handleCardDoubleClick = (event: React.MouseEvent) => {
+    if (card.isSubboardRoot) {
+      event.stopPropagation();
+      onSubboardOpen(card.id);
+    }
   };
 
   const handleAddChildClick = (event: React.MouseEvent) => {
@@ -86,6 +100,7 @@ function CardTreeView(props: CardTreeViewProps) {
           cardCategory={appSnapshot.findCategoryById(card.categoryId)}
           isSelected={isSelected}
           onClick={handleCardClick}
+          onDoubleClick={handleCardDoubleClick}
         />
         {isSelected && (
           <div className="CardsView-AddChildContainer">
@@ -114,6 +129,7 @@ function CardTreeView(props: CardTreeViewProps) {
             cardSelectedId={cardSelectedId}
             onCardSelect={onCardSelect}
             onCardAddChildClick={onCardAddChildClick}
+            onSubboardOpen={onSubboardOpen}
           />
         </>
       )}
@@ -128,6 +144,7 @@ interface CardListProps {
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
+  onSubboardOpen: (subboardRootId: string) => void;
 }
 
 function CardList(props: CardListProps) {
@@ -138,6 +155,7 @@ function CardList(props: CardListProps) {
     cardSelectedId,
     onCardSelect,
     onCardAddChildClick,
+    onSubboardOpen,
   } = props;
 
   return (
@@ -151,6 +169,7 @@ function CardList(props: CardListProps) {
           cardSelectedId={cardSelectedId}
           onCardSelect={onCardSelect}
           onCardAddChildClick={onCardAddChildClick}
+          onSubboardOpen={onSubboardOpen}
         />
       ))}
     </div>

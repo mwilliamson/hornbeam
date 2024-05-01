@@ -32,6 +32,8 @@ interface CardDetailViewProps {
   onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
+  onSubboardOpen: (subboardRootId: string | null) => void;
+  selectedSubboardRootId: string | null;
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
@@ -42,6 +44,8 @@ export default function CardDetailView(props: CardDetailViewProps) {
     onCardEdit,
     onCardMove,
     onCommentAdd,
+    onSubboardOpen,
+    selectedSubboardRootId,
   } = props;
 
   const category = appSnapshot.findCategoryById(card.categoryId);
@@ -100,6 +104,8 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <CardSubboardView
           card={card}
           onCardIsSubboardRootSave={handleCardIsSubboardRootSave}
+          onSubboardOpen={onSubboardOpen}
+          selectedSubboardRootId={selectedSubboardRootId}
         />
       </div>
 
@@ -303,10 +309,12 @@ function CardChildrenView(props: CardChildrenViewProps) {
 interface CardIsSubboardRootViewProps {
   card: Card;
   onCardIsSubboardRootSave: (isSubboardRoot: boolean) => Promise<void>;
+  onSubboardOpen: (subboardRootId: string | null) => void;
+  selectedSubboardRootId: string | null;
 }
 
 function CardSubboardView(props: CardIsSubboardRootViewProps) {
-  const {card, onCardIsSubboardRootSave} = props;
+  const {card, onCardIsSubboardRootSave, onSubboardOpen, selectedSubboardRootId} = props;
 
   const handleEnableSubboard = () =>
     onCardIsSubboardRootSave(true);
@@ -333,6 +341,30 @@ function CardSubboardView(props: CardIsSubboardRootViewProps) {
           {toggleText}
         </Button>
       </ControlGroup>
+
+      {card.isSubboardRoot && (
+        <ControlGroup>
+          {selectedSubboardRootId === card.id ? (
+            <Button
+              type="button"
+              fullWidth
+              intent="secondary"
+              onClick={() => onSubboardOpen(null)}
+            >
+              Close subboard
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              fullWidth
+              intent="secondary"
+              onClick={() => onSubboardOpen(card.id)}
+            >
+              Open subboard
+            </Button>
+          )}
+        </ControlGroup>
+      )}
     </>
   );
 }

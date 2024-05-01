@@ -48,6 +48,7 @@ const card: Card = {
   categoryId: appSnapshot.availableCategories()[1].id,
   createdAt: Instant.ofEpochMilli(1713386548306),
   id: uuidv7(),
+  isSubboardRoot: false,
   number: 42,
   parentCardId: null,
   status: CardStatus.None,

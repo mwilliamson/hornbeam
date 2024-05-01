@@ -7,6 +7,7 @@ export interface Card {
   categoryId: string;
   createdAt: Instant;
   id: string;
+  isSubboardRoot: boolean;
   number: number;
   parentCardId: string | null;
   status: CardStatus;
@@ -44,6 +45,7 @@ export function createCard(request: CardAddRequest, cardNumber: number): Card {
     categoryId: request.categoryId,
     createdAt: request.createdAt,
     id: request.id,
+    isSubboardRoot: false,
     number: cardNumber,
     parentCardId: request.parentCardId,
     status: CardStatus.None,
@@ -55,6 +57,7 @@ export interface CardEditRequest {
   categoryId?: string;
   createdAt: Instant;
   id: string;
+  isSubboardRoot?: boolean;
   parentCardId?: string | null;
   status?: CardStatus;
   text?: string;
@@ -65,6 +68,7 @@ export function updateCard(card: Card, request: CardEditRequest): Card {
     categoryId: request.categoryId === undefined ? card.categoryId : request.categoryId,
     createdAt: card.createdAt,
     id: card.id,
+    isSubboardRoot: request.isSubboardRoot === undefined ? card.isSubboardRoot : request.isSubboardRoot,
     number: card.number,
     parentCardId: request.parentCardId === undefined ? card.parentCardId : request.parentCardId,
     status: request.status === undefined ? card.status : request.status,

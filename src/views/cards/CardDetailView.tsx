@@ -60,6 +60,9 @@ export default function CardDetailView(props: CardDetailViewProps) {
   const handleCardStatusSave = (status: CardStatus) =>
     onCardEdit({status});
 
+  const handleCardIsSubboardRootSave = (isSubboardRoot: boolean) =>
+    onCardEdit({isSubboardRoot});
+
   return (
     <>
       <div className="CardDetailView-Header">
@@ -93,6 +96,10 @@ export default function CardDetailView(props: CardDetailViewProps) {
           appSnapshot={appSnapshot}
           cardId={card.id}
           onAddChildClick={onAddChildClick}
+        />
+        <CardSubboardView
+          card={card}
+          onCardIsSubboardRootSave={handleCardIsSubboardRootSave}
         />
       </div>
 
@@ -288,6 +295,43 @@ function CardChildrenView(props: CardChildrenViewProps) {
       </ControlLabel>
       <ControlGroup>
         {childCount} {pluralize(childCount, "child", "children")}
+      </ControlGroup>
+    </>
+  );
+}
+
+interface CardIsSubboardRootViewProps {
+  card: Card;
+  onCardIsSubboardRootSave: (isSubboardRoot: boolean) => Promise<void>;
+}
+
+function CardSubboardView(props: CardIsSubboardRootViewProps) {
+  const {card, onCardIsSubboardRootSave} = props;
+
+  const handleEnableSubboard = () =>
+    onCardIsSubboardRootSave(true);
+
+  const handleDisableSubboard = () =>
+    onCardIsSubboardRootSave(false);
+
+  const [toggleText, handleToggle] = card.isSubboardRoot
+    ? ["Disable subboard", handleDisableSubboard]
+    : ["Enable subboard", handleEnableSubboard];
+
+  return (
+    <>
+      <ControlLabel>
+        Subboard
+      </ControlLabel>
+      <ControlGroup>
+        <Button
+          type="button"
+          fullWidth
+          intent="secondary"
+          onClick={handleToggle}
+        >
+          {toggleText}
+        </Button>
       </ControlGroup>
     </>
   );

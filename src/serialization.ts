@@ -28,6 +28,7 @@ const SerializedCardEditRequest = t.intersection([
   }),
   t.partial({
     categoryId: t.string,
+    isSubboardRoot: t.boolean,
     parentCardId: t.union([t.string, t.null]),
     status: SerializedCardStatus,
     text: t.string,

@@ -117,3 +117,4 @@
 {"payload":{"updateId":"018f257d-2a79-770f-b0bb-81d726cc47b9","request":{"type":"cardMove","cardMove":{"createdAt":[1714320910,969000000],"direction":"up","id":"018f257d-21e4-7856-bac0-608716f36f46"}}}}
 {"payload":{"updateId":"018f257d-2bbd-7e55-9bbc-8ca2989e8ca4","request":{"type":"cardMove","cardMove":{"createdAt":[1714320911,293000000],"direction":"up","id":"018f257d-21e4-7856-bac0-608716f36f46"}}}}
 {"payload":{"updateId":"018f265e-6b3f-755d-a6b6-4f6a6766acf4","request":{"type":"cardEdit","cardEdit":{"createdAt":[1714335673,151000000],"id":"018eec0d-282e-747b-914a-6becdca31410","text":"Build a shared understanding of a project, macro to micro"}}}}
+{"payload":{"updateId":"018f35f6-1ae3-7013-9fad-3cc61cb7beb9","request":{"type":"cardEdit","cardEdit":{"isSubboardRoot":true,"createdAt":[1714597272,291000000],"id":"018f023b-1c33-7c84-bd2a-4fe598b16c71"}}}}

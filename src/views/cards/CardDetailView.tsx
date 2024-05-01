@@ -270,7 +270,9 @@ function CardStatusPropertyView(props: CardStatusPropertyViewProps) {
         />
       )}
       renderReadonly={({id}) => (
-        <span id={id}><CardStatusLabel value={status} /></span>
+        <span id={id}>
+          <CardStatusLabel showNone value={status} />
+        </span>
       )}
       validate={(controlId, newStatus) => ValidationResult.valid(newStatus)}
     />

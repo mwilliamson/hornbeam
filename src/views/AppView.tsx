@@ -360,30 +360,15 @@ function Sidebar(props: SidebarProps) {
           appSnapshot={appSnapshot}
           card={selectedCard}
           onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
-          onCardCategorySave={newCategoryId => onCardSave({
+          onCardEdit={request => onCardSave({
+            ...request,
             createdAt: Instant.now(),
             id: selectedCard.id,
-            categoryId: newCategoryId,
           })}
           onCardMove={(direction) => onCardMove({
             createdAt: Instant.now(),
             direction,
             id: selectedCard.id,
-          })}
-          onCardParentSave={newParentId => onCardSave({
-            createdAt: Instant.now(),
-            id: selectedCard.id,
-            parentCardId: newParentId,
-          })}
-          onCardStatusSave={newStatus => onCardSave({
-            createdAt: Instant.now(),
-            id: selectedCard.id,
-            status: newStatus,
-          })}
-          onCardTextSave={newText => onCardSave({
-            createdAt: Instant.now(),
-            id: selectedCard.id,
-            text: newText,
           })}
           onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
         />

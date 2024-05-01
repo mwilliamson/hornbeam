@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { CardStatus } from "../../app/cardStatuses";
-import { Card, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
+import { Card, CardEditRequest, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
 import { CommentSet } from "../../app/comments";
@@ -29,11 +29,8 @@ interface CardDetailViewProps {
   appSnapshot: CardSet & CategorySet & ColorSet & CommentSet;
   card: Card;
   onAddChildClick: () => void;
-  onCardCategorySave: (newCategoryId: string) => Promise<void>;
+  onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
-  onCardParentSave: (newParentId: string | null) => Promise<void>;
-  onCardTextSave: (newText: string) => Promise<void>;
-  onCardStatusSave: (newStatus: CardStatus) => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
 }
 
@@ -42,17 +39,26 @@ export default function CardDetailView(props: CardDetailViewProps) {
     appSnapshot,
     card,
     onAddChildClick,
-    onCardCategorySave,
+    onCardEdit,
     onCardMove,
-    onCardParentSave,
-    onCardStatusSave,
-    onCardTextSave,
     onCommentAdd,
   } = props;
 
   const category = appSnapshot.findCategoryById(card.categoryId);
 
   const addCommentControlId = useId();
+
+  const handleCardTextSave = (text: string) =>
+    onCardEdit({text});
+
+  const handleCardParentSave = (parentCardId: string | null) =>
+    onCardEdit({parentCardId});
+
+  const handleCardCategorySave = (categoryId: string) =>
+    onCardEdit({categoryId});
+
+  const handleCardStatusSave = (status: CardStatus) =>
+    onCardEdit({status});
 
   return (
     <>
@@ -67,21 +73,21 @@ export default function CardDetailView(props: CardDetailViewProps) {
       </div>
 
       <div className="CardDetailView-Properties">
-        <CardTextPropertyView card={card} onCardTextSave={onCardTextSave} />
+        <CardTextPropertyView card={card} onCardTextSave={handleCardTextSave} />
         <CardParentPropertyView
           appSnapshot={appSnapshot}
           onCardMove={onCardMove}
           parentCardId={card.parentCardId}
-          onCardParentSave={onCardParentSave}
+          onCardParentSave={handleCardParentSave}
         />
         <CardCategoryPropertyView
           appSnapshot={appSnapshot}
           categoryId={card.categoryId}
-          onCardCategorySave={onCardCategorySave}
+          onCardCategorySave={handleCardCategorySave}
         />
         <CardStatusPropertyView
           status={card.status}
-          onCardStatusSave={onCardStatusSave}
+          onCardStatusSave={handleCardStatusSave}
         />
         <CardChildrenView
           appSnapshot={appSnapshot}

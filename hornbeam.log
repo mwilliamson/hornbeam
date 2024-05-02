@@ -120,3 +120,12 @@
 {"payload":{"updateId":"018f35f6-1ae3-7013-9fad-3cc61cb7beb9","request":{"type":"cardEdit","cardEdit":{"isSubboardRoot":true,"createdAt":[1714597272,291000000],"id":"018f023b-1c33-7c84-bd2a-4fe598b16c71"}}}}
 {"payload":{"updateId":"018f3613-b895-764b-84c9-731d502a0260","request":{"type":"cardEdit","cardEdit":{"isSubboardRoot":true,"createdAt":[1714599213,205000000],"id":"018eec18-098c-7354-93db-f683329b26ee"}}}}
 {"payload":{"updateId":"018f3613-cfac-7744-afee-8fd50cbbee06","request":{"type":"cardEdit","cardEdit":{"isSubboardRoot":true,"createdAt":[1714599219,116000000],"id":"018f00c0-d0f9-709b-a125-f8924e56c162"}}}}
+{"payload":{"updateId":"018f3614-e467-7175-8f09-7ddb6f653853","request":{"type":"cardEdit","cardEdit":{"status":"done","createdAt":[1714599289,959000000],"id":"018f257d-21e4-7856-bac0-608716f36f46"}}}}
+{"payload":{"updateId":"018f3614-f0e5-7703-9511-2996ad0126fc","request":{"type":"cardEdit","cardEdit":{"status":"done","createdAt":[1714599293,157000000],"id":"018ef6ca-76ed-7223-9bbd-9d2c909832f5"}}}}
+{"payload":{"updateId":"018f3614-fefb-75ef-8689-79ee8302be20","request":{"type":"cardEdit","cardEdit":{"status":"done","createdAt":[1714599296,763000000],"id":"018ef6ca-a6f5-7391-9441-792a4e8fc497"}}}}
+{"payload":{"updateId":"018f3615-0cae-7fe1-8826-590d482d90a0","request":{"type":"cardEdit","cardEdit":{"status":"done","createdAt":[1714599300,270000000],"id":"018f257b-e37a-76a5-93b7-b4343e30761f"}}}}
+{"payload":{"updateId":"018f3615-3f8a-77a1-94a1-a2ae1642f7af","request":{"type":"cardEdit","cardEdit":{"text":"Define subboards to focus on relevant context","createdAt":[1714599313,290000000],"id":"018f257b-e37a-76a5-93b7-b4343e30761f"}}}}
+{"payload":{"updateId":"018f3615-6269-7b87-b1c3-84292cf32183","request":{"type":"cardEdit","cardEdit":{"text":"Mark card as subboard root","createdAt":[1714599322,217000000],"id":"018f257d-21e4-7856-bac0-608716f36f46"}}}}
+{"payload":{"updateId":"018f3615-825f-7b55-8e6c-d618b6159cf1","request":{"type":"cardEdit","cardEdit":{"text":"Prune tree view at subboard roots","createdAt":[1714599330,399000000],"id":"018ef6ca-76ed-7223-9bbd-9d2c909832f5"}}}}
+{"payload":{"updateId":"018f3615-9bc3-79eb-a36d-4963918b3209","request":{"type":"cardEdit","cardEdit":{"text":"Focus on subboard","createdAt":[1714599336,899000000],"id":"018ef6ca-a6f5-7391-9441-792a4e8fc497"}}}}
+{"payload":{"updateId":"018f3615-a7f0-70ab-97f5-7c35b8cbe20d","request":{"type":"cardEdit","cardEdit":{"isSubboardRoot":true,"createdAt":[1714599340,16000000],"id":"018f257b-e37a-76a5-93b7-b4343e30761f"}}}}

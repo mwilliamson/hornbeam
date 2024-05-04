@@ -29,7 +29,7 @@ const context = await esbuild.context({
         build.onResolve({filter: /\/source-sans-3-.*\.woff2$/}, (args) => {
           const result = /\/(source-sans-3-.*\.woff2)$/.exec(args.path);
           const name = result[1];
-          return {path: `/fonts/${name}`, external: true, namespace: "provided"};
+          return {path: `./fonts/${name}`, external: true, namespace: "provided"};
         });
       }
     },

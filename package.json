@@ -1,7 +1,7 @@
 {
     "scripts": {
         "build": "node build.mjs",
-        "build-watch": "npm run build -- --watch",
+        "build-watch": "npm run build -- --cosmos --watch",
         "check": "npm run check:tsc && npm run check:eslint",
         "check:tsc": "tsc",
         "check:eslint": "eslint src && echo 'No lint errors' 1>&2",

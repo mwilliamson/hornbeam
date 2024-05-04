@@ -7,6 +7,9 @@ import util from "util";
 
 const args = util.parseArgs({
   options: {
+    cosmos: {
+      type: "boolean",
+    },
     watch: {
       type: "boolean",
     }
@@ -16,8 +19,14 @@ const args = util.parseArgs({
 
 await fs.cp("node_modules/@fontsource-variable/source-sans-3/files", "public/fonts", {recursive: true});
 
+const entryPoints = ["src/client.tsx", "src/demo.tsx"];
+
+if (args.values.cosmos) {
+  entryPoints.push("src/cosmos.tsx");
+}
+
 const context = await esbuild.context({
-  entryPoints: ["src/client.tsx", "src/demo.tsx", "src/cosmos.tsx"],
+  entryPoints,
   bundle: true,
   outdir: "public/",
   metafile: true,

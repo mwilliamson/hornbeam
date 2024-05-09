@@ -116,34 +116,7 @@ function CardTreeView(props: CardTreeViewProps) {
         )}
       </div>
       {cardTree.card.isSubboardRoot && (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox={`0 0 ${parentChildGap} ${cardHeight}`}
-          width={parentChildGap}
-          height={cardHeight}
-        >
-          <defs>
-            <linearGradient
-              id="fade"
-              x1={0}
-              y1={Math.floor(cardHeight / 2) + 0.5}
-              x2={parentChildGap}
-              y2={Math.floor(cardHeight / 2) + 0.5}
-              gradientUnits="userSpaceOnUse"
-            >
-              <stop stopOpacity="1" stopColor={branchStroke} offset="0" />
-              <stop stopOpacity="0" stopColor={branchStroke} offset="1" />
-            </linearGradient>
-          </defs>
-          <line
-            x1={0}
-            y1={Math.floor(cardHeight / 2) + 0.5}
-            x2={parentChildGap}
-            y2={Math.floor(cardHeight / 2) + 0.5}
-            stroke="url(#fade)"
-          />
-
-        </svg>
+        <SubboardPlaceholder />
       )}
       {cardTree.children.length > 0 && (
         <>
@@ -203,6 +176,38 @@ function CardList(props: CardListProps) {
         />
       ))}
     </div>
+  );
+}
+
+function SubboardPlaceholder() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox={`0 0 ${parentChildGap} ${cardHeight}`}
+      width={parentChildGap}
+      height={cardHeight}
+    >
+      <defs>
+        <linearGradient
+          id="fade"
+          x1={0}
+          y1={Math.floor(cardHeight / 2) + 0.5}
+          x2={parentChildGap}
+          y2={Math.floor(cardHeight / 2) + 0.5}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopOpacity="1" stopColor={branchStroke} offset="0" />
+          <stop stopOpacity="0" stopColor={branchStroke} offset="1" />
+        </linearGradient>
+      </defs>
+      <line
+        x1={0}
+        y1={Math.floor(cardHeight / 2) + 0.5}
+        x2={parentChildGap}
+        y2={Math.floor(cardHeight / 2) + 0.5}
+        stroke="url(#fade)"
+      />
+    </svg>
   );
 }
 

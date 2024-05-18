@@ -18,3 +18,4 @@ type = "tsc-watch"
 [[processes]]
 name = "eslint"
 command = ["npm", "run", "check:eslint"]
+after = "tsc"

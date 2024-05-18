@@ -11,5 +11,10 @@ name = "Build"
 command = ["npm", "run", "build-watch"]
 
 [[processes]]
-name = "Check"
-command = ["npm", "run", "check-watch"]
+name = "tsc"
+command = ["npm", "run", "check:tsc", "--", "--watch"]
+type = "tsc-watch"
+
+[[processes]]
+name = "eslint"
+command = ["npm", "run", "check:eslint"]

@@ -1,0 +1,15 @@
+[[processes]]
+name = "Server"
+command = ["npm", "start"]
+
+[[processes]]
+name = "Cosmos"
+command = ["npm", "run", "cosmos"]
+
+[[processes]]
+name = "Build"
+command = ["npm", "run", "build-watch"]
+
+[[processes]]
+name = "Check"
+command = ["npm", "run", "check-watch"]

@@ -4,7 +4,7 @@ import { uuidv7 } from "uuidv7";
 
 import { AppState } from "../app";
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
-import { Card, CardAddRequest, CardEditRequest, CardMoveRequest } from "../app/cards";
+import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
@@ -122,6 +122,20 @@ export default function AppView(props: AppViewProps) {
     await sendRequest(requests.cardMove(request));
   };
 
+  const handleCardMoveToAfter = async (request: Omit<CardMoveToAfterRequest, "createdAt">) => {
+    await sendRequest(requests.cardMoveToAfter({
+      ...request,
+      createdAt: Instant.now(),
+    }));
+  };
+
+  const handleCardMoveToBefore = async (request: Omit<CardMoveToBeforeRequest, "createdAt">) => {
+    await sendRequest(requests.cardMoveToBefore({
+      ...request,
+      createdAt: Instant.now(),
+    }));
+  };
+
   const handleCardSave = async (request: CardEditRequest) => {
     await sendRequest(requests.cardEdit(request));
   };
@@ -229,6 +243,8 @@ export default function AppView(props: AppViewProps) {
             appSnapshot={appState.latestSnapshot()}
             cards={cards}
             cardSelectedId={viewState.selectedCardId}
+            onCardMoveToAfter={handleCardMoveToAfter}
+            onCardMoveToBefore={handleCardMoveToBefore}
             onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
             onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
             onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}

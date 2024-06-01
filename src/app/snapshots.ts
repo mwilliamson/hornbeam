@@ -1,6 +1,6 @@
 import { Instant } from "@js-joda/core";
 import assertNever from "../util/assertNever";
-import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardSet, createCard, updateCard } from "./cards";
+import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, createCategory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
@@ -96,6 +96,74 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
+  public cardMoveToAfter(request: CardMoveToAfterRequest): AppSnapshot {
+    if (request.afterCardId === request.moveCardId) {
+      return this;
+    }
+
+    const afterCard = this.cards.find(card => card.id === request.afterCardId);
+    if (afterCard === undefined) {
+      return this;
+    }
+
+    const movedCard = this.cards.find(card => card.id === request.moveCardId);
+    if (movedCard === undefined) {
+      return this;
+    }
+
+    return new AppSnapshot(
+      this.cards.flatMap(card => {
+        if (card.id === request.moveCardId) {
+          return [];
+        } else if (card.id === request.afterCardId) {
+          return [
+            card,
+            updateCard(movedCard, {parentCardId: request.parentCardId}),
+          ];
+        } else {
+          return [card];
+        }
+      }),
+      this.nextCardNumber,
+      this.categories,
+      this.comments,
+    );
+  }
+
+  public cardMoveToBefore(request: CardMoveToBeforeRequest): AppSnapshot {
+    if (request.beforeCardId === request.moveCardId) {
+      return this;
+    }
+
+    const beforeCard = this.cards.find(card => card.id === request.beforeCardId);
+    if (beforeCard === undefined) {
+      return this;
+    }
+
+    const movedCard = this.cards.find(card => card.id === request.moveCardId);
+    if (movedCard === undefined) {
+      return this;
+    }
+
+    return new AppSnapshot(
+      this.cards.flatMap(card => {
+        if (card.id === request.moveCardId) {
+          return [];
+        } else if (card.id === request.beforeCardId) {
+          return [
+            updateCard(movedCard, {parentCardId: request.parentCardId}),
+            card,
+          ];
+        } else {
+          return [card];
+        }
+      }),
+      this.nextCardNumber,
+      this.categories,
+      this.comments,
+    );
+  }
+
   public allCards(): ReadonlyArray<Card> {
     return this.cards;
   }
@@ -181,6 +249,8 @@ export type Request =
   | {type: "cardAdd", cardAdd: CardAddRequest}
   | {type: "cardEdit", cardEdit: CardEditRequest}
   | {type: "cardMove", cardMove: CardMoveRequest}
+  | {type: "cardMoveToAfter", cardMoveToAfter: CardMoveToAfterRequest}
+  | {type: "cardMoveToBefore", cardMoveToBefore: CardMoveToBeforeRequest}
   | {type: "categoryAdd", categoryAdd: CategoryAddRequest}
   | {type: "categoryReorder", categoryReorder: CategoryReorderRequest}
   | {type: "commentAdd", commentAdd: CommentAddRequest};
@@ -196,6 +266,14 @@ export const requests = {
 
   cardMove(request: CardMoveRequest): Request {
     return {type: "cardMove", cardMove: request};
+  },
+
+  cardMoveToAfter(request: CardMoveToAfterRequest): Request {
+    return {type: "cardMoveToAfter", cardMoveToAfter: request};
+  },
+
+  cardMoveToBefore(request: CardMoveToBeforeRequest): Request {
+    return {type: "cardMoveToBefore", cardMoveToBefore: request};
   },
 
   categoryAdd(request: CategoryAddRequest): Request {
@@ -219,6 +297,10 @@ export function requestCreatedAt(request: Request): Instant {
       return request.cardEdit.createdAt;
     case "cardMove":
       return request.cardMove.createdAt;
+    case "cardMoveToAfter":
+      return request.cardMoveToAfter.createdAt;
+    case "cardMoveToBefore":
+      return request.cardMoveToBefore.createdAt;
     case "categoryAdd":
       return request.categoryAdd.createdAt;
     case "categoryReorder":
@@ -238,6 +320,10 @@ export function applySnapshotUpdate(snapshot: AppSnapshot, update: AppUpdate): A
       return snapshot.cardEdit(update.request.cardEdit);
     case "cardMove":
       return snapshot.cardMove(update.request.cardMove);
+    case "cardMoveToAfter":
+      return snapshot.cardMoveToAfter(update.request.cardMoveToAfter);
+    case "cardMoveToBefore":
+      return snapshot.cardMoveToBefore(update.request.cardMoveToBefore);
     case "categoryAdd":
       return snapshot.categoryAdd(update.request.categoryAdd);
     case "categoryReorder":

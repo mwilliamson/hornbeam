@@ -63,7 +63,7 @@ export interface CardEditRequest {
   text?: string;
 }
 
-export function updateCard(card: Card, request: CardEditRequest): Card {
+export function updateCard(card: Card, request: Omit<CardEditRequest, "createdAt" | "id">): Card {
   return {
     categoryId: request.categoryId === undefined ? card.categoryId : request.categoryId,
     createdAt: card.createdAt,
@@ -80,6 +80,20 @@ export interface CardMoveRequest {
   createdAt: Instant;
   direction: "up" | "down";
   id: string;
+}
+
+export interface CardMoveToBeforeRequest {
+  beforeCardId: string;
+  createdAt: Instant;
+  moveCardId: string;
+  parentCardId: string | null;
+}
+
+export interface CardMoveToAfterRequest {
+  afterCardId: string;
+  createdAt: Instant;
+  moveCardId: string;
+  parentCardId: string | null;
 }
 
 export function validateCardText(elementId: string, text: string): ValidationResult<string> {

@@ -41,6 +41,20 @@ const SerializedCardMoveRequest = t.type({
   id: t.string,
 }, "SerializedCardMoveRequest");
 
+const SerializedCardMoveToAfterRequest = t.type({
+  createdAt: t2.instant,
+  afterCardId: t.string,
+  moveCardId: t.string,
+  parentCardId: t.union([t.string, t.null]),
+}, "SerializedCardMoveToAfterRequest");
+
+const SerializedCardMoveToBeforeRequest = t.type({
+  createdAt: t2.instant,
+  beforeCardId: t.string,
+  moveCardId: t.string,
+  parentCardId: t.union([t.string, t.null]),
+}, "SerializedCardMoveToBeforeRequest");
+
 const SerializedCategoryAddRequest = t.type({
   createdAt: t2.instant,
   color: t.type({presetColorId: t.string}),
@@ -64,6 +78,8 @@ const SerializedRequest = t.union([
   t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddRequest}),
   t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditRequest}),
   t.type({type: t.literal("cardMove"), cardMove: SerializedCardMoveRequest}),
+  t.type({type: t.literal("cardMoveToAfter"), cardMoveToAfter: SerializedCardMoveToAfterRequest}),
+  t.type({type: t.literal("cardMoveToBefore"), cardMoveToBefore: SerializedCardMoveToBeforeRequest}),
   t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddRequest}),
   t.type({type: t.literal("categoryReorder"), categoryReorder: SerializedCategoryReorderRequest}),
   t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddRequest}),

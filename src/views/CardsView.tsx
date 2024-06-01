@@ -1,16 +1,21 @@
+import { DndContext, DragEndEvent, PointerSensor, closestCorners, useDraggable, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
 import React from "react";
 
 import { CardTree, cardsToTrees } from "../app/cardTrees";
-import { Card } from "../app/cards";
+import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
 import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
+import classNames from "classnames";
+import assertNever from "../util/assertNever";
 
 interface CardsViewProps {
   appSnapshot: CategorySet & ColorSet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
+  onCardMoveToAfter: (request: Omit<CardMoveToAfterRequest, "createdAt">) => void;
+  onCardMoveToBefore: (request: Omit<CardMoveToBeforeRequest, "createdAt">) => void;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (cardId: string) => void;
   onSubboardOpen: (subboardRootId: string) => void;
@@ -22,6 +27,8 @@ export default function CardsView(props: CardsViewProps) {
     appSnapshot,
     cards,
     cardSelectedId,
+    onCardMoveToAfter,
+    onCardMoveToBefore,
     onCardSelect,
     onCardAddChildClick,
     onSubboardOpen,
@@ -32,21 +39,71 @@ export default function CardsView(props: CardsViewProps) {
 
   const cardTops = calculateCardTops(cardTrees);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 1000,
+      }
+    }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    if (event.over === null) {
+      return;
+    }
+
+    const droppable = event.over.data.current as DroppableData;
+    const movedCardId = event.active.id as string;
+
+    if (droppable.cardId === movedCardId) {
+      return;
+    }
+
+    switch (droppable.type) {
+      case "after":
+        onCardMoveToAfter({
+          afterCardId: droppable.cardId,
+          moveCardId: movedCardId,
+          parentCardId: droppable.parentCardId,
+        });
+        return;
+
+      case "before":
+        onCardMoveToBefore({
+          beforeCardId: droppable.cardId,
+          moveCardId: movedCardId,
+          parentCardId: droppable.parentCardId,
+        });
+        return;
+
+      default:
+        assertNever(droppable.type, null);
+        return;
+    }
+  };
+
   return (
-    <div className="CardsView">
-      <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
-        <CardList
-          appSnapshot={appSnapshot}
-          cardTrees={cardTrees}
-          cardTops={cardTops}
-          cardSelectedId={cardSelectedId}
-          isRoot
-          onCardSelect={onCardSelect}
-          onCardAddChildClick={onCardAddChildClick}
-          onSubboardOpen={onSubboardOpen}
-        />
+    <DndContext
+      collisionDetection={closestCorners}
+      onDragEnd={handleDragEnd}
+      sensors={sensors}
+    >
+      <div className="CardsView">
+        <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
+          <CardList
+            appSnapshot={appSnapshot}
+            cardTrees={cardTrees}
+            cardTops={cardTops}
+            cardSelectedId={cardSelectedId}
+            isRoot
+            onCardSelect={onCardSelect}
+            onCardAddChildClick={onCardAddChildClick}
+            onSubboardOpen={onSubboardOpen}
+          />
+        </div>
       </div>
-    </div>
+    </DndContext>
   );
 }
 
@@ -75,6 +132,8 @@ function CardTreeView(props: CardTreeViewProps) {
 
   const {card} = cardTree;
 
+  const draggableCard = useDraggable({id: card.id});
+
   const handleCardClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     onCardSelect(card.id);
@@ -94,20 +153,52 @@ function CardTreeView(props: CardTreeViewProps) {
 
   const isSelected = cardSelectedId === card.id;
 
+  const isDroppable = (
+    (isRoot && cardTree.card.parentCardId === null) ||
+    !isRoot
+  );
+
   return (
     <div className="CardsView-TreeView">
       {cardTree.card.parentCardId !== null && isRoot && (
         <ParentPlaceholder />
       )}
       <div className="CardsView-TreeView-Parent">
-        <CardView
-          appSnapshot={appSnapshot}
-          card={card}
-          cardCategory={appSnapshot.findCategoryById(card.categoryId)}
-          isSelected={isSelected}
-          onClick={handleCardClick}
-          onDoubleClick={handleCardDoubleClick}
-        />
+        <div
+          ref={draggableCard.setNodeRef}
+          style={{
+            opacity: draggableCard.isDragging ? 0.5 : 1,
+          }}
+          {...draggableCard.listeners}
+          {...draggableCard.attributes}
+        >
+          {isDroppable && (
+            <CardDroppable
+              moveTo={{
+                type: "before",
+                cardId: cardTree.card.id,
+                parentCardId: cardTree.card.parentCardId,
+              }}
+            />
+          )}
+          <CardView
+            appSnapshot={appSnapshot}
+            card={card}
+            cardCategory={appSnapshot.findCategoryById(card.categoryId)}
+            isSelected={isSelected && !draggableCard.active}
+            onClick={handleCardClick}
+            onDoubleClick={handleCardDoubleClick}
+          />
+          {isDroppable && (
+            <CardDroppable
+              moveTo={{
+                type: "after",
+                cardId: cardTree.card.id,
+                parentCardId: cardTree.card.parentCardId,
+              }}
+            />
+          )}
+        </div>
         {isSelected && (
           <div className="CardsView-AddChildContainer">
             <button
@@ -185,6 +276,49 @@ function CardList(props: CardListProps) {
           onSubboardOpen={onSubboardOpen}
         />
       ))}
+    </div>
+  );
+}
+
+interface MoveTo {
+  type: "before" | "after";
+  cardId: string;
+  parentCardId: string | null;
+}
+
+type DroppableData = MoveTo;
+
+interface CardDroppableProps {
+  moveTo: MoveTo;
+}
+
+function CardDroppable(props: CardDroppableProps) {
+  const {moveTo} = props;
+
+  const droppableData: DroppableData = moveTo;
+
+  const {isOver, setNodeRef} = useDroppable({
+    id: `${moveTo.type}_${moveTo.cardId}`,
+    data: droppableData
+  });
+
+  return (
+    <div
+      className="CardsView-CardDroppable"
+      ref={setNodeRef}
+    >
+      {isOver && (
+        <div
+          className={classNames(
+            "CardsView-CardDroppableActive",
+            {
+              "CardsView-CardDroppableActive--Before": moveTo.type === "before",
+              "CardsView-CardDroppableActive--After": moveTo.type === "after",
+            },
+          )}
+        >
+        </div>
+      )}
     </div>
   );
 }

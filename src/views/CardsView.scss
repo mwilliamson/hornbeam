@@ -1,13 +1,16 @@
 @use "../scss/buttons";
 @use "../scss/cards";
+@use "../scss/colors";
 @use "../scss/spacing";
 @use "../scss/text";
+@use "./cards/CardView";
 
 .CardsView {
   height: 100%;
   width: 100%;
   overflow: auto;
   padding: spacing.$md;
+  user-select: none;
 }
 
 @mixin CardsView-CardsRow {
@@ -62,4 +65,26 @@
 
 .CardsView-CardList {
   @include CardsView-CardsRow;
+}
+
+.CardsView-CardDroppable {
+  position: relative;
+  width: CardView.$card-width;
+}
+
+$droppable-height: 2px;
+
+.CardsView-CardDroppableActive {
+  position: absolute;
+  height: $droppable-height;
+  width: 100%;
+  background-color: colors.$primary;
+
+  &--Before {
+    top: calc(0px - cards.$card-gap / 2 - $droppable-height / 2);
+  }
+
+  &--After {
+    top: calc(0px + cards.$card-gap / 2 - $droppable-height / 2);
+  }
 }

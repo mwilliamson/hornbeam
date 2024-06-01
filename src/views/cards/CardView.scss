@@ -1,6 +1,9 @@
 @use "../../scss/cards";
 @use "../../scss/text";
 
+$card-height: 85px;
+$card-width: 15em;
+
 .CardView {
   @include cards.card;
 
@@ -9,8 +12,8 @@
   TODO: specify height in ems, adjust SVG accordingly?
   height: 5em;
   **/
-  height: 85px;
-  width: 15em;
+  height: $card-height;
+  width: $card-width;
   display: flex;
   flex-direction: column;
 

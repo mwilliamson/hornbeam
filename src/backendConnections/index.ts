@@ -1,5 +1,5 @@
 import { AppState } from "../app";
-import { Request } from "../app/snapshots";
+import { AppRequest } from "../app/snapshots";
 
 export type BackendConnectionState =
   | {
@@ -18,5 +18,5 @@ export type BackendConnectionState =
 
 export interface BackendConnection {
   appState: AppState;
-  sendRequest: (update: Request) => Promise<void>;
+  sendRequest: (update: AppRequest) => Promise<void>;
 }

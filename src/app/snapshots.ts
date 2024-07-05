@@ -242,10 +242,10 @@ export function initialAppSnapshot(): AppSnapshot {
 
 export interface AppUpdate {
   updateId: string;
-  request: Request;
+  request: AppRequest;
 }
 
-export type Request =
+export type AppRequest =
   | {type: "cardAdd", cardAdd: CardAddRequest}
   | {type: "cardEdit", cardEdit: CardEditRequest}
   | {type: "cardMove", cardMove: CardMoveRequest}
@@ -256,40 +256,40 @@ export type Request =
   | {type: "commentAdd", commentAdd: CommentAddRequest};
 
 export const requests = {
-  cardAdd(request: CardAddRequest): Request {
+  cardAdd(request: CardAddRequest): AppRequest {
     return {type: "cardAdd", cardAdd: request};
   },
 
-  cardEdit(request: CardEditRequest): Request {
+  cardEdit(request: CardEditRequest): AppRequest {
     return {type: "cardEdit", cardEdit: request};
   },
 
-  cardMove(request: CardMoveRequest): Request {
+  cardMove(request: CardMoveRequest): AppRequest {
     return {type: "cardMove", cardMove: request};
   },
 
-  cardMoveToAfter(request: CardMoveToAfterRequest): Request {
+  cardMoveToAfter(request: CardMoveToAfterRequest): AppRequest {
     return {type: "cardMoveToAfter", cardMoveToAfter: request};
   },
 
-  cardMoveToBefore(request: CardMoveToBeforeRequest): Request {
+  cardMoveToBefore(request: CardMoveToBeforeRequest): AppRequest {
     return {type: "cardMoveToBefore", cardMoveToBefore: request};
   },
 
-  categoryAdd(request: CategoryAddRequest): Request {
+  categoryAdd(request: CategoryAddRequest): AppRequest {
     return {type: "categoryAdd", categoryAdd: request};
   },
 
-  categoryReorder(request: CategoryReorderRequest): Request {
+  categoryReorder(request: CategoryReorderRequest): AppRequest {
     return {type: "categoryReorder", categoryReorder: request};
   },
 
-  commentAdd(request: CommentAddRequest): Request {
+  commentAdd(request: CommentAddRequest): AppRequest {
     return {type: "commentAdd", commentAdd: request};
   },
 };
 
-export function requestCreatedAt(request: Request): Instant {
+export function requestCreatedAt(request: AppRequest): Instant {
   switch (request.type) {
     case "cardAdd":
       return request.cardAdd.createdAt;

@@ -4,7 +4,7 @@ import { useSimpleSync } from "simple-sync/lib/react";
 import { AppState, applyAppUpdate, initialAppState } from "../app";
 import { deserializeAppUpdate, serializeAppUpdate } from "../serialization";
 import { BackendConnectionState } from ".";
-import { AppUpdate, Request } from "../app/snapshots";
+import { AppUpdate, AppRequest } from "../app/snapshots";
 import { useEffect, useRef } from "react";
 import { Deferred, createDeferred } from "../util/promises";
 import { uuidv7 } from "uuidv7";
@@ -64,13 +64,13 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
 function useSendRequest(
   sendUpdate: (update: AppUpdate) => void,
   updateIds: ReadonlyArray<string>,
-): (request: Request) => Promise<void> {
+): (request: AppRequest) => Promise<void> {
   const pendingRef = useRef({
     requests: new Map<string, Deferred<void>>(),
     lastUpdateIndex: -1,
   });
 
-  const sendRequestRef = useRef(async (request: Request) => {
+  const sendRequestRef = useRef(async (request: AppRequest) => {
     const updateId = uuidv7();
     sendUpdate({
       updateId,

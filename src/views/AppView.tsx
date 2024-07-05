@@ -3,7 +3,7 @@ import { useEffect, useId, useState } from "react";
 
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
 import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
-import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
+import { CategoryAddRequest } from "../app/categories";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
 import { AppSnapshot, requests } from "../app/snapshots";
@@ -94,10 +94,6 @@ export default function AppView(props: AppViewProps) {
 
   const handleCategoryAdd = async (request: CategoryAddRequest) => {
     await sendRequest(requests.categoryAdd(request));
-  };
-
-  const handleCategoryReorder = async (request: CategoryReorderRequest) => {
-    await sendRequest(requests.categoryReorder(request));
   };
 
   const handleCommentAdd = async (request: CommentAddRequest) => {
@@ -223,7 +219,6 @@ export default function AppView(props: AppViewProps) {
             onCardMove={handleCardMove}
             onCardSave={handleCardSave}
             onCategoryAdd={handleCategoryAdd}
-            onCategoryReorder={handleCategoryReorder}
             onCommentAdd={handleCommentAdd}
             onSettingsClick={handleSettingsClick}
             onSettingsClose={handleSettingsClose}
@@ -252,7 +247,6 @@ interface SidebarProps {
   onCardMove: (request: CardMoveRequest) => Promise<void>;
   onCardSave: (request: CardEditRequest) => Promise<void>;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
-  onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
   onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   onSettingsClick: () => void;
   onSettingsClose: () => void;
@@ -271,7 +265,6 @@ function Sidebar(props: SidebarProps) {
     onCardMove,
     onCardSave,
     onCategoryAdd,
-    onCategoryReorder,
     onCommentAdd,
     onSettingsClick,
     onSettingsClose,
@@ -311,7 +304,6 @@ function Sidebar(props: SidebarProps) {
           appSnapshot={appSnapshot}
           onBack={onSettingsClose}
           onCategoryAdd={onCategoryAdd}
-          onCategoryReorder={onCategoryReorder}
         />
       </Pane>
     );

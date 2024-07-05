@@ -3,10 +3,10 @@ import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
 import { ChevronLeft } from "lucide-react";
-import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
+import { CategoryAddRequest } from "../app/categories";
 import { AppSnapshot } from "../app/snapshots";
 import "./SettingsView.scss";
-import CategoryListView from "./categories/CategoryListView";
+import CategoryListViewBoundary from "./categories/CategoryListViewBoundary";
 import ColorSelect from "./colors/ColorSelect";
 import Button from "./widgets/Button";
 import ControlGroup from "./widgets/ControlGroup";
@@ -19,11 +19,10 @@ interface SettingsViewProps {
   appSnapshot: AppSnapshot;
   onBack: () => void;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
-  onCategoryReorder: (request: CategoryReorderRequest) => Promise<void>;
 }
 
 export default function SettingsView(props: SettingsViewProps) {
-  const {appSnapshot, onBack, onCategoryAdd, onCategoryReorder} = props;
+  const {appSnapshot, onBack, onCategoryAdd} = props;
 
   return (
     <section>
@@ -36,12 +35,8 @@ export default function SettingsView(props: SettingsViewProps) {
 
       <h3>Categories</h3>
 
-      <CategoryListView
+      <CategoryListViewBoundary
         appSnapshot={appSnapshot}
-        onReorder={ids => onCategoryReorder({
-          createdAt: Instant.now(),
-          ids,
-        })}
       />
 
       <AddCategorySection

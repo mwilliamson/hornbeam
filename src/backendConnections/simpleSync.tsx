@@ -50,7 +50,7 @@ interface ConnectedSimpleSyncProps {
 function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   const {appState, children, sendAppUpdate} = props;
 
-  const sendRequest = useSendRequest(sendAppUpdate, appState.updateIds);
+  const sendRequest = useCreateSendRequest(sendAppUpdate, appState.updateIds);
 
   return children({
     type: "connected",
@@ -61,7 +61,7 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   });
 }
 
-function useSendRequest(
+function useCreateSendRequest(
   sendUpdate: (update: AppUpdate) => void,
   updateIds: ReadonlyArray<string>,
 ): (request: AppRequest) => Promise<void> {

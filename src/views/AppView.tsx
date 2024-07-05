@@ -1,17 +1,14 @@
 import { Instant } from "@js-joda/core";
-import { useEffect, useId, useRef, useState } from "react";
-import { uuidv7 } from "uuidv7";
+import { useEffect, useId, useState } from "react";
 
-import { AppState } from "../app";
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
 import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CategoryAddRequest, CategoryReorderRequest } from "../app/categories";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
-import { AppSnapshot, AppUpdate, Request, requests } from "../app/snapshots";
+import { AppSnapshot, requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
-import { Deferred, createDeferred } from "../util/promises";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import SettingsView from "./SettingsView";
@@ -24,6 +21,7 @@ import CardDetailView from "./cards/CardDetailView";
 import { ValidCardFormValues } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
+import { BackendConnection } from "../backendConnections";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -51,59 +49,13 @@ const initialViewState: ViewState = {
 };
 
 interface AppViewProps {
-  sendUpdate: (update: AppUpdate) => void;
-  appState: AppState;
-}
-
-function useSendRequest(
-  sendUpdate: (update: AppUpdate) => void,
-  state: AppState,
-): (request: Request) => Promise<void> {
-  const pendingRef = useRef({
-    requests: new Map<string, Deferred<void>>(),
-    lastUpdateIndex: -1,
-  });
-
-  const sendRequestRef = useRef(async (request: Request) => {
-    const updateId = uuidv7();
-    sendUpdate({
-      updateId,
-      request,
-    });
-
-    const deferred = createDeferred<void>();
-
-    pendingRef.current.requests.set(updateId, deferred);
-
-    return deferred.promise;
-  });
-
-  useEffect(() => {
-    for (
-      let updateIndex = pendingRef.current.lastUpdateIndex + 1;
-      updateIndex < state.updateIds.length;
-      updateIndex++
-    ) {
-      const updateId = state.updateIds[updateIndex];
-      const pendingRequest = pendingRef.current.requests.get(updateId);
-      if (pendingRequest !== undefined) {
-        pendingRequest.resolve();
-        pendingRef.current.requests.delete(updateId);
-      }
-
-      pendingRef.current.lastUpdateIndex = updateIndex;
-    }
-  }, [state.updateIds]);
-
-  return sendRequestRef.current;
+  backendConnection: BackendConnection;
 }
 
 export default function AppView(props: AppViewProps) {
-  const {sendUpdate, appState} = props;
+  const {backendConnection: {appState, sendRequest}} = props;
 
   const [viewState, setViewState] = useState(initialViewState);
-
-  const sendRequest = useSendRequest(sendUpdate, appState);
 
   const handleCardAddClick = (initialCardAddRequest: Partial<CardAddRequest>) => {
     setViewState({...viewState, addingCard: initialCardAddRequest});

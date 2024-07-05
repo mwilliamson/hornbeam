@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
 
-import { applyAppUpdate, AppState, initialAppState } from "./app";
-import { AppUpdate } from "./app/snapshots";
+import { applyAppUpdate, initialAppState } from "./app";
 import AppView from "./views/AppView";
 import hornbeamLog from "../hornbeam.log";
 import { deserializeAppUpdate } from "./serialization";
+import { useInMemoryBackend } from "./backendConnections/inMemory";
 
 function Client() {
-  const [appState, setAppState] = useState<AppState>(() => {
+  const backendConnection = useInMemoryBackend(() => {
     let appState = initialAppState();
 
     for (const message of hornbeamLog) {
@@ -19,12 +19,8 @@ function Client() {
     return appState;
   });
 
-  const sendUpdate = (update: AppUpdate) => {
-    setAppState(appState => applyAppUpdate(appState, update));
-  };
-
   return (
-    <AppView sendUpdate={sendUpdate} appState={appState} />
+    <AppView backendConnection={backendConnection} />
   );
 }
 

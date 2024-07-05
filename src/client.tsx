@@ -1,10 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { useSimpleSync } from "simple-sync/lib/react";
 
-import { applyAppUpdate, initialAppState } from "./app";
-import { deserializeAppUpdate, serializeAppUpdate } from "./serialization";
 import AppView from "./views/AppView";
+import { ConnectSimpleSync } from "./backendConnections/simpleSync";
+import { BackendConnectionState } from "./backendConnections";
 
 function webSocketUri() {
   const location = window.location;
@@ -19,23 +18,32 @@ function webSocketUri() {
 }
 
 function Client() {
-  const state = useSimpleSync({
-    applyAppUpdate,
-    initialAppState: initialAppState(),
-    uri: webSocketUri(),
+  return (
+    <ConnectSimpleSync uri={webSocketUri()}>
+      {(connectionState) => (
+        <BackendConnectionStateView
+          connectionState={connectionState}
+        />
+      )}
+    </ConnectSimpleSync>
+  );
+}
 
-    serializeAppUpdate,
-    deserializeAppUpdate,
-  });
+interface BackendConnectionStateViewProps {
+  connectionState: BackendConnectionState;
+}
 
-  switch (state.type) {
+function BackendConnectionStateView(props: BackendConnectionStateViewProps) {
+  const {connectionState} = props;
+
+  switch (connectionState.type) {
     case "connecting":
       return (
         <p>Connecting...</p>
       );
     case "connected":
       return (
-        <AppView sendUpdate={state.sendAppUpdate} appState={state.appState} />
+        <AppView backendConnection={connectionState.connection} />
       );
     case "connection-error":
       return (

@@ -24,6 +24,7 @@ export function ConnectInMemory(props: ConnectInMemoryProps) {
     setAppState(appState => applyAppUpdate(appState, update));
   };
 
+  // TODO: ensure connection doesn't change.
   const connection = {
     appState,
     query: appStateToQueryFunction(appState),

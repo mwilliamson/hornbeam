@@ -54,6 +54,7 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   const query = appStateToQueryFunction(appState);
   const sendRequest = useCreateSendRequest(sendAppUpdate, appState.updateIds);
 
+  // TODO: ensure connection doesn't change.
   const connection: BackendConnection = {
     appState,
     query,
@@ -75,7 +76,7 @@ export function appStateToQueryFunction(appState: AppState) {
   // TODO: time travel
   const snapshot = appState.latestSnapshot();
 
-  return <R,>(query: AppQuery<R>): R => {
+  return async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
       case "allCategories":
         return query.proof(snapshot.allCategories());

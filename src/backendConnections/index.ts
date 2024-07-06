@@ -22,7 +22,7 @@ export type BackendConnectionState =
 export interface BackendConnection {
   appState: AppState;
   sendRequest: SendRequest;
-  query: <R>(query: AppQuery<R>) => R;
+  query: <R>(query: AppQuery<R>) => Promise<R>;
 }
 
 export type SendRequest = (update: AppRequest) => Promise<void>;

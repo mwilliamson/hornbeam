@@ -30,7 +30,7 @@ export default function SettingsView(props: SettingsViewProps) {
       <CategoryListViewBoundary />
 
       <AddCategorySection
-        appSnapshot={appSnapshot}
+        allColors={appSnapshot}
         onCategoryAdd={onCategoryAdd}
       />
     </section>

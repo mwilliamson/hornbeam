@@ -4,7 +4,7 @@ import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
 import { CategoryAddRequest } from "../../app/categories";
-import { AppSnapshot } from "../../app/snapshots";
+import { ColorSet } from "../../app/colors";
 import ColorSelect from "../colors/ColorSelect";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
@@ -19,12 +19,12 @@ interface AddCategoryState {
 }
 
 interface AddCategorySectionProps {
-  appSnapshot: AppSnapshot;
+  allColors: ColorSet;
   onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
 }
 
 export default function AddCategorySection(props: AddCategorySectionProps) {
-  const {appSnapshot, onCategoryAdd} = props;
+  const {allColors, onCategoryAdd} = props;
 
   const [state, setState] = useState<AddCategoryState | null>(null);
 
@@ -80,7 +80,7 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
         </ControlLabel>
         <ControlGroup>
           <ColorSelect
-            colors={appSnapshot}
+            colors={allColors}
             id={colorControlId}
             onChange={newPresetColorId => setState({...state, presetColorId: newPresetColorId})}
             value={state.presetColorId}

@@ -112,7 +112,7 @@ function AddCategorySection(props: AddCategorySectionProps) {
         </ControlLabel>
         <ControlGroup>
           <ColorSelect
-            appSnapshot={appSnapshot}
+            colors={appSnapshot}
             id={colorControlId}
             onChange={newPresetColorId => setState({...state, presetColorId: newPresetColorId})}
             value={state.presetColorId}

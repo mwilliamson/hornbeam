@@ -2,14 +2,14 @@ import { ColorSet } from "../../app/colors";
 import CardRadioButtons from "../widgets/CardRadioButtons";
 
 interface ColorSelectProps {
-  appSnapshot: ColorSet;
+  colors: ColorSet;
   id: string;
   onChange: (value: string) => void;
   value: string | null;
 }
 
 export default function ColorSelect(props: ColorSelectProps) {
-  const {appSnapshot, id, onChange, value} = props;
+  const {colors: appSnapshot, id, onChange, value} = props;
 
   return (
     <CardRadioButtons

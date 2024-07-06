@@ -3,9 +3,17 @@ import { uuidv7 } from "uuidv7";
 
 import { AppState, applyAppUpdate } from "../app";
 import { AppUpdate, AppRequest } from "../app/snapshots";
-import { BackendConnection } from ".";
+import { BackendConnection, BackendConnectionProvider } from ".";
+import { appStateToQueryFunction } from "./simpleSync";
 
-export function useInMemoryBackend(initialState: () => AppState): BackendConnection {
+interface ConnectInMemoryProps {
+  children: (connection: BackendConnection) => React.ReactNode;
+  initialState: () => AppState;
+}
+
+export function ConnectInMemory(props: ConnectInMemoryProps) {
+  const {children, initialState} = props;
+
   const [appState, setAppState] = useState<AppState>(initialState);
 
   const sendRequest = async (request: AppRequest) => {
@@ -16,8 +24,15 @@ export function useInMemoryBackend(initialState: () => AppState): BackendConnect
     setAppState(appState => applyAppUpdate(appState, update));
   };
 
-  return {
+  const connection = {
     appState,
+    query: appStateToQueryFunction(appState),
     sendRequest,
   };
+
+  return (
+    <BackendConnectionProvider value={connection}>
+      {children(connection)}
+    </BackendConnectionProvider>
+  );
 }

@@ -5,10 +5,10 @@ import { applyAppUpdate, initialAppState } from "./app";
 import AppView from "./views/AppView";
 import hornbeamLog from "../hornbeam.log";
 import { deserializeAppUpdate } from "./serialization";
-import { useInMemoryBackend } from "./backendConnections/inMemory";
+import { ConnectInMemory } from "./backendConnections/inMemory";
 
 function Client() {
-  const backendConnection = useInMemoryBackend(() => {
+  const initialDemoState = () => {
     let appState = initialAppState();
 
     for (const message of hornbeamLog) {
@@ -17,10 +17,14 @@ function Client() {
     }
 
     return appState;
-  });
+  };
 
   return (
-    <AppView backendConnection={backendConnection} />
+    <ConnectInMemory initialState={initialDemoState}>
+      {backendConnection => (
+        <AppView backendConnection={backendConnection} />
+      )}
+    </ConnectInMemory>
   );
 }
 

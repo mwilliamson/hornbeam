@@ -35,9 +35,7 @@ export default function SettingsView(props: SettingsViewProps) {
 
       <h3>Categories</h3>
 
-      <CategoryListViewBoundary
-        appSnapshot={appSnapshot}
-      />
+      <CategoryListViewBoundary />
 
       <AddCategorySection
         appSnapshot={appSnapshot}

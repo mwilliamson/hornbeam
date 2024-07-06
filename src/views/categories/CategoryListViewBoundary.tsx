@@ -1,22 +1,21 @@
 import { Instant } from "@js-joda/core";
 
-import { AppSnapshot, requests } from "../../app/snapshots";
+import { requests } from "../../app/snapshots";
 import CategoryListView from "./CategoryListView";
 import Boundary from "../Boundary";
+import { allCategoriesQuery, allColorsQuery } from "../../backendConnections/queries";
 
-interface CategoryListViewBoundaryProps {
-  appSnapshot: AppSnapshot;
-}
-
-export default function CategoryListViewBoundary(props: CategoryListViewBoundaryProps) {
-  const {appSnapshot} = props;
-
+export default function CategoryListViewBoundary() {
   return (
     <Boundary
-      render={(sendRequest) => (
+      queries={{
+        allCategories: allCategoriesQuery,
+        allColors: allColorsQuery,
+      }}
+      render={({allCategories, allColors}, sendRequest) => (
         <CategoryListView
-          categories={appSnapshot.allCategories()}
-          allColors={appSnapshot}
+          categories={allCategories}
+          allColors={allColors}
           onReorder={async ids => await sendRequest(requests.categoryReorder({
             createdAt: Instant.now(),
             ids,

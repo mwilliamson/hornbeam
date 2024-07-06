@@ -1,13 +1,14 @@
 
 import { useSimpleSync } from "simple-sync/lib/react";
+import { uuidv7 } from "uuidv7";
 
 import { AppState, applyAppUpdate, initialAppState } from "../app";
 import { deserializeAppUpdate, serializeAppUpdate } from "../serialization";
-import { BackendConnectionState } from ".";
+import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
 import { AppUpdate, AppRequest } from "../app/snapshots";
 import { useEffect, useRef } from "react";
 import { Deferred, createDeferred } from "../util/promises";
-import { uuidv7 } from "uuidv7";
+import { AppQuery } from "./queries";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;
@@ -50,15 +51,38 @@ interface ConnectedSimpleSyncProps {
 function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   const {appState, children, sendAppUpdate} = props;
 
+  const query = appStateToQueryFunction(appState);
   const sendRequest = useCreateSendRequest(sendAppUpdate, appState.updateIds);
 
-  return children({
-    type: "connected",
-    connection: {
-      appState,
-      sendRequest,
+  const connection: BackendConnection = {
+    appState,
+    query,
+    sendRequest,
+  };
+
+  return (
+    <BackendConnectionProvider value={connection}>
+      {children({
+        type: "connected",
+        connection,
+      })}
+    </BackendConnectionProvider>
+  );
+}
+
+// TODO: extract to common module?
+export function appStateToQueryFunction(appState: AppState) {
+  // TODO: time travel
+  const snapshot = appState.latestSnapshot();
+
+  return <R,>(query: AppQuery<R>): R => {
+    switch (query.type) {
+      case "allCategories":
+        return query.proof(snapshot.allCategories());
+      case "allColors":
+        return query.proof(snapshot);
     }
-  });
+  };
 }
 
 function useCreateSendRequest(

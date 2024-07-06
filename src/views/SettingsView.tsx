@@ -1,20 +1,15 @@
 import { ChevronLeft } from "lucide-react";
-import { CategoryAddRequest } from "../app/categories";
-import { AppSnapshot } from "../app/snapshots";
 import "./SettingsView.scss";
-import AddCategorySection from "./categories/AddCategorySection";
-import CategoryListViewBoundary from "./categories/CategoryListViewBoundary";
+import CategorySectionBoundary from "./categories/CategorySectionBoundary";
 import ControlGroup from "./widgets/ControlGroup";
 import LinkButton from "./widgets/LinkButton";
 
 interface SettingsViewProps {
-  appSnapshot: AppSnapshot;
   onBack: () => void;
-  onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
 }
 
 export default function SettingsView(props: SettingsViewProps) {
-  const {appSnapshot, onBack, onCategoryAdd} = props;
+  const {onBack} = props;
 
   return (
     <section>
@@ -27,12 +22,7 @@ export default function SettingsView(props: SettingsViewProps) {
 
       <h3>Categories</h3>
 
-      <CategoryListViewBoundary />
-
-      <AddCategorySection
-        allColors={appSnapshot}
-        onCategoryAdd={onCategoryAdd}
-      />
+      <CategorySectionBoundary />
     </section>
   );
 }

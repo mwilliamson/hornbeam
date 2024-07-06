@@ -1,11 +1,12 @@
 import { Instant } from "@js-joda/core";
 
+import { CategoryAddRequest } from "../../app/categories";
 import { requests } from "../../app/snapshots";
-import CategoryListView from "./CategoryListView";
 import Boundary from "../Boundary";
 import { allCategoriesQuery, allColorsQuery } from "../../backendConnections/queries";
+import CategorySection from "./CategorySection";
 
-export default function CategoryListViewBoundary() {
+export default function CategorySectionBoundary() {
   return (
     <Boundary
       queries={{
@@ -13,13 +14,16 @@ export default function CategoryListViewBoundary() {
         allColors: allColorsQuery,
       }}
       render={({allCategories, allColors}, sendRequest) => (
-        <CategoryListView
+        <CategorySection
           categories={allCategories}
           allColors={allColors}
           onReorder={async ids => await sendRequest(requests.categoryReorder({
             createdAt: Instant.now(),
             ids,
           }))}
+          onCategoryAdd={async (request: CategoryAddRequest) => {
+            await sendRequest(requests.categoryAdd(request));
+          }}
         />
       )}
     />

@@ -15,7 +15,8 @@ export default function CategoryListViewBoundary(props: CategoryListViewBoundary
     <Boundary
       render={(sendRequest) => (
         <CategoryListView
-          appSnapshot={appSnapshot}
+          categories={appSnapshot.allCategories()}
+          allColors={appSnapshot}
           onReorder={async ids => await sendRequest(requests.categoryReorder({
             createdAt: Instant.now(),
             ids,

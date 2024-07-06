@@ -48,7 +48,8 @@ export default {
 
     return (
       <CategoryListView
-        appSnapshot={appSnapshot}
+        categories={appSnapshot.allCategories()}
+        allColors={appSnapshot}
         onReorder={async (categoryIds) => {
           await new Promise(resolve => setTimeout(resolve, 500));
           setAppSnapshot(appSnapshot.categoryReorder({

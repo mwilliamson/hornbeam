@@ -4,25 +4,25 @@ import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 
 import { Category, categoryBackgroundColorStyle } from "../../app/categories";
-import { AppSnapshot } from "../../app/snapshots";
+import { ColorSet } from "../../app/colors";
 import { reorder } from "../../util/arrays";
 import "./CategoryListView.scss";
 
 interface CategoryListViewProps {
-  appSnapshot: AppSnapshot;
+  categories: ReadonlyArray<Category>;
+  allColors: ColorSet;
   onReorder: (categoryIds: ReadonlyArray<string>) => Promise<void>;
 }
 
 export default function CategoryListView(props: CategoryListViewProps) {
-  const {appSnapshot, onReorder} = props;
+  const {categories: categoriesUnordered, allColors, onReorder} = props;
 
   const [pendingReorder, setPendingReorder] = useState<ReadonlyArray<string> | null>(null);
 
-  let categories = appSnapshot.allCategories();
-  if (pendingReorder !== null) {
-    // Apply pending reordering to prevent the elements flying around.
-    categories = reorder(categories, category => category.id, pendingReorder);
-  }
+  // Apply pending reordering to prevent the elements flying around.
+  const categories = pendingReorder === null
+    ? categoriesUnordered
+    : reorder(categoriesUnordered, category => category.id, pendingReorder);
 
   const categoryIds = categories.map(category => category.id);
 
@@ -80,7 +80,7 @@ export default function CategoryListView(props: CategoryListViewProps) {
             {categories.map(category => (
               <CategoryTableRow
                 key={category.id}
-                appSnapshot={appSnapshot}
+                allColors={allColors}
                 category={category}
               />
             ))}
@@ -92,14 +92,14 @@ export default function CategoryListView(props: CategoryListViewProps) {
 }
 
 interface CategoryTableRowProps {
-  appSnapshot: AppSnapshot;
+  allColors: ColorSet;
   category: Category;
 }
 
 function CategoryTableRow(props: CategoryTableRowProps) {
-  const {appSnapshot, category} = props;
+  const {allColors, category} = props;
 
-  const color = appSnapshot.findPresetColorById(category.color.presetColorId);
+  const color = allColors.findPresetColorById(category.color.presetColorId);
 
   const {attributes, listeners, setNodeRef, transform, transition}  = useSortable({id: category.id});
 
@@ -119,7 +119,7 @@ function CategoryTableRow(props: CategoryTableRowProps) {
       <td>
         <span
           className="CategoryListView-CategoryColor"
-          style={categoryBackgroundColorStyle(category, appSnapshot)}
+          style={categoryBackgroundColorStyle(category, allColors)}
         >
           {color === null ? null : color.name}
         </span>

@@ -92,7 +92,7 @@ export default function CardForm(props: CardFormProps) {
       <ControlLabel>Category</ControlLabel>
       <ControlGroup>
         <CategorySelect
-          appSnapshot={appSnapshot}
+          allColors={appSnapshot}
           availableCategories={appSnapshot.availableCategories()}
           onChange={categoryId => onChange({...state, categoryId})}
           value={state.categoryId}

@@ -227,7 +227,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
       onSave={onCardCategorySave}
       renderControl={({id, onChange, value}) => (
         <CategorySelect
-          appSnapshot={appSnapshot}
+          allColors={appSnapshot}
           availableCategories={appSnapshot.availableCategories()}
           id={id}
           onChange={onChange}

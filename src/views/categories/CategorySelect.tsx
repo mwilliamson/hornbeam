@@ -3,7 +3,7 @@ import { ColorSet } from "../../app/colors";
 import CardRadioButtons from "../widgets/CardRadioButtons";
 
 interface CategorySelectProps {
-  appSnapshot: ColorSet;
+  allColors: ColorSet;
   availableCategories: ReadonlyArray<Category>;
   id?: string;
   onChange: (categoryId: string) => void;
@@ -11,14 +11,14 @@ interface CategorySelectProps {
 }
 
 export default function CategorySelect(props: CategorySelectProps) {
-  const {availableCategories, appSnapshot, id, onChange, value} = props;
+  const {allColors, availableCategories, id, onChange, value} = props;
 
   return (
     <CardRadioButtons
       id={id}
       onChange={onChange}
       options={availableCategories}
-      optionColor={option => categoryBackgroundColor(option, appSnapshot).color}
+      optionColor={option => categoryBackgroundColor(option, allColors).color}
       optionLabel={option => option.name}
       value={value}
     />

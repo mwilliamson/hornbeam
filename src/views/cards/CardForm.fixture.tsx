@@ -10,8 +10,8 @@ export default {
 
     return (
       <CardForm
-        allCategories={appSnapshot}
         allColors={appSnapshot}
+        availableCategories={appSnapshot.availableCategories()}
         errors={[]}
         onStateChange={state => setState(state)}
         state={state}

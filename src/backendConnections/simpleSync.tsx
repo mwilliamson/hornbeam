@@ -80,6 +80,8 @@ export function appStateToQueryFunction(appState: AppState) {
     switch (query.type) {
       case "allCategories":
         return query.proof(snapshot.allCategories());
+      case "availableCategories":
+        return query.proof(snapshot.availableCategories());
       case "allColors":
         return query.proof(snapshot);
     }

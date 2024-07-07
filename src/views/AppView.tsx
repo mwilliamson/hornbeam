@@ -2,7 +2,7 @@ import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
-import { CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
+import { CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
 import { AppSnapshot, requests } from "../app/snapshots";
@@ -15,12 +15,12 @@ import TimeTravelSidebar from "./TimeTravelSidebar";
 import TimeTravelSlider from "./TimeTravelSlider";
 import ToolsView from "./ToolsView";
 import CardStatusLabel from "./cardStatuses/CardStatusLabel";
-import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
-import { CardFormInitialState, ValidCardFormValues } from "./cards/CardForm";
+import { CardFormInitialState } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
+import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -62,11 +62,6 @@ export default function AppView(props: AppViewProps) {
 
   const handleCardAddClose = () => {
     setViewState({...viewState, addingCard: null});
-  };
-
-  const handleCardAdd = async (request: CardAddRequest) => {
-    await sendRequest(requests.cardAdd(request));
-    handleCardAddClose();
   };
 
   const handleCardMove = async (request: CardMoveRequest) => {
@@ -208,7 +203,6 @@ export default function AppView(props: AppViewProps) {
         <div className="AppView-Sidebar-Main">
           <Sidebar
             appSnapshot={snapshot}
-            onCardAdd={handleCardAdd}
             onCardAddClick={handleCardAddClick}
             onCardAddClose={handleCardAddClose}
             onCardMove={handleCardMove}
@@ -235,7 +229,6 @@ export default function AppView(props: AppViewProps) {
 
 interface SidebarProps {
   appSnapshot: AppSnapshot;
-  onCardAdd: (values: CardAddRequest) => Promise<void>;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onCardAddClose: () => void;
   onCardMove: (request: CardMoveRequest) => Promise<void>;
@@ -252,7 +245,6 @@ interface SidebarProps {
 function Sidebar(props: SidebarProps) {
   const {
     appSnapshot,
-    onCardAdd,
     onCardAddClick,
     onCardAddClose,
     onCardMove,
@@ -269,16 +261,6 @@ function Sidebar(props: SidebarProps) {
   const selectedCard = viewState.selectedCardId === null
     ? null
     : appSnapshot.findCardById(viewState.selectedCardId);
-
-  const handleCardAdd = async ({categoryId, text}: ValidCardFormValues) => {
-    await onCardAdd({
-      categoryId,
-      createdAt: Instant.now(),
-      id: generateId(),
-      parentCardId: viewState.selectedCardId,
-      text,
-    });
-  };
 
   const handleCommentAdd = async ({cardId, text}: {cardId: string, text: string}) => {
     await onCommentAdd({
@@ -309,11 +291,9 @@ function Sidebar(props: SidebarProps) {
   } else if (viewState.addingCard !== null) {
     return (
       <Pane header="Add card">
-        <CardAddForm
-          appSnapshot={appSnapshot}
+        <CardAddFormBoundary
           initialValue={viewState.addingCard}
           onClose={onCardAddClose}
-          onCardAdd={handleCardAdd}
         />
       </Pane>
     );

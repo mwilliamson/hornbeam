@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 
 import { Card, validateCardCategory, validateCardText } from "../../app/cards";
-import { CategorySet } from "../../app/categories";
+import { Category } from "../../app/categories";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import { ValidationErrorsInlineView } from "../validation-views";
@@ -60,8 +60,8 @@ export function validateCardForm(value: CardFormState): ValidationResult<ValidCa
 }
 
 interface CardFormProps {
-  allCategories: CategorySet;
   allColors: ColorSet;
+  availableCategories: ReadonlyArray<Category>;
   errors: ReadonlyArray<ValidationError>;
 
   onStateChange: (value: CardFormState) => void;
@@ -69,7 +69,7 @@ interface CardFormProps {
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {allCategories, allColors, errors, onStateChange: onChange, state} = props;
+  const {allColors, availableCategories, errors, onStateChange: onChange, state} = props;
 
   const {controlIds: {text: textControlId, category: categoryControlId}} = state;
 
@@ -97,7 +97,7 @@ export default function CardForm(props: CardFormProps) {
       <ControlGroup>
         <CategorySelect
           allColors={allColors}
-          availableCategories={allCategories.availableCategories()}
+          availableCategories={availableCategories}
           onChange={categoryId => onChange({...state, categoryId})}
           value={state.categoryId}
         />

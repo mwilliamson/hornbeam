@@ -11,12 +11,21 @@ export type AppQuery<R> =
     readonly proof: Leibniz<ReadonlyArray<Category>, R>;
   }
   | {
+    readonly type: "availableCategories";
+    readonly proof: Leibniz<ReadonlyArray<Category>, R>;
+  }
+  | {
     readonly type: "allColors";
     readonly proof: Leibniz<ColorSet, R>;
   };
 
 export const allCategoriesQuery: AppQuery<ReadonlyArray<Category>> = {
   type: "allCategories",
+  proof: x => x,
+};
+
+export const availableCategoriesQuery: AppQuery<ReadonlyArray<Category>> = {
+  type: "availableCategories",
   proof: x => x,
 };
 

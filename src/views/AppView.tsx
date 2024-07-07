@@ -2,7 +2,7 @@ import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
-import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
+import { CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CommentAddRequest } from "../app/comments";
 import { generateId } from "../app/ids";
 import { AppSnapshot, requests } from "../app/snapshots";
@@ -17,7 +17,7 @@ import ToolsView from "./ToolsView";
 import CardStatusLabel from "./cardStatuses/CardStatusLabel";
 import CardAddForm from "./cards/CardAddForm";
 import CardDetailView from "./cards/CardDetailView";
-import { ValidCardFormValues } from "./cards/CardForm";
+import { CardFormInitialState, ValidCardFormValues } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
@@ -27,7 +27,7 @@ interface CardFilters {
 }
 
 interface ViewState {
-  addingCard: Partial<CardAddRequest> | null,
+  addingCard: CardFormInitialState | null,
   cardFilters: CardFilters;
   selectedCardId: string | null;
   selectedSubboardRootId: string | null;
@@ -56,8 +56,8 @@ export default function AppView(props: AppViewProps) {
 
   const [viewState, setViewState] = useState(initialViewState);
 
-  const handleCardAddClick = (initialCardAddRequest: Partial<CardAddRequest>) => {
-    setViewState({...viewState, addingCard: initialCardAddRequest});
+  const handleCardAddClick = (cardFormInitialState: CardFormInitialState) => {
+    setViewState({...viewState, addingCard: cardFormInitialState});
   };
 
   const handleCardAddClose = () => {
@@ -189,7 +189,7 @@ export default function AppView(props: AppViewProps) {
             onCardMoveToAfter={handleCardMoveToAfter}
             onCardMoveToBefore={handleCardMoveToBefore}
             onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
-            onCardAddChildClick={(cardId) => handleCardAddClick({parentCardId: cardId})}
+            onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
             onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}
             selectedSubboardRootId={viewState.selectedSubboardRootId}
           />
@@ -236,7 +236,7 @@ export default function AppView(props: AppViewProps) {
 interface SidebarProps {
   appSnapshot: AppSnapshot;
   onCardAdd: (values: CardAddRequest) => Promise<void>;
-  onCardAddClick: (initialCard: Partial<Card>) => void;
+  onCardAddClick: (initialCard: CardFormInitialState) => void;
   onCardAddClose: () => void;
   onCardMove: (request: CardMoveRequest) => Promise<void>;
   onCardSave: (request: CardEditRequest) => Promise<void>;
@@ -323,7 +323,7 @@ function Sidebar(props: SidebarProps) {
         <CardDetailView
           appSnapshot={appSnapshot}
           card={selectedCard}
-          onAddChildClick={() => onCardAddClick({parentCardId: selectedCard.id})}
+          onAddChildClick={() => onCardAddClick({parentCard: selectedCard})}
           onCardEdit={request => onCardSave({
             ...request,
             createdAt: Instant.now(),
@@ -344,7 +344,7 @@ function Sidebar(props: SidebarProps) {
     return (
       <Pane header="Overview">
         <ToolsView
-          onCardAddClick={() => onCardAddClick({})}
+          onCardAddClick={() => onCardAddClick({parentCard: null})}
           onSettingsClick={onSettingsClick}
           onSubboardClose={
             viewState.selectedSubboardRootId === null

@@ -17,7 +17,7 @@ interface CardsViewProps {
   onCardMoveToAfter: (request: Omit<CardMoveToAfterRequest, "createdAt">) => void;
   onCardMoveToBefore: (request: Omit<CardMoveToBeforeRequest, "createdAt">) => void;
   onCardSelect: (cardId: string | null) => void;
-  onCardAddChildClick: (cardId: string) => void;
+  onCardAddChildClick: (card: Card) => void;
   onSubboardOpen: (subboardRootId: string) => void;
   selectedSubboardRootId: string | null;
 }
@@ -114,7 +114,7 @@ interface CardTreeViewProps {
   cardSelectedId: string | null;
   isRoot: boolean;
   onCardSelect: (cardId: string | null) => void;
-  onCardAddChildClick: (cardId: string) => void;
+  onCardAddChildClick: (card: Card) => void;
   onSubboardOpen: (subboardRootId: string) => void;
 }
 
@@ -148,7 +148,7 @@ function CardTreeView(props: CardTreeViewProps) {
 
   const handleAddChildClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    onCardAddChildClick(card.id);
+    onCardAddChildClick(card);
   };
 
   const isSelected = cardSelectedId === card.id;
@@ -245,7 +245,7 @@ interface CardListProps {
   cardSelectedId: string | null;
   isRoot: boolean;
   onCardSelect: (cardId: string | null) => void;
-  onCardAddChildClick: (cardId: string) => void;
+  onCardAddChildClick: (card: Card) => void;
   onSubboardOpen: (subboardRootId: string) => void;
 }
 

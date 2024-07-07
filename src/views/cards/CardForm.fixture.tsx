@@ -4,11 +4,12 @@ import CardForm, { useCardFormState } from "./CardForm";
 export default {
   Blank() {
     const appSnapshot = initialAppSnapshot();
-    const [state, setState] = useCardFormState({});
+    const [state, setState] = useCardFormState({
+      parentCard: null,
+    });
 
     return (
       <CardForm
-        appSnapshot={appSnapshot}
         allCategories={appSnapshot}
         allColors={appSnapshot}
         errors={[]}

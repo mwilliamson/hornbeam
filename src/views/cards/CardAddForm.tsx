@@ -1,16 +1,16 @@
 import { useState } from "react";
 
-import { CardAddRequest, CardSet } from "../../app/cards";
+import { CardSet } from "../../app/cards";
 import { CategorySet } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
 import { ValidationError } from "../../util/validation";
 import { ValidationErrorsSummaryView } from "../validation-views";
 import Form from "../widgets/Form";
-import CardForm, { ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
+import CardForm, { CardFormInitialState, ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";
 
 interface CardAddFormProps {
   appSnapshot: CardSet & CategorySet & ColorSet;
-  initialValue: Partial<CardAddRequest>;
+  initialValue: CardFormInitialState;
   onCardAdd: (values: ValidCardFormValues) => Promise<void>;
   onClose: () => void;
 }
@@ -36,7 +36,6 @@ export default function CardAddForm(props: CardAddFormProps) {
     <Form onSubmit={handleSubmit}>
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm
-        appSnapshot={appSnapshot}
         allCategories={appSnapshot}
         allColors={appSnapshot}
         errors={errors}

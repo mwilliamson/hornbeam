@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 
-import { CardAddRequest, CardSet, validateCardCategory, validateCardText } from "../../app/cards";
+import { Card, validateCardCategory, validateCardText } from "../../app/cards";
 import { CategorySet } from "../../app/categories";
 import { ValidationError, ValidationResult } from "../../util/validation";
 import CategorySelect from "../categories/CategorySelect";
@@ -11,13 +11,17 @@ import Input from "../widgets/Input";
 import CardParentView from "./CardParentView";
 import { ColorSet } from "../../app/colors";
 
+export type CardFormInitialState = Pick<CardFormState, "parentCard">;
+
 export interface CardFormState {
   controlIds: {
     text: string;
     category: string;
   };
   categoryId: string | null;
-  parentCardId: string | null;
+  // Storing the parent card, rather than just the ID, means it can become
+  // stale, but allows us to have clearly delineated fetch boundaries.
+  parentCard: Card | null;
   text: string;
 }
 
@@ -27,37 +31,35 @@ export interface ValidCardFormValues {
   text: string;
 }
 
-// TODO: Partial<CardAddRequest> isn't quite right in that it allows fields we ignore (notably, the ID)
 export function useCardFormState(
-  card: Partial<CardAddRequest>,
+  initialState: CardFormInitialState,
 ): [CardFormState, (newState: CardFormState) => void] {
   const textControlId = useId();
   const categoryControlId = useId();
 
-  return useState(() => ({
+  return useState((): CardFormState => ({
     controlIds: {
       text: textControlId,
       category: categoryControlId,
     },
-    categoryId: card?.categoryId ?? null,
-    parentCardId: card?.parentCardId ?? null,
-    text: card?.text ?? "",
-  }));
+    categoryId: null,
+    parentCard: initialState.parentCard,
+    text: "",
+  } satisfies CardFormState));
 }
 
 export function validateCardForm(value: CardFormState): ValidationResult<ValidCardFormValues> {
-  const {controlIds, categoryId, parentCardId, text} = value;
+  const {controlIds, categoryId, parentCard, text} = value;
 
   // The order of fields will determine the order of error messages.
   return ValidationResult.flatten({
     text: validateCardText(controlIds.text, text),
     categoryId: validateCardCategory(controlIds.category, categoryId),
-    parentCardId: ValidationResult.valid(parentCardId),
+    parentCardId: ValidationResult.valid(parentCard === null ? null : parentCard.id),
   });
 }
 
 interface CardFormProps {
-  appSnapshot: CardSet;
   allCategories: CategorySet;
   allColors: ColorSet;
   errors: ReadonlyArray<ValidationError>;
@@ -67,7 +69,7 @@ interface CardFormProps {
 }
 
 export default function CardForm(props: CardFormProps) {
-  const {appSnapshot, allCategories, allColors, errors, onStateChange: onChange, state} = props;
+  const {allCategories, allColors, errors, onStateChange: onChange, state} = props;
 
   const {controlIds: {text: textControlId, category: categoryControlId}} = state;
 
@@ -89,7 +91,7 @@ export default function CardForm(props: CardFormProps) {
         Parent
       </ControlLabel>
       <ControlGroup>
-        <CardParentView appSnapshot={appSnapshot} parentCardId={state.parentCardId} />
+        <CardParentView parentCard={state.parentCard} />
       </ControlGroup>
       <ControlLabel>Category</ControlLabel>
       <ControlGroup>

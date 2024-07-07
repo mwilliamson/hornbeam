@@ -168,6 +168,8 @@ interface CardParentPropertyViewProps {
 function CardParentPropertyView(props: CardParentPropertyViewProps) {
   const {appSnapshot, onCardMove, parentCardId, onCardParentSave} = props;
 
+  const parentCard = parentCardId === null ? null : appSnapshot.findCardById(parentCardId);
+
   return (
     <EditableCardPropertyView
       extraControls={
@@ -195,9 +197,8 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
       )}
       renderReadonly={({id}) => (
         <CardParentView
-          appSnapshot={appSnapshot}
           id={id}
-          parentCardId={parentCardId}
+          parentCard={parentCard}
         />
       )}
       validate={(controlId, value) => ValidationResult.valid(value)}

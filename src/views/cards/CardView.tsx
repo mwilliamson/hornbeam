@@ -7,7 +7,7 @@ import "./CardView.scss";
 import CardStatusLabel from "../cardStatuses/CardStatusLabel";
 
 interface CardViewProps {
-  appSnapshot: ColorSet;
+  allColors: ColorSet;
   card: Card;
   cardCategory: Category | null;
   isSelected?: boolean;
@@ -16,12 +16,12 @@ interface CardViewProps {
 }
 
 export default function CardView(props: CardViewProps) {
-  const {appSnapshot, card, cardCategory, isSelected, onClick, onDoubleClick} = props;
+  const {allColors, card, cardCategory, isSelected, onClick, onDoubleClick} = props;
 
   return (
     <div
       className={classNames("CardView", {"CardView--selected": isSelected})}
-      style={categoryBackgroundColorStyle(cardCategory, appSnapshot)}
+      style={categoryBackgroundColorStyle(cardCategory, allColors)}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >

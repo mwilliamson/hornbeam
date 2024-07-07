@@ -27,7 +27,8 @@ import CardView from "./CardView";
 
 interface CardDetailViewProps {
   allCategories: CategorySet;
-  appSnapshot: CardSet & ColorSet & CommentSet;
+  allColors: ColorSet;
+  appSnapshot: CardSet & CommentSet;
   card: Card;
   onAddChildClick: () => void;
   onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
@@ -40,6 +41,7 @@ interface CardDetailViewProps {
 export default function CardDetailView(props: CardDetailViewProps) {
   const {
     allCategories,
+    allColors,
     appSnapshot,
     card,
     onAddChildClick,
@@ -74,7 +76,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Header">
         <div>
           <CardView
-            appSnapshot={appSnapshot}
+            allColors={allColors}
             card={card}
             cardCategory={category}
           />
@@ -91,7 +93,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
         />
         <CardCategoryPropertyView
           allCategories={allCategories}
-          appSnapshot={appSnapshot}
+          allColors={allColors}
           categoryId={card.categoryId}
           onCardCategorySave={handleCardCategorySave}
         />
@@ -211,13 +213,13 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
 
 interface CardCategoryPropertyViewProps {
   allCategories: CategorySet;
-  appSnapshot: ColorSet;
+  allColors: ColorSet;
   categoryId: string;
   onCardCategorySave: (newCategoryId: string) => Promise<void>;
 }
 
 function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
-  const {allCategories, appSnapshot, categoryId, onCardCategorySave} = props;
+  const {allCategories, allColors, categoryId, onCardCategorySave} = props;
 
   const category = allCategories.findCategoryById(categoryId);
   if (category === null) {
@@ -232,7 +234,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
       onSave={onCardCategorySave}
       renderControl={({id, onChange, value}) => (
         <CategorySelect
-          allColors={appSnapshot}
+          allColors={allColors}
           availableCategories={allCategories.availableCategories()}
           id={id}
           onChange={onChange}
@@ -243,7 +245,7 @@ function CardCategoryPropertyView(props: CardCategoryPropertyViewProps) {
         <div className="CardDetailView-CategoryCardContainer" id={id}>
           <div
             className="CardDetailView-CategoryCard"
-            style={categoryBackgroundColorStyle(category, appSnapshot)}
+            style={categoryBackgroundColorStyle(category, allColors)}
           >
             {category.name}
           </div>

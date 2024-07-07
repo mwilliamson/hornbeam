@@ -182,7 +182,7 @@ function CardTreeView(props: CardTreeViewProps) {
             />
           )}
           <CardView
-            appSnapshot={appSnapshot}
+            allColors={appSnapshot}
             card={card}
             cardCategory={appSnapshot.findCategoryById(card.categoryId)}
             isSelected={isSelected && !draggableCard.active}

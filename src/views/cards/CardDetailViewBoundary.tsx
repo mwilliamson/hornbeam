@@ -1,16 +1,14 @@
 import { Instant } from "@js-joda/core";
 import { Card, CardSet } from "../../app/cards";
-import { CategorySet } from "../../app/categories";
-import { ColorSet } from "../../app/colors";
 import { CommentSet } from "../../app/comments";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
-import { allCategoriesQuery } from "../../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 
 interface CardDetailViewBoundaryProps {
-  appSnapshot: CardSet & CategorySet & ColorSet & CommentSet;
+  appSnapshot: CardSet & CommentSet;
   card: Card;
   onAddChildClick: () => void;
   onSubboardOpen: (subboardRootId: string | null) => void;
@@ -24,10 +22,12 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
     <Boundary
       queries={{
         allCategories: allCategoriesQuery,
+        allColors: allColorsQuery,
       }}
-      render={({allCategories}, sendRequest) => (
+      render={({allCategories, allColors}, sendRequest) => (
         <CardDetailView
           allCategories={allCategories}
+          allColors={allColors}
           appSnapshot={appSnapshot}
           card={card}
           onAddChildClick={onAddChildClick}

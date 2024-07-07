@@ -3,7 +3,7 @@ import { uuidv7 } from "uuidv7";
 
 import { initialAppSnapshot } from "../../app/snapshots";
 import CardDetailView from "./CardDetailView";
-import { Card } from "../../app/cards";
+import { Card, generateCardHistory } from "../../app/cards";
 import { CardStatus } from "../../app/cardStatuses";
 
 const appSnapshot = initialAppSnapshot()
@@ -62,6 +62,7 @@ export default (
       allColors={appSnapshot}
       appSnapshot={appSnapshot}
       card={card}
+      cardHistory={generateCardHistory(card, appSnapshot)}
       onAddChildClick={() => {}}
       onCardEdit={() => Promise.resolve()}
       onCardMove={() => Promise.resolve()}

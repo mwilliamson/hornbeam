@@ -9,6 +9,7 @@ import { AppUpdate, AppRequest } from "../app/snapshots";
 import { useEffect, useRef } from "react";
 import { Deferred, createDeferred } from "../util/promises";
 import { AppQuery } from "./queries";
+import { generateCardHistory } from "../app/cards";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;
@@ -78,12 +79,20 @@ export function appStateToQueryFunction(appState: AppState) {
 
   return async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
-      case "allCategories":
+      case "cardHistory": {
+        const card = snapshot.findCardById(query.cardId);
+        const cardHistory = card === null ? [] : generateCardHistory(card, snapshot);
+        return query.proof(cardHistory);
+      }
+      case "allCategories": {
         return query.proof(snapshot);
-      case "availableCategories":
+      }
+      case "availableCategories": {
         return query.proof(snapshot.availableCategories());
-      case "allColors":
+      }
+      case "allColors": {
         return query.proof(snapshot);
+      }
     }
   };
 }

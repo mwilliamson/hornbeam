@@ -20,7 +20,7 @@ export type CardEvent =
 
 export type CardHistory = ReadonlyArray<CardEvent>;
 
-export function cardHistory(card: Card, appSnapshot: CommentSet): CardHistory {
+export function generateCardHistory(card: Card, appSnapshot: CommentSet): CardHistory {
   return [
     {
       type: "created",

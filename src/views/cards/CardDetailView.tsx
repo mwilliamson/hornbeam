@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { CardStatus } from "../../app/cardStatuses";
-import { Card, CardEditRequest, CardEvent, CardSet, cardHistory, validateCardText } from "../../app/cards";
+import { Card, CardEditRequest, CardEvent, CardHistory, CardSet, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
 import { CommentSet } from "../../app/comments";
@@ -30,6 +30,7 @@ interface CardDetailViewProps {
   allColors: ColorSet;
   appSnapshot: CardSet & CommentSet;
   card: Card;
+  cardHistory: CardHistory,
   onAddChildClick: () => void;
   onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
@@ -44,6 +45,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     allColors,
     appSnapshot,
     card,
+    cardHistory,
     onAddChildClick,
     onCardEdit,
     onCardMove,
@@ -117,7 +119,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-History">
         <h3 className="CardDetailView-History-Title">History</h3>
         <div>
-          {cardHistory(card, appSnapshot).map((event, eventIndex) => (
+          {cardHistory.map((event, eventIndex) => (
             <CardEventView key={eventIndex} cardEvent={event} />
           ))}
         </div>

@@ -1,3 +1,4 @@
+import { CardHistory } from "../app/cards";
 import { Category, CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
 
@@ -6,6 +7,13 @@ interface Leibniz<A, B> {
 }
 
 export type AppQuery<R> =
+  // Cards
+  | {
+    readonly type: "cardHistory";
+    readonly proof: Leibniz<CardHistory, R>;
+    readonly cardId: string;
+  }
+  // Categories
   | {
     readonly type: "allCategories";
     readonly proof: Leibniz<CategorySet, R>;
@@ -14,10 +22,19 @@ export type AppQuery<R> =
     readonly type: "availableCategories";
     readonly proof: Leibniz<ReadonlyArray<Category>, R>;
   }
+  // Colors
   | {
     readonly type: "allColors";
     readonly proof: Leibniz<ColorSet, R>;
   };
+
+export function cardHistoryQuery(cardId: string): AppQuery<CardHistory> {
+  return {
+    type: "cardHistory",
+    proof: x => x,
+    cardId,
+  };
+}
 
 export const allCategoriesQuery: AppQuery<CategorySet> = {
   type: "allCategories",

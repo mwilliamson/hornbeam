@@ -3,7 +3,7 @@ import { Card, CardSet } from "../../app/cards";
 import { CommentSet } from "../../app/comments";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
-import { allCategoriesQuery, allColorsQuery } from "../../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery, cardHistoryQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 
@@ -23,13 +23,15 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
       queries={{
         allCategories: allCategoriesQuery,
         allColors: allColorsQuery,
+        cardHistory: cardHistoryQuery(card.id),
       }}
-      render={({allCategories, allColors}, sendRequest) => (
+      render={({allCategories, allColors, cardHistory}, sendRequest) => (
         <CardDetailView
           allCategories={allCategories}
           allColors={allColors}
           appSnapshot={appSnapshot}
           card={card}
+          cardHistory={cardHistory}
           onAddChildClick={onAddChildClick}
           onCardEdit={(request) => sendRequest(requests.cardEdit({
             ...request,

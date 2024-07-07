@@ -48,6 +48,7 @@ export interface CategoryReorderRequest {
 }
 
 export interface CategorySet {
+  allCategories(): ReadonlyArray<Category>;
   availableCategories(): ReadonlyArray<Category>;
   findCategoryById: (categoryId: string) => Category | null;
 }

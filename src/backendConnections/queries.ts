@@ -1,4 +1,4 @@
-import { Category } from "../app/categories";
+import { Category, CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
 
 interface Leibniz<A, B> {
@@ -8,7 +8,7 @@ interface Leibniz<A, B> {
 export type AppQuery<R> =
   | {
     readonly type: "allCategories";
-    readonly proof: Leibniz<ReadonlyArray<Category>, R>;
+    readonly proof: Leibniz<CategorySet, R>;
   }
   | {
     readonly type: "availableCategories";
@@ -19,7 +19,7 @@ export type AppQuery<R> =
     readonly proof: Leibniz<ColorSet, R>;
   };
 
-export const allCategoriesQuery: AppQuery<ReadonlyArray<Category>> = {
+export const allCategoriesQuery: AppQuery<CategorySet> = {
   type: "allCategories",
   proof: x => x,
 };

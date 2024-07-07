@@ -79,7 +79,7 @@ export function appStateToQueryFunction(appState: AppState) {
   return async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
       case "allCategories":
-        return query.proof(snapshot.allCategories());
+        return query.proof(snapshot);
       case "availableCategories":
         return query.proof(snapshot.availableCategories());
       case "allColors":

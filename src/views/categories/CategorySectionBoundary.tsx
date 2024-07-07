@@ -15,7 +15,7 @@ export default function CategorySectionBoundary() {
       }}
       render={({allCategories, allColors}, sendRequest) => (
         <CategorySection
-          categories={allCategories}
+          categories={allCategories.allCategories()}
           allColors={allColors}
           onReorder={async ids => await sendRequest(requests.categoryReorder({
             createdAt: Instant.now(),

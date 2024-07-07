@@ -18,7 +18,9 @@ export type CardEvent =
   | {type: "created", instant: Instant}
   | {type: "comment", instant: Instant, comment: Comment};
 
-export function cardHistory(card: Card, appSnapshot: CommentSet): ReadonlyArray<CardEvent> {
+export type CardHistory = ReadonlyArray<CardEvent>;
+
+export function cardHistory(card: Card, appSnapshot: CommentSet): CardHistory {
   return [
     {
       type: "created",

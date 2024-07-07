@@ -37,6 +37,8 @@ export default function CardAddForm(props: CardAddFormProps) {
       <ValidationErrorsSummaryView errors={errors} />
       <CardForm
         appSnapshot={appSnapshot}
+        allCategories={appSnapshot}
+        allColors={appSnapshot}
         errors={errors}
         onStateChange={value => setFormState(value)}
         state={formState}

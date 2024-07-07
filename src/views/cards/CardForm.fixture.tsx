@@ -9,6 +9,8 @@ export default {
     return (
       <CardForm
         appSnapshot={appSnapshot}
+        allCategories={appSnapshot}
+        allColors={appSnapshot}
         errors={[]}
         onStateChange={state => setState(state)}
         state={state}

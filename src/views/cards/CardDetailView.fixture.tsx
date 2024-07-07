@@ -58,6 +58,7 @@ const card: Card = {
 export default (
   <div style={{border: "1px solid black", width: 400, minHeight: 600}}>
     <CardDetailView
+      allCategories={appSnapshot}
       appSnapshot={appSnapshot}
       card={card}
       onAddChildClick={() => {}}

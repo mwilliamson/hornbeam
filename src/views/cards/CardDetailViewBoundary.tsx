@@ -5,6 +5,7 @@ import { ColorSet } from "../../app/colors";
 import { CommentSet } from "../../app/comments";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
+import { allCategoriesQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 
@@ -21,9 +22,12 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
 
   return (
     <Boundary
-      queries={{}}
-      render={({}, sendRequest) => (
+      queries={{
+        allCategories: allCategoriesQuery,
+      }}
+      render={({allCategories}, sendRequest) => (
         <CardDetailView
+          allCategories={allCategories}
           appSnapshot={appSnapshot}
           card={card}
           onAddChildClick={onAddChildClick}

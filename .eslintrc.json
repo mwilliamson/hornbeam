@@ -45,7 +45,8 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "no-empty-pattern": "off"
     },
     "ignorePatterns": ["src/cosmos.imports.ts"]
 }

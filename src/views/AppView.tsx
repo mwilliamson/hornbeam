@@ -2,9 +2,7 @@ import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
-import { CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
-import { CommentAddRequest } from "../app/comments";
-import { generateId } from "../app/ids";
+import { CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { AppSnapshot, requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
@@ -15,12 +13,12 @@ import TimeTravelSidebar from "./TimeTravelSidebar";
 import TimeTravelSlider from "./TimeTravelSlider";
 import ToolsView from "./ToolsView";
 import CardStatusLabel from "./cardStatuses/CardStatusLabel";
-import CardDetailView from "./cards/CardDetailView";
 import { CardFormInitialState } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
+import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -64,10 +62,6 @@ export default function AppView(props: AppViewProps) {
     setViewState({...viewState, addingCard: null});
   };
 
-  const handleCardMove = async (request: CardMoveRequest) => {
-    await sendRequest(requests.cardMove(request));
-  };
-
   const handleCardMoveToAfter = async (request: Omit<CardMoveToAfterRequest, "createdAt">) => {
     await sendRequest(requests.cardMoveToAfter({
       ...request,
@@ -80,14 +74,6 @@ export default function AppView(props: AppViewProps) {
       ...request,
       createdAt: Instant.now(),
     }));
-  };
-
-  const handleCardSave = async (request: CardEditRequest) => {
-    await sendRequest(requests.cardEdit(request));
-  };
-
-  const handleCommentAdd = async (request: CommentAddRequest) => {
-    await sendRequest(requests.commentAdd(request));
   };
 
   const handleSettingsClick = () => {
@@ -205,9 +191,6 @@ export default function AppView(props: AppViewProps) {
             appSnapshot={snapshot}
             onCardAddClick={handleCardAddClick}
             onCardAddClose={handleCardAddClose}
-            onCardMove={handleCardMove}
-            onCardSave={handleCardSave}
-            onCommentAdd={handleCommentAdd}
             onSettingsClick={handleSettingsClick}
             onSettingsClose={handleSettingsClose}
             onSubboardOpen={handleSubboardOpen}
@@ -231,9 +214,6 @@ interface SidebarProps {
   appSnapshot: AppSnapshot;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onCardAddClose: () => void;
-  onCardMove: (request: CardMoveRequest) => Promise<void>;
-  onCardSave: (request: CardEditRequest) => Promise<void>;
-  onCommentAdd: (request: CommentAddRequest) => Promise<void>;
   onSettingsClick: () => void;
   onSettingsClose: () => void;
   onSubboardOpen: (subboardRootId: string | null) => void;
@@ -247,9 +227,6 @@ function Sidebar(props: SidebarProps) {
     appSnapshot,
     onCardAddClick,
     onCardAddClose,
-    onCardMove,
-    onCardSave,
-    onCommentAdd,
     onSettingsClick,
     onSettingsClose,
     onSubboardOpen,
@@ -261,15 +238,6 @@ function Sidebar(props: SidebarProps) {
   const selectedCard = viewState.selectedCardId === null
     ? null
     : appSnapshot.findCardById(viewState.selectedCardId);
-
-  const handleCommentAdd = async ({cardId, text}: {cardId: string, text: string}) => {
-    await onCommentAdd({
-      cardId,
-      createdAt: Instant.now(),
-      id: generateId(),
-      text,
-    });
-  };
 
   if (viewState.viewSettings) {
     return (
@@ -300,21 +268,10 @@ function Sidebar(props: SidebarProps) {
   } else if (selectedCard !== null) {
     return (
       <Pane header="Selected card">
-        <CardDetailView
+        <CardDetailViewBoundary
           appSnapshot={appSnapshot}
           card={selectedCard}
           onAddChildClick={() => onCardAddClick({parentCard: selectedCard})}
-          onCardEdit={request => onCardSave({
-            ...request,
-            createdAt: Instant.now(),
-            id: selectedCard.id,
-          })}
-          onCardMove={(direction) => onCardMove({
-            createdAt: Instant.now(),
-            direction,
-            id: selectedCard.id,
-          })}
-          onCommentAdd={text => handleCommentAdd({cardId: selectedCard.id, text})}
           onSubboardOpen={onSubboardOpen}
           selectedSubboardRootId={viewState.selectedSubboardRootId}
         />

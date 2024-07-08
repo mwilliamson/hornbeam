@@ -1,4 +1,4 @@
-import { CardHistory } from "../app/cards";
+import { Card, CardHistory } from "../app/cards";
 import { Category, CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
 
@@ -8,6 +8,11 @@ interface Leibniz<A, B> {
 
 export type AppQuery<R> =
   // Cards
+  | {
+    readonly type: "parentCard";
+    readonly proof: Leibniz<Card | null, R>;
+    readonly cardId: string;
+  }
   | {
     readonly type: "cardHistory";
     readonly proof: Leibniz<CardHistory, R>;
@@ -27,6 +32,14 @@ export type AppQuery<R> =
     readonly type: "allColors";
     readonly proof: Leibniz<ColorSet, R>;
   };
+
+export function parentCardQuery(cardId: string): AppQuery<Card | null> {
+  return {
+    type: "parentCard",
+    proof: x => x,
+    cardId,
+  };
+}
 
 export function cardHistoryQuery(cardId: string): AppQuery<CardHistory> {
   return {

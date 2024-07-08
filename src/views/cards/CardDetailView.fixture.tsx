@@ -68,6 +68,7 @@ export default (
       onCardMove={() => Promise.resolve()}
       onCommentAdd={() => Promise.resolve()}
       onSubboardOpen={() => {}}
+      parentCard={null}
       selectedSubboardRootId={null}
     />
   </div>

@@ -36,6 +36,7 @@ interface CardDetailViewProps {
   onCardMove: (direction: "up" | "down") => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
   onSubboardOpen: (subboardRootId: string | null) => void;
+  parentCard: Card | null;
   selectedSubboardRootId: string | null;
 }
 
@@ -51,6 +52,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     onCardMove,
     onCommentAdd,
     onSubboardOpen,
+    parentCard,
     selectedSubboardRootId,
   } = props;
 
@@ -90,7 +92,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <CardParentPropertyView
           appSnapshot={appSnapshot}
           onCardMove={onCardMove}
-          parentCardId={card.parentCardId}
+          parentCard={parentCard}
           onCardParentSave={handleCardParentSave}
         />
         <CardCategoryPropertyView
@@ -168,14 +170,12 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
 interface CardParentPropertyViewProps {
   appSnapshot: CardSet;
   onCardMove: (direction: "up" | "down") => Promise<void>;
-  parentCardId: string | null
+  parentCard: Card | null
   onCardParentSave: (newParentCardId: string | null) => Promise<void>;
 }
 
 function CardParentPropertyView(props: CardParentPropertyViewProps) {
-  const {appSnapshot, onCardMove, parentCardId, onCardParentSave} = props;
-
-  const parentCard = parentCardId === null ? null : appSnapshot.findCardById(parentCardId);
+  const {appSnapshot, onCardMove, parentCard, onCardParentSave} = props;
 
   return (
     <EditableCardPropertyView
@@ -191,7 +191,7 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
           {" "}
         </>
       }
-      initialEditValue={parentCardId}
+      initialEditValue={parentCard === null ? null : parentCard.id}
       label="Parent"
       onSave={onCardParentSave}
       renderControl={({id, onChange, value}) => (

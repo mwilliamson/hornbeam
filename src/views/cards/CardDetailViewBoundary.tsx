@@ -3,7 +3,7 @@ import { Card, CardSet } from "../../app/cards";
 import { CommentSet } from "../../app/comments";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
-import { allCategoriesQuery, allColorsQuery, cardHistoryQuery } from "../../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery, cardHistoryQuery, parentCardQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 
@@ -24,8 +24,9 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
         allCategories: allCategoriesQuery,
         allColors: allColorsQuery,
         cardHistory: cardHistoryQuery(card.id),
+        parentCard: parentCardQuery(card.id),
       }}
-      render={({allCategories, allColors, cardHistory}, sendRequest) => (
+      render={({allCategories, allColors, cardHistory, parentCard}, sendRequest) => (
         <CardDetailView
           allCategories={allCategories}
           allColors={allColors}
@@ -50,6 +51,7 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
             text,
           }))}
           onSubboardOpen={onSubboardOpen}
+          parentCard={parentCard}
           selectedSubboardRootId={selectedSubboardRootId}
         />
       )}

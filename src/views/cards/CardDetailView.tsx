@@ -3,7 +3,6 @@ import { CardStatus } from "../../app/cardStatuses";
 import { Card, CardEditRequest, CardEvent, CardHistory, CardSet, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
-import { CommentSet } from "../../app/comments";
 import assertNever from "../../util/assertNever";
 import pluralize from "../../util/pluralize";
 import { ValidationError, ValidationResult } from "../../util/validation";
@@ -28,7 +27,7 @@ import CardView from "./CardView";
 interface CardDetailViewProps {
   allCategories: CategorySet;
   allColors: ColorSet;
-  appSnapshot: CardSet & CommentSet;
+  appSnapshot: CardSet;
   card: Card;
   cardHistory: CardHistory,
   onAddChildClick: () => void;

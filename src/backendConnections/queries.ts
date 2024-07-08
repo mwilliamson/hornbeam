@@ -14,6 +14,11 @@ export type AppQuery<R> =
     readonly cardId: string;
   }
   | {
+    readonly type: "cardChildCount";
+    readonly proof: Leibniz<number, R>;
+    readonly cardId: string;
+  }
+  | {
     readonly type: "cardHistory";
     readonly proof: Leibniz<CardHistory, R>;
     readonly cardId: string;
@@ -36,6 +41,14 @@ export type AppQuery<R> =
 export function parentCardQuery(cardId: string): AppQuery<Card | null> {
   return {
     type: "parentCard",
+    proof: x => x,
+    cardId,
+  };
+}
+
+export function cardChildCountQuery(cardId: string): AppQuery<number> {
+  return {
+    type: "cardChildCount",
     proof: x => x,
     cardId,
   };

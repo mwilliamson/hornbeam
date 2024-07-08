@@ -79,11 +79,6 @@ export function appStateToQueryFunction(appState: AppState) {
 
   return async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
-      case "cardHistory": {
-        const card = snapshot.findCardById(query.cardId);
-        const cardHistory = card === null ? [] : generateCardHistory(card, snapshot);
-        return query.proof(cardHistory);
-      }
       case "parentCard": {
         const card = snapshot.findCardById(query.cardId);
         if (card === null || card.parentCardId === null) {
@@ -91,6 +86,14 @@ export function appStateToQueryFunction(appState: AppState) {
         }
 
         return query.proof(snapshot.findCardById(card.parentCardId));
+      }
+      case "cardChildCount": {
+        return query.proof(snapshot.countCardChildren(query.cardId));
+      }
+      case "cardHistory": {
+        const card = snapshot.findCardById(query.cardId);
+        const cardHistory = card === null ? [] : generateCardHistory(card, snapshot);
+        return query.proof(cardHistory);
       }
       case "allCategories": {
         return query.proof(snapshot);

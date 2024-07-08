@@ -29,6 +29,7 @@ interface CardDetailViewProps {
   allColors: ColorSet;
   appSnapshot: CardSet;
   card: Card;
+  cardChildCount: number;
   cardHistory: CardHistory,
   onAddChildClick: () => void;
   onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
@@ -45,6 +46,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
     allColors,
     appSnapshot,
     card,
+    cardChildCount,
     cardHistory,
     onAddChildClick,
     onCardEdit,
@@ -105,8 +107,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
           onCardStatusSave={handleCardStatusSave}
         />
         <CardChildrenView
-          appSnapshot={appSnapshot}
-          cardId={card.id}
+          childCount={cardChildCount}
           onAddChildClick={onAddChildClick}
         />
         <CardSubboardView
@@ -288,15 +289,12 @@ function CardStatusPropertyView(props: CardStatusPropertyViewProps) {
 }
 
 interface CardChildrenViewProps {
-  appSnapshot: CardSet;
-  cardId: string;
+  childCount: number;
   onAddChildClick: () => void;
 }
 
 function CardChildrenView(props: CardChildrenViewProps) {
-  const {appSnapshot, cardId, onAddChildClick} = props;
-
-  const childCount = appSnapshot.countCardChildren(cardId);
+  const {childCount, onAddChildClick} = props;
 
   return (
     <>

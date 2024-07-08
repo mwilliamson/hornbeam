@@ -62,6 +62,7 @@ export default (
       allColors={appSnapshot}
       appSnapshot={appSnapshot}
       card={card}
+      cardChildCount={2}
       cardHistory={generateCardHistory(card, appSnapshot)}
       onAddChildClick={() => {}}
       onCardEdit={() => Promise.resolve()}

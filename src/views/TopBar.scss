@@ -7,12 +7,22 @@
   justify-content: space-between;
 }
 
+.TopBar-Left {
+  display: flex;
+  flex-direction: row;
+  gap: spacing.$md;
+}
+
 .TopBar-Title {
   font-size: 1.5rem;
   font-weight: normal;
 }
 
-.TopBar-Controls {
+.TopBar-UpIcon {
+  vertical-align: sub;
+}
+
+.TopBar-Right {
   display: flex;
   flex-direction: row;
   gap: spacing.$md;

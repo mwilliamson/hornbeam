@@ -163,19 +163,36 @@ export default function AppView(props: AppViewProps) {
     ? null
     : snapshot.findCardById(viewState.selectedSubboardRootId);
 
+  const handleBoardUp = viewState.selectedSubboardRootId === null
+    ? undefined
+    : () => {
+      // TODO: extract and test logic
+      // TODO: deselect selected card if not visible on the board?
+      let cardId = viewState.selectedSubboardRootId;
+
+      while (cardId !== null) {
+        const card = snapshot.findCardById(cardId);
+        if (card === null) {
+          cardId = null;
+        } else if (card.isSubboardRoot && cardId !== viewState.selectedSubboardRootId) {
+          break;
+        } else {
+          cardId = card.parentCardId;
+        }
+      }
+
+      handleSubboardOpen(cardId);
+    };
+
   return (
     <div className="AppView">
       <div className="AppView-Top">
         <TopBar
+          onBoardUp={handleBoardUp}
           onCardAddClick={() => handleCardAddClick({
             parentCard: selectedSubboardRoot,
           })}
           onSettingsClick={handleSettingsClick}
-          onSubboardClose={
-            viewState.selectedSubboardRootId === null
-              ? undefined
-              : () => handleSubboardOpen(null)
-          }
           onTimeTravelStart={handleTimeTravelStart}
         />
       </div>

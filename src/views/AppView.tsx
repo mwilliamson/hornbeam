@@ -11,7 +11,6 @@ import CardsView from "./CardsView";
 import SettingsView from "./SettingsView";
 import TimeTravelSidebar from "./TimeTravelSidebar";
 import TimeTravelSlider from "./TimeTravelSlider";
-import ToolsView from "./ToolsView";
 import CardStatusLabel from "./cardStatuses/CardStatusLabel";
 import { CardFormInitialState } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
@@ -19,6 +18,7 @@ import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
+import TopBar from "./TopBar";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -159,51 +159,69 @@ export default function AppView(props: AppViewProps) {
   const cards = snapshot.allCards()
     .filter(card => viewState.cardFilters.cardStatuses.has(card.status));
 
+  const selectedSubboardRoot = viewState.selectedSubboardRootId === null
+    ? null
+    : snapshot.findCardById(viewState.selectedSubboardRootId);
+
   return (
     <div className="AppView">
-      <div className="AppView-Left">
-        <div className="AppView-Cards">
-          <CardsView
-            appSnapshot={appState.latestSnapshot()}
-            cards={cards}
-            cardSelectedId={viewState.selectedCardId}
-            onCardMoveToAfter={handleCardMoveToAfter}
-            onCardMoveToBefore={handleCardMoveToBefore}
-            onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
-            onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
-            onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}
-            selectedSubboardRootId={viewState.selectedSubboardRootId}
-          />
-        </div>
-        {viewState.timeTravelSnapshotIndex !== null && (
-          <div className="AppView-TimeTravelSlider">
-            <TimeTravelSlider
-              currentSnapshotIndex={viewState.timeTravelSnapshotIndex}
-              maxSnapshotIndex={appState.latestSnapshotIndex()}
-              onCurrentSnapshotIndexChange={handleTimeTravelSnapshotIndexChange}
+      <div className="AppView-Top">
+        <TopBar
+          onCardAddClick={() => handleCardAddClick({
+            parentCard: selectedSubboardRoot,
+          })}
+          onSettingsClick={handleSettingsClick}
+          onSubboardClose={
+            viewState.selectedSubboardRootId === null
+              ? undefined
+              : () => handleSubboardOpen(null)
+          }
+          onTimeTravelStart={handleTimeTravelStart}
+        />
+      </div>
+      <div className="AppView-Bottom">
+        <div className="AppView-Left">
+          <div className="AppView-Cards">
+            <CardsView
+              appSnapshot={appState.latestSnapshot()}
+              cards={cards}
+              cardSelectedId={viewState.selectedCardId}
+              onCardMoveToAfter={handleCardMoveToAfter}
+              onCardMoveToBefore={handleCardMoveToBefore}
+              onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
+              onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
+              onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}
+              selectedSubboardRootId={viewState.selectedSubboardRootId}
             />
           </div>
-        )}
-      </div>
-      <div className="AppView-Sidebar">
-        <div className="AppView-Sidebar-Main">
-          <Sidebar
-            appSnapshot={snapshot}
-            onCardAddClick={handleCardAddClick}
-            onCardAddClose={handleCardAddClose}
-            onSettingsClick={handleSettingsClick}
-            onSettingsClose={handleSettingsClose}
-            onSubboardOpen={handleSubboardOpen}
-            onTimeTravelStart={handleTimeTravelStart}
-            onTimeTravelStop={handleTimeTravelStop}
-            viewState={viewState}
-          />
+          {viewState.timeTravelSnapshotIndex !== null && (
+            <div className="AppView-TimeTravelSlider">
+              <TimeTravelSlider
+                currentSnapshotIndex={viewState.timeTravelSnapshotIndex}
+                maxSnapshotIndex={appState.latestSnapshotIndex()}
+                onCurrentSnapshotIndexChange={handleTimeTravelSnapshotIndexChange}
+              />
+            </div>
+          )}
         </div>
-        <div className="AppView-Sidebar-CardFilters">
-          <CardFiltersView
-            cardFilters={viewState.cardFilters}
-            onCardFiltersChange={handleCardFiltersChange}
-          />
+        <div className="AppView-Sidebar">
+          <div className="AppView-Sidebar-Main">
+            <Sidebar
+              appSnapshot={snapshot}
+              onCardAddClick={handleCardAddClick}
+              onCardAddClose={handleCardAddClose}
+              onSettingsClose={handleSettingsClose}
+              onSubboardOpen={handleSubboardOpen}
+              onTimeTravelStop={handleTimeTravelStop}
+              viewState={viewState}
+            />
+          </div>
+          <div className="AppView-Sidebar-CardFilters">
+            <CardFiltersView
+              cardFilters={viewState.cardFilters}
+              onCardFiltersChange={handleCardFiltersChange}
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -214,10 +232,8 @@ interface SidebarProps {
   appSnapshot: AppSnapshot;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onCardAddClose: () => void;
-  onSettingsClick: () => void;
   onSettingsClose: () => void;
   onSubboardOpen: (subboardRootId: string | null) => void;
-  onTimeTravelStart: () => void;
   onTimeTravelStop: () => void;
   viewState: ViewState;
 }
@@ -227,10 +243,8 @@ function Sidebar(props: SidebarProps) {
     appSnapshot,
     onCardAddClick,
     onCardAddClose,
-    onSettingsClick,
     onSettingsClose,
     onSubboardOpen,
-    onTimeTravelStart,
     onTimeTravelStop,
     viewState,
   } = props;
@@ -278,20 +292,7 @@ function Sidebar(props: SidebarProps) {
       </Pane>
     );
   } else {
-    return (
-      <Pane header="Overview">
-        <ToolsView
-          onCardAddClick={() => onCardAddClick({parentCard: null})}
-          onSettingsClick={onSettingsClick}
-          onSubboardClose={
-            viewState.selectedSubboardRootId === null
-              ? undefined
-              : () => onSubboardOpen(null)
-          }
-          onTimeTravelStart={onTimeTravelStart}
-        />
-      </Pane>
-    );
+    return null;
   }
 }
 

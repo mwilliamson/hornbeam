@@ -11,6 +11,7 @@
   overflow: auto;
   padding: spacing.$md;
   user-select: none;
+  background-color: #dcdcdc;
 }
 
 @mixin CardsView-CardsRow {

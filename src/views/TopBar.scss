@@ -1,0 +1,19 @@
+@use "../scss/spacing";
+
+.TopBar {
+  padding: spacing.$sm spacing.$md;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.TopBar-Title {
+  font-size: 1.5rem;
+  font-weight: normal;
+}
+
+.TopBar-Controls {
+  display: flex;
+  flex-direction: row;
+  gap: spacing.$md;
+}

@@ -1,4 +1,4 @@
-import { FolderUpIcon } from "lucide-react";
+import { FolderUpIcon, SettingsIcon } from "lucide-react";
 
 import Button from "./widgets/Button";
 import "./TopBar.scss";
@@ -26,7 +26,7 @@ export default function TopBar(props: TopBarProps) {
           onClick={onBoardUp}
           disabled={onBoardUp === undefined}
         >
-          <FolderUpIcon className="TopBar-UpIcon" size={18} /> Up
+          <FolderUpIcon className="TopBar-Icon" size={18} /> Up
         </Button>
       </div>
 
@@ -45,7 +45,7 @@ export default function TopBar(props: TopBarProps) {
 
         <div>
           <Button type="button" intent="secondary" onClick={onSettingsClick}>
-            Settings
+            <SettingsIcon className="TopBar-Icon" size={18} /> Settings
           </Button>
         </div>
       </div>

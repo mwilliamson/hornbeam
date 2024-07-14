@@ -1,4 +1,4 @@
-import { FolderUpIcon, SettingsIcon } from "lucide-react";
+import { FolderUpIcon, SettingsIcon, SquarePlusIcon } from "lucide-react";
 
 import Button from "./widgets/Button";
 import "./TopBar.scss";
@@ -33,7 +33,7 @@ export default function TopBar(props: TopBarProps) {
       <div className="TopBar-Right">
         <div>
           <Button type="button" intent="secondary" onClick={onCardAddClick}>
-            Add card
+            <SquarePlusIcon className="TopBar-Icon" size={18} /> Add card
           </Button>
         </div>
 

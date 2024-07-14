@@ -176,6 +176,19 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.cards.find(card => card.id == cardId) ?? null;
   }
 
+  public searchCards(query: string): ReadonlyArray<Card> {
+    query = query.toLowerCase();
+
+    return this.cards.filter(card => {
+      // TODO: include numbers
+      // TODO: prefer shorter matches
+      // TODO: prefer match at start of text
+      // TODO: normalise text
+      // TODO: tokenize
+      return card.text.toLowerCase().includes(query);
+    });
+  }
+
   public findCategoryById(categoryId: string): Category | null {
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }

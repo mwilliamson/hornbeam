@@ -1,4 +1,4 @@
-import ReactSelect from "react-select";
+import AsyncSelect from "react-select/async";
 
 import { Card, CardSet } from "../../app/cards";
 
@@ -15,12 +15,13 @@ export default function CardSelect(props: CardSelectProps) {
   const selectedCard = value === null ? null : appSnapshot.findCardById(value);
 
   return (
-    <ReactSelect<Card>
+    <AsyncSelect<Card>
+      cacheOptions
       getOptionLabel={card => `${card.text} (#${card.number})`}
       getOptionValue={card => card.id}
       id={id}
+      loadOptions={query => Promise.resolve(appSnapshot.searchCards(query))}
       onChange={value => onChange(value === null ? null : value.id)}
-      options={appSnapshot.allCards()}
       value={selectedCard}
     />
   );

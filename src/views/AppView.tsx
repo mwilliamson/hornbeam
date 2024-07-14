@@ -3,7 +3,7 @@ import { useEffect, useId, useState } from "react";
 
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
 import { CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
-import { AppSnapshot, requests } from "../app/snapshots";
+import { requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import "./AppView.scss";
@@ -224,7 +224,6 @@ export default function AppView(props: AppViewProps) {
         <div className="AppView-Sidebar">
           <div className="AppView-Sidebar-Main">
             <Sidebar
-              appSnapshot={snapshot}
               onCardAddClick={handleCardAddClick}
               onCardAddClose={handleCardAddClose}
               onSettingsClose={handleSettingsClose}
@@ -245,7 +244,6 @@ export default function AppView(props: AppViewProps) {
 }
 
 interface SidebarProps {
-  appSnapshot: AppSnapshot;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onCardAddClose: () => void;
   onSettingsClose: () => void;
@@ -255,7 +253,6 @@ interface SidebarProps {
 
 function Sidebar(props: SidebarProps) {
   const {
-    appSnapshot,
     onCardAddClick,
     onCardAddClose,
     onSettingsClose,
@@ -284,7 +281,6 @@ function Sidebar(props: SidebarProps) {
     return (
       <Pane header="Selected card">
         <CardDetailViewBoundary
-          appSnapshot={appSnapshot}
           cardId={viewState.selectedCardId}
           onCardAddClick={onCardAddClick}
           onSubboardOpen={onSubboardOpen}

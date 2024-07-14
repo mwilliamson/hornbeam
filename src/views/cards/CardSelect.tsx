@@ -1,18 +1,16 @@
 import AsyncSelect from "react-select/async";
 
-import { Card, CardSet } from "../../app/cards";
+import { Card, CardSearcher } from "../../app/cards";
 
 interface CardSelectProps {
-  appSnapshot: CardSet;
+  cardSearcher: CardSearcher;
   id: string;
-  onChange: (value: string | null) => void;
-  value: string | null;
+  onChange: (value: Card | null) => void;
+  value: Card | null;
 }
 
 export default function CardSelect(props: CardSelectProps) {
-  const {appSnapshot, id, onChange, value} = props;
-
-  const selectedCard = value === null ? null : appSnapshot.findCardById(value);
+  const {cardSearcher, id, onChange, value} = props;
 
   return (
     <AsyncSelect<Card>
@@ -20,9 +18,9 @@ export default function CardSelect(props: CardSelectProps) {
       getOptionLabel={card => `${card.text} (#${card.number})`}
       getOptionValue={card => card.id}
       id={id}
-      loadOptions={query => Promise.resolve(appSnapshot.searchCards(query))}
-      onChange={value => onChange(value === null ? null : value.id)}
-      value={selectedCard}
+      loadOptions={query => cardSearcher.searchCards(query)}
+      onChange={value => onChange(value)}
+      value={value}
     />
   );
 }

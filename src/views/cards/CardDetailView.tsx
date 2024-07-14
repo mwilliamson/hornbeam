@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { CardStatus } from "../../app/cardStatuses";
-import { Card, CardEditRequest, CardEvent, CardHistory, CardSet, validateCardText } from "../../app/cards";
+import { Card, CardEditRequest, CardEvent, CardHistory, CardSearcher, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
 import { ColorSet } from "../../app/colors";
 import assertNever from "../../util/assertNever";
@@ -27,10 +27,10 @@ import CardView from "./CardView";
 interface CardDetailViewProps {
   allCategories: CategorySet;
   allColors: ColorSet;
-  appSnapshot: CardSet;
   card: Card;
   cardChildCount: number;
   cardHistory: CardHistory,
+  cardSearcher: CardSearcher,
   onAddChildClick: () => void;
   onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
@@ -44,10 +44,10 @@ export default function CardDetailView(props: CardDetailViewProps) {
   const {
     allCategories,
     allColors,
-    appSnapshot,
     card,
     cardChildCount,
     cardHistory,
+    cardSearcher,
     onAddChildClick,
     onCardEdit,
     onCardMove,
@@ -91,7 +91,7 @@ export default function CardDetailView(props: CardDetailViewProps) {
       <div className="CardDetailView-Properties">
         <CardTextPropertyView card={card} onCardTextSave={handleCardTextSave} />
         <CardParentPropertyView
-          appSnapshot={appSnapshot}
+          cardSearcher={cardSearcher}
           onCardMove={onCardMove}
           parentCard={parentCard}
           onCardParentSave={handleCardParentSave}
@@ -168,14 +168,14 @@ function CardTextPropertyView(props: CardTextPropertyViewProps) {
 }
 
 interface CardParentPropertyViewProps {
-  appSnapshot: CardSet;
+  cardSearcher: CardSearcher;
   onCardMove: (direction: "up" | "down") => Promise<void>;
   parentCard: Card | null
   onCardParentSave: (newParentCardId: string | null) => Promise<void>;
 }
 
 function CardParentPropertyView(props: CardParentPropertyViewProps) {
-  const {appSnapshot, onCardMove, parentCard, onCardParentSave} = props;
+  const {cardSearcher, onCardMove, parentCard, onCardParentSave} = props;
 
   return (
     <EditableCardPropertyView
@@ -191,12 +191,12 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
           {" "}
         </>
       }
-      initialEditValue={parentCard === null ? null : parentCard.id}
+      initialEditValue={parentCard}
       label="Parent"
       onSave={onCardParentSave}
       renderControl={({id, onChange, value}) => (
         <CardSelect
-          appSnapshot={appSnapshot}
+          cardSearcher={cardSearcher}
           id={id}
           onChange={onChange}
           value={value}
@@ -208,7 +208,7 @@ function CardParentPropertyView(props: CardParentPropertyViewProps) {
           parentCard={parentCard}
         />
       )}
-      validate={(controlId, value) => ValidationResult.valid(value)}
+      validate={(controlId, value) => ValidationResult.valid(value === null ? null : value.id)}
     />
   );
 }

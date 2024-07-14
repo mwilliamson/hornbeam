@@ -1,14 +1,12 @@
 import { Instant } from "@js-joda/core";
-import { CardSet } from "../../app/cards";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
-import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery } from "../../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, cardSearcherQuery, parentCardQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 import { CardFormInitialState } from "./CardForm";
 
 interface CardDetailViewBoundaryProps {
-  appSnapshot: CardSet;
   cardId: string;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onSubboardOpen: (subboardRootId: string | null) => void;
@@ -16,7 +14,7 @@ interface CardDetailViewBoundaryProps {
 }
 
 export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProps) {
-  const {appSnapshot, cardId, onCardAddClick, onSubboardOpen, selectedSubboardRootId} = props;
+  const {cardId, onCardAddClick, onSubboardOpen, selectedSubboardRootId} = props;
 
   return (
     <Boundary
@@ -26,6 +24,7 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
         card: cardQuery(cardId),
         cardChildCount: cardChildCountQuery(cardId),
         cardHistory: cardHistoryQuery(cardId),
+        cardSearcher: cardSearcherQuery,
         parentCard: parentCardQuery(cardId),
       }}
       render={(
@@ -35,6 +34,7 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
           card,
           cardChildCount,
           cardHistory,
+          cardSearcher,
           parentCard,
         },
         sendRequest
@@ -43,10 +43,10 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
         <CardDetailView
           allCategories={allCategories}
           allColors={allColors}
-          appSnapshot={appSnapshot}
           card={card}
           cardChildCount={cardChildCount}
           cardHistory={cardHistory}
+          cardSearcher={cardSearcher}
           onAddChildClick={() => onCardAddClick({parentCard: card})}
           onCardEdit={(request) => sendRequest(requests.cardEdit({
             ...request,

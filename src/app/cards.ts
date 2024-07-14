@@ -130,5 +130,8 @@ export interface CardSet {
   allCards: () => ReadonlyArray<Card>;
   countCardChildren: (cardId: string) => number;
   findCardById: (cardId: string) => Card | null;
-  searchCards: (query: string) => ReadonlyArray<Card>;
+}
+
+export interface CardSearcher {
+  searchCards: (query: string) => Promise<ReadonlyArray<Card>>;
 }

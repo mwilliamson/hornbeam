@@ -98,6 +98,13 @@ export function appStateToQueryFunction(appState: AppState) {
         const cardHistory = card === null ? [] : generateCardHistory(card, snapshot);
         return query.proof(cardHistory);
       }
+      case "cardSearcher": {
+        return query.proof({
+          searchCards: async (query: string) => {
+            return snapshot.searchCards(query);
+          }
+        });
+      }
       case "allCategories": {
         return query.proof(snapshot);
       }

@@ -1,4 +1,4 @@
-import { Card, CardHistory } from "../app/cards";
+import { Card, CardHistory, CardSearcher } from "../app/cards";
 import { Category, CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
 
@@ -27,6 +27,10 @@ export type AppQuery<R> =
     readonly type: "cardHistory";
     readonly proof: Leibniz<CardHistory, R>;
     readonly cardId: string;
+  }
+  | {
+    readonly type: "cardSearcher";
+    readonly proof: Leibniz<CardSearcher, R>;
   }
   // Categories
   | {
@@ -74,6 +78,11 @@ export function cardHistoryQuery(cardId: string): AppQuery<CardHistory> {
     cardId,
   };
 }
+
+export const cardSearcherQuery: AppQuery<CardSearcher> = {
+  type: "cardSearcher",
+  proof: x => x,
+};
 
 export const allCategoriesQuery: AppQuery<CategorySet> = {
   type: "allCategories",

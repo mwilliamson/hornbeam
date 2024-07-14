@@ -60,10 +60,10 @@ export default (
     <CardDetailView
       allCategories={appSnapshot}
       allColors={appSnapshot}
-      appSnapshot={appSnapshot}
       card={card}
       cardChildCount={2}
       cardHistory={generateCardHistory(card, appSnapshot)}
+      cardSearcher={{searchCards: async (query: string) => appSnapshot.searchCards(query)}}
       onAddChildClick={() => {}}
       onCardEdit={() => Promise.resolve()}
       onCardMove={() => Promise.resolve()}

@@ -2,10 +2,16 @@
 
 .TimeTravelSlider {
   background-color: #fff;
-  padding: spacing.$md;
+  padding: spacing.$sm spacing.$md;
   display: flex;
   flex-direction: row;
   gap: spacing.$md;
+
+  & > * {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 }
 
 .TimeTravelSlider-Label {

@@ -9,6 +9,7 @@ export default {
         currentSnapshotIndex={snapshotIndex}
         maxSnapshotIndex={20}
         onCurrentSnapshotIndexChange={newSnapshotIndex => setSnapshotIndex(newSnapshotIndex)}
+        onTimeTravelStop={() => console.log("Time travel stop")}
       />
     );
   },

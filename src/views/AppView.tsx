@@ -9,7 +9,6 @@ import isInputEvent from "../util/isInputEvent";
 import "./AppView.scss";
 import CardsView from "./CardsView";
 import SettingsView from "./SettingsView";
-import TimeTravelSidebar from "./TimeTravelSidebar";
 import TimeTravelSlider from "./TimeTravelSlider";
 import CardStatusLabel from "./cardStatuses/CardStatusLabel";
 import { CardFormInitialState } from "./cards/CardForm";
@@ -217,6 +216,7 @@ export default function AppView(props: AppViewProps) {
                 currentSnapshotIndex={viewState.timeTravelSnapshotIndex}
                 maxSnapshotIndex={appState.latestSnapshotIndex()}
                 onCurrentSnapshotIndexChange={handleTimeTravelSnapshotIndexChange}
+                onTimeTravelStop={handleTimeTravelStop}
               />
             </div>
           )}
@@ -229,7 +229,6 @@ export default function AppView(props: AppViewProps) {
               onCardAddClose={handleCardAddClose}
               onSettingsClose={handleSettingsClose}
               onSubboardOpen={handleSubboardOpen}
-              onTimeTravelStop={handleTimeTravelStop}
               viewState={viewState}
             />
           </div>
@@ -251,7 +250,6 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onSettingsClose: () => void;
   onSubboardOpen: (subboardRootId: string | null) => void;
-  onTimeTravelStop: () => void;
   viewState: ViewState;
 }
 
@@ -262,7 +260,6 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onSettingsClose,
     onSubboardOpen,
-    onTimeTravelStop,
     viewState,
   } = props;
 
@@ -275,15 +272,6 @@ function Sidebar(props: SidebarProps) {
       <Pane header="Settings">
         <SettingsView
           onBack={onSettingsClose}
-        />
-      </Pane>
-    );
-  } else if (viewState.timeTravelSnapshotIndex !== null) {
-    return (
-      <Pane header="Time travel">
-        <TimeTravelSidebar
-          onTimeTravelStop={onTimeTravelStop}
-          timeTravelSnapshotIndex={viewState.timeTravelSnapshotIndex}
         />
       </Pane>
     );

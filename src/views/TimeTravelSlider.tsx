@@ -1,15 +1,17 @@
 import { useId } from "react";
 
 import "./TimeTravelSlider.scss";
+import Button from "./widgets/Button";
 
 interface TimeTravelSliderProps {
   currentSnapshotIndex: number;
   maxSnapshotIndex: number;
   onCurrentSnapshotIndexChange: (snapshotIndex: number) => void;
+  onTimeTravelStop: () => void;
 }
 
 export default function TimeTravelSlider(props: TimeTravelSliderProps) {
-  const {currentSnapshotIndex, maxSnapshotIndex, onCurrentSnapshotIndexChange} = props;
+  const {currentSnapshotIndex, maxSnapshotIndex, onCurrentSnapshotIndexChange, onTimeTravelStop} = props;
 
   const sliderId = useId();
 
@@ -28,6 +30,12 @@ export default function TimeTravelSlider(props: TimeTravelSliderProps) {
           min={0}
           max={maxSnapshotIndex}
         />
+      </div>
+
+      <div>
+        <Button type="button" intent="secondary" onClick={onTimeTravelStop}>
+          Stop
+        </Button>
       </div>
     </div>
   );

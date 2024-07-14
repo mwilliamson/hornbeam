@@ -79,6 +79,9 @@ export function appStateToQueryFunction(appState: AppState) {
 
   return async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
+      case "card": {
+        return query.proof(snapshot.findCardById(query.cardId));
+      }
       case "parentCard": {
         const card = snapshot.findCardById(query.cardId);
         if (card === null || card.parentCardId === null) {

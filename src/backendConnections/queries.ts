@@ -9,6 +9,11 @@ interface Leibniz<A, B> {
 export type AppQuery<R> =
   // Cards
   | {
+    readonly type: "card";
+    readonly proof: Leibniz<Card | null, R>;
+    readonly cardId: string;
+  }
+  | {
     readonly type: "parentCard";
     readonly proof: Leibniz<Card | null, R>;
     readonly cardId: string;
@@ -37,6 +42,14 @@ export type AppQuery<R> =
     readonly type: "allColors";
     readonly proof: Leibniz<ColorSet, R>;
   };
+
+export function cardQuery(cardId: string): AppQuery<Card | null> {
+  return {
+    type: "card",
+    proof: x => x,
+    cardId,
+  };
+}
 
 export function parentCardQuery(cardId: string): AppQuery<Card | null> {
   return {

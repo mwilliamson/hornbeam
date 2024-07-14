@@ -263,10 +263,6 @@ function Sidebar(props: SidebarProps) {
     viewState,
   } = props;
 
-  const selectedCard = viewState.selectedCardId === null
-    ? null
-    : appSnapshot.findCardById(viewState.selectedCardId);
-
   if (viewState.viewSettings) {
     return (
       <Pane header="Settings">
@@ -284,13 +280,13 @@ function Sidebar(props: SidebarProps) {
         />
       </Pane>
     );
-  } else if (selectedCard !== null) {
+  } else if (viewState.selectedCardId !== null) {
     return (
       <Pane header="Selected card">
         <CardDetailViewBoundary
           appSnapshot={appSnapshot}
-          card={selectedCard}
-          onAddChildClick={() => onCardAddClick({parentCard: selectedCard})}
+          cardId={viewState.selectedCardId}
+          onCardAddClick={onCardAddClick}
           onSubboardOpen={onSubboardOpen}
           selectedSubboardRootId={viewState.selectedSubboardRootId}
         />

@@ -1,33 +1,46 @@
 import { Instant } from "@js-joda/core";
-import { Card, CardSet } from "../../app/cards";
+import { CardSet } from "../../app/cards";
 import { CommentSet } from "../../app/comments";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
-import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, parentCardQuery } from "../../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
+import { CardFormInitialState } from "./CardForm";
 
 interface CardDetailViewBoundaryProps {
   appSnapshot: CardSet & CommentSet;
-  card: Card;
-  onAddChildClick: () => void;
+  cardId: string;
+  onCardAddClick: (initialCard: CardFormInitialState) => void;
   onSubboardOpen: (subboardRootId: string | null) => void;
   selectedSubboardRootId: string | null;
 }
 
 export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProps) {
-  const {appSnapshot, card, onAddChildClick, onSubboardOpen, selectedSubboardRootId} = props;
+  const {appSnapshot, cardId, onCardAddClick, onSubboardOpen, selectedSubboardRootId} = props;
 
   return (
     <Boundary
       queries={{
         allCategories: allCategoriesQuery,
         allColors: allColorsQuery,
-        cardChildCount: cardChildCountQuery(card.id),
-        cardHistory: cardHistoryQuery(card.id),
-        parentCard: parentCardQuery(card.id),
+        card: cardQuery(cardId),
+        cardChildCount: cardChildCountQuery(cardId),
+        cardHistory: cardHistoryQuery(cardId),
+        parentCard: parentCardQuery(cardId),
       }}
-      render={({allCategories, allColors, cardChildCount, cardHistory, parentCard}, sendRequest) => (
+      render={(
+        {
+          allCategories,
+          allColors,
+          card,
+          cardChildCount,
+          cardHistory,
+          parentCard,
+        },
+        sendRequest
+      // TODO: handle null card
+      ) => card === null ? null : (
         <CardDetailView
           allCategories={allCategories}
           allColors={allColors}
@@ -35,7 +48,7 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
           card={card}
           cardChildCount={cardChildCount}
           cardHistory={cardHistory}
-          onAddChildClick={onAddChildClick}
+          onAddChildClick={() => onCardAddClick({parentCard: card})}
           onCardEdit={(request) => sendRequest(requests.cardEdit({
             ...request,
             createdAt: Instant.now(),

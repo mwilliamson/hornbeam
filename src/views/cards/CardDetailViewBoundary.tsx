@@ -1,6 +1,5 @@
 import { Instant } from "@js-joda/core";
 import { CardSet } from "../../app/cards";
-import { CommentSet } from "../../app/comments";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
 import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery } from "../../backendConnections/queries";
@@ -9,7 +8,7 @@ import CardDetailView from "./CardDetailView";
 import { CardFormInitialState } from "./CardForm";
 
 interface CardDetailViewBoundaryProps {
-  appSnapshot: CardSet & CommentSet;
+  appSnapshot: CardSet;
   cardId: string;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onSubboardOpen: (subboardRootId: string | null) => void;

@@ -2,7 +2,6 @@ import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
-import { CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
@@ -59,20 +58,6 @@ export default function AppView(props: AppViewProps) {
 
   const handleCardAddClose = () => {
     setViewState({...viewState, addingCard: null});
-  };
-
-  const handleCardMoveToAfter = async (request: Omit<CardMoveToAfterRequest, "createdAt">) => {
-    await sendRequest(requests.cardMoveToAfter({
-      ...request,
-      createdAt: Instant.now(),
-    }));
-  };
-
-  const handleCardMoveToBefore = async (request: Omit<CardMoveToBeforeRequest, "createdAt">) => {
-    await sendRequest(requests.cardMoveToBefore({
-      ...request,
-      createdAt: Instant.now(),
-    }));
   };
 
   const handleSettingsClick = () => {
@@ -201,8 +186,6 @@ export default function AppView(props: AppViewProps) {
             <CardsViewBoundary
               cards={cards}
               cardSelectedId={viewState.selectedCardId}
-              onCardMoveToAfter={handleCardMoveToAfter}
-              onCardMoveToBefore={handleCardMoveToBefore}
               onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
               onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
               onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}

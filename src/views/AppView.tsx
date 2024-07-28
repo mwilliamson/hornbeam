@@ -7,7 +7,7 @@ import { requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import "./AppView.scss";
-import CardsView from "./CardsView";
+import CardsViewBoundary from "./CardsViewBoundary";
 import SettingsView from "./SettingsView";
 import TimeTravelSlider from "./TimeTravelSlider";
 import CardStatusLabel from "./cardStatuses/CardStatusLabel";
@@ -198,8 +198,7 @@ export default function AppView(props: AppViewProps) {
       <div className="AppView-Bottom">
         <div className="AppView-Left">
           <div className="AppView-Cards">
-            <CardsView
-              appSnapshot={appState.latestSnapshot()}
+            <CardsViewBoundary
               cards={cards}
               cardSelectedId={viewState.selectedCardId}
               onCardMoveToAfter={handleCardMoveToAfter}

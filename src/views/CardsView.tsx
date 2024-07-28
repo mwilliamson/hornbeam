@@ -12,7 +12,8 @@ import classNames from "classnames";
 import assertNever from "../util/assertNever";
 
 interface CardsViewProps {
-  appSnapshot: CategorySet & ColorSet;
+  allCategories: CategorySet;
+  allColors: ColorSet;
   cards: ReadonlyArray<Card>;
   cardSelectedId: string | null;
   onCardMoveToAfter: (request: Omit<CardMoveToAfterRequest, "createdAt">) => void;
@@ -25,7 +26,8 @@ interface CardsViewProps {
 
 export default function CardsView(props: CardsViewProps) {
   const {
-    appSnapshot,
+    allCategories,
+    allColors,
     cards,
     cardSelectedId,
     onCardMoveToAfter,
@@ -93,7 +95,8 @@ export default function CardsView(props: CardsViewProps) {
       <div className="CardsView">
         <div className="CardsView-Cards" onClick={() => onCardSelect(null)}>
           <CardList
-            appSnapshot={appSnapshot}
+            allCategories={allCategories}
+            allColors={allColors}
             cardTrees={cardTrees}
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
@@ -109,7 +112,8 @@ export default function CardsView(props: CardsViewProps) {
 }
 
 interface CardTreeViewProps {
-  appSnapshot: CategorySet & ColorSet;
+  allCategories: CategorySet;
+  allColors: ColorSet;
   cardTree: CardTree;
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
@@ -121,7 +125,8 @@ interface CardTreeViewProps {
 
 function CardTreeView(props: CardTreeViewProps) {
   const {
-    appSnapshot,
+    allCategories,
+    allColors,
     cardTree,
     cardTops,
     cardSelectedId,
@@ -188,9 +193,9 @@ function CardTreeView(props: CardTreeViewProps) {
             />
           )}
           <CardView
-            allColors={appSnapshot}
+            allColors={allColors}
             card={card}
-            cardCategory={appSnapshot.findCategoryById(card.categoryId)}
+            cardCategory={allCategories.findCategoryById(card.categoryId)}
             isSelected={isSelected && !draggableCard.active}
             onClick={handleCardClick}
             onDoubleClick={handleCardDoubleClick}
@@ -240,7 +245,8 @@ function CardTreeView(props: CardTreeViewProps) {
             parentCard={card}
           />
           <CardList
-            appSnapshot={appSnapshot}
+            allCategories={allCategories}
+            allColors={allColors}
             cardTrees={cardTree.children}
             cardTops={cardTops}
             cardSelectedId={cardSelectedId}
@@ -256,7 +262,8 @@ function CardTreeView(props: CardTreeViewProps) {
 }
 
 interface CardListProps {
-  appSnapshot: CategorySet & ColorSet;
+  allCategories: CategorySet;
+  allColors: ColorSet;
   cardTrees: ReadonlyArray<CardTree>;
   cardTops: {[cardId: string]: number};
   cardSelectedId: string | null;
@@ -268,7 +275,8 @@ interface CardListProps {
 
 function CardList(props: CardListProps) {
   const {
-    appSnapshot,
+    allCategories,
+    allColors,
     cardTrees,
     cardTops,
     cardSelectedId,
@@ -283,7 +291,8 @@ function CardList(props: CardListProps) {
       {cardTrees.map(cardTree => (
         <CardTreeView
           key={cardTree.card.id}
-          appSnapshot={appSnapshot}
+          allCategories={allCategories}
+          allColors={allColors}
           cardTree={cardTree}
           cardTops={cardTops}
           cardSelectedId={cardSelectedId}

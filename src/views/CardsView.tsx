@@ -1,4 +1,5 @@
 import { DndContext, DragEndEvent, PointerSensor, closestCorners, useDraggable, useDroppable, useSensor, useSensors } from "@dnd-kit/core";
+import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
 import { CardTree, cardsToTrees } from "../app/cardTrees";
@@ -151,6 +152,11 @@ function CardTreeView(props: CardTreeViewProps) {
     onCardAddChildClick(card);
   };
 
+  const handleOpenSubboard = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    onSubboardOpen(card.id);
+  };
+
   const isSelected = cardSelectedId === card.id;
 
   const isDroppable = (
@@ -200,15 +206,26 @@ function CardTreeView(props: CardTreeViewProps) {
           )}
         </div>
         {isSelected && (
-          <div className="CardsView-AddChildContainer">
-            <button
-              type="button"
-              aria-label="Add child"
-              className="CardsView-AddChild"
-              onClick={handleAddChildClick}
-            >
-              +
-            </button>
+          <div className="CardsView-ChildButtonContainer">
+            {card.isSubboardRoot && !isRoot ? (
+              <button
+                type="button"
+                aria-label="Open subboard"
+                className="CardsView-ChildButton"
+                onClick={handleOpenSubboard}
+              >
+                <ArrowRightIcon size={14} className="CardsView-ChildButtonIcon" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                aria-label="Add child"
+                className="CardsView-ChildButton"
+                onClick={handleAddChildClick}
+              >
+                <PlusIcon size={14} className="CardsView-ChildButtonIcon" />
+              </button>
+            )}
           </div>
         )}
       </div>

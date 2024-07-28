@@ -45,11 +45,11 @@
   align-items: center;
 }
 
-.CardsView-AddChildContainer {
+.CardsView-ChildButtonContainer {
   position: relative;
 }
 
-.CardsView-AddChild {
+.CardsView-ChildButton {
   @include buttons.button-reset;
 
   font-size: 14px;
@@ -58,10 +58,17 @@
   height: 40px;
   width: 24px;
   background-color: #edf2f7;
-  text-align: center;
   border: 1px solid #666;
   border-left: none;
   border-radius: 0 0.5em 0.5em 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.CardsView-ChildButtonIcon {
+  display: block;
 }
 
 .CardsView-CardList {

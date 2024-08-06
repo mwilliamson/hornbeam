@@ -14,10 +14,10 @@ import { CardFormInitialState } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
+import { parentBoardQuery } from "../backendConnections/queries";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
-import TopBar from "./TopBar";
-import { parentBoardQuery } from "../backendConnections/queries";
+import TopBarBoundary from "./TopBarBoundary";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -138,14 +138,6 @@ export default function AppView(props: AppViewProps) {
     };
   }, [viewState.selectedCardId, sendRequest]);
 
-  const snapshot = viewState.timeTravelSnapshotIndex === null
-    ? appState.latestSnapshot()
-    : appState.snapshot(viewState.timeTravelSnapshotIndex);
-
-  const selectedSubboardRoot = viewState.selectedSubboardRootId === null
-    ? null
-    : snapshot.findCardById(viewState.selectedSubboardRootId);
-
   const handleBoardUp = viewState.selectedSubboardRootId === null
     ? undefined
     : async () => {
@@ -161,13 +153,12 @@ export default function AppView(props: AppViewProps) {
   return (
     <div className="AppView">
       <div className="AppView-Top">
-        <TopBar
+        <TopBarBoundary
           onBoardUp={handleBoardUp}
-          onCardAddClick={() => handleCardAddClick({
-            parentCard: selectedSubboardRoot,
-          })}
+          onCardAddClick={handleCardAddClick}
           onSettingsClick={handleSettingsClick}
           onTimeTravelStart={handleTimeTravelStart}
+          subboardRootId={viewState.selectedSubboardRootId}
         />
       </div>
       <div className="AppView-Bottom">

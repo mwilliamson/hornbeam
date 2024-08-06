@@ -1,4 +1,5 @@
 import { Instant } from "@js-joda/core";
+import { BoardId } from "../../app/boards";
 import { generateId } from "../../app/ids";
 import { requests } from "../../app/snapshots";
 import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, cardSearcherQuery, parentCardQuery } from "../../backendConnections/queries";
@@ -9,12 +10,12 @@ import { CardFormInitialState } from "./CardForm";
 interface CardDetailViewBoundaryProps {
   cardId: string;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
-  onSubboardOpen: (subboardRootId: string | null) => void;
-  selectedSubboardRootId: string | null;
+  onBoardOpen: (boardId: BoardId) => void;
+  selectedBoardId: BoardId;
 }
 
 export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProps) {
-  const {cardId, onCardAddClick, onSubboardOpen, selectedSubboardRootId} = props;
+  const {cardId, onCardAddClick, onBoardOpen, selectedBoardId} = props;
 
   return (
     <Boundary
@@ -64,9 +65,9 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
             id: generateId(),
             text,
           }))}
-          onSubboardOpen={onSubboardOpen}
+          onBoardOpen={onBoardOpen}
           parentCard={parentCard}
-          selectedSubboardRootId={selectedSubboardRootId}
+          selectedBoardId={selectedBoardId}
         />
       )}
     />

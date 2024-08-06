@@ -2,6 +2,7 @@ import { groupBy, partition } from "lodash";
 
 import { mapNotNull } from "../util/arrays";
 import { Card } from "./cards";
+import { BoardId } from "./boards";
 
 export interface CardTree {
   card: Card;
@@ -10,7 +11,7 @@ export interface CardTree {
 
 export function cardsToTrees(
   cards: ReadonlyArray<Card>,
-  selectedSubboardRootId: string | null,
+  boardId: BoardId,
 ): ReadonlyArray<CardTree> {
   const [topLevelCards, nonTopLevelCards] = partition(
     cards,
@@ -34,9 +35,9 @@ export function cardsToTrees(
     return (cardsByParentId[card.id] ?? []).map(cardToTree);
   };
 
-  const selectedSubboardRoot = selectedSubboardRootId === null
+  const selectedSubboardRoot = boardId.boardRootId === null
     ? null
-    : cards.find(card => card.isSubboardRoot && card.id === selectedSubboardRootId) ?? null;
+    : cards.find(card => card.isSubboardRoot && card.id === boardId.boardRootId) ?? null;
 
   if (selectedSubboardRoot === null) {
     return mapNotNull(topLevelCards, cardToTree);

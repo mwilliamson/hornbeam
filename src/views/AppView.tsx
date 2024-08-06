@@ -1,6 +1,7 @@
 import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
+import { BoardId, isRootBoardId, rootBoardId } from "../app/boards";
 import { CardStatus, allCardStatuses } from "../app/cardStatuses";
 import { requests } from "../app/snapshots";
 import "../scss/style.scss";
@@ -27,7 +28,7 @@ interface ViewState {
   addingCard: CardFormInitialState | null,
   cardFilters: CardFilters;
   selectedCardId: string | null;
-  selectedSubboardRootId: string | null;
+  selectedBoardId: BoardId;
   viewSettings: boolean;
 }
 
@@ -37,7 +38,7 @@ const initialViewState: ViewState = {
     cardStatuses: new Set(allCardStatuses.filter(cardStatus => cardStatus !== CardStatus.Deleted)),
   },
   selectedCardId: null,
-  selectedSubboardRootId: null,
+  selectedBoardId: rootBoardId,
   viewSettings: false,
 };
 
@@ -94,10 +95,10 @@ export default function AppView(props: AppViewProps) {
     });
   };
 
-  const handleSubboardOpen = (subboardRootId: string | null) => {
+  const handleBoardOpen = (boardId: BoardId) => {
     setViewState({
       ...viewState,
-      selectedSubboardRootId: subboardRootId,
+      selectedBoardId: boardId,
     });
   };
 
@@ -128,16 +129,16 @@ export default function AppView(props: AppViewProps) {
     };
   }, [viewState.selectedCardId, sendRequest]);
 
-  const handleBoardUp = viewState.selectedSubboardRootId === null
+  const handleBoardUp = isRootBoardId(viewState.selectedBoardId)
     ? undefined
     : async () => {
-      if (viewState.selectedSubboardRootId === null) {
+      if (isRootBoardId(viewState.selectedBoardId)) {
         return;
       }
       // TODO: deselect selected card if not visible on the board?
-      const query = parentBoardQuery(viewState.selectedSubboardRootId);
-      const parentBoardRootId = await backendConnection.query(query);
-      handleSubboardOpen(parentBoardRootId);
+      const query = parentBoardQuery(viewState.selectedBoardId);
+      const parentBoardId = await backendConnection.query(query);
+      handleBoardOpen(parentBoardId);
     };
 
   return (
@@ -148,7 +149,7 @@ export default function AppView(props: AppViewProps) {
           onCardAddClick={handleCardAddClick}
           onSettingsClick={handleSettingsClick}
           onTimeTravelStart={handleTimeTravelStart}
-          subboardRootId={viewState.selectedSubboardRootId}
+          boardId={viewState.selectedBoardId}
         />
       </div>
       <div className="AppView-Bottom">
@@ -158,8 +159,8 @@ export default function AppView(props: AppViewProps) {
               cardSelectedId={viewState.selectedCardId}
               onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
               onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
-              onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}
-              selectedSubboardRootId={viewState.selectedSubboardRootId}
+              onBoardOpen={(boardId) => setViewState({...viewState, selectedBoardId: boardId})}
+              selectedBoardId={viewState.selectedBoardId}
               visibleCardStatuses={viewState.cardFilters.cardStatuses}
             />
           </div>
@@ -180,7 +181,7 @@ export default function AppView(props: AppViewProps) {
               onCardAddClick={handleCardAddClick}
               onCardAddClose={handleCardAddClose}
               onSettingsClose={handleSettingsClose}
-              onSubboardOpen={handleSubboardOpen}
+              onBoardOpen={handleBoardOpen}
               viewState={viewState}
             />
           </div>
@@ -200,7 +201,7 @@ interface SidebarProps {
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onCardAddClose: () => void;
   onSettingsClose: () => void;
-  onSubboardOpen: (subboardRootId: string | null) => void;
+  onBoardOpen: (boardId: BoardId) => void;
   viewState: ViewState;
 }
 
@@ -209,7 +210,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClick,
     onCardAddClose,
     onSettingsClose,
-    onSubboardOpen,
+    onBoardOpen,
     viewState,
   } = props;
 
@@ -236,8 +237,8 @@ function Sidebar(props: SidebarProps) {
         <CardDetailViewBoundary
           cardId={viewState.selectedCardId}
           onCardAddClick={onCardAddClick}
-          onSubboardOpen={onSubboardOpen}
-          selectedSubboardRootId={viewState.selectedSubboardRootId}
+          onBoardOpen={onBoardOpen}
+          selectedBoardId={viewState.selectedBoardId}
         />
       </Pane>
     );

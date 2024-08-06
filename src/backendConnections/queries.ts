@@ -1,3 +1,4 @@
+import { BoardId } from "../app/boards";
 import { Card, CardHistory, CardSearcher } from "../app/cards";
 import { CardStatus } from "../app/cardStatuses";
 import { CardTree } from "../app/cardTrees";
@@ -38,12 +39,12 @@ export type AppQuery<R> =
     readonly type: "boardCardTrees";
     readonly proof: Leibniz<ReadonlyArray<CardTree>, R>;
     readonly cardStatuses: ReadonlySet<CardStatus>;
-    readonly subboardRootId: string | null;
+    readonly boardId: BoardId;
   }
   | {
     readonly type: "parentBoard";
-    readonly proof: Leibniz<string | null, R>;
-    readonly subboardRootId: string;
+    readonly proof: Leibniz<BoardId, R>;
+    readonly boardId: BoardId;
   }
   // Categories
   | {
@@ -99,24 +100,24 @@ export const cardSearcherQuery: AppQuery<CardSearcher> = {
 
 export function boardCardTreesQuery({
   cardStatuses,
-  subboardRootId,
+  boardId,
 }: {
   readonly cardStatuses: ReadonlySet<CardStatus>;
-  readonly subboardRootId: string | null;
+  readonly boardId: BoardId;
 }): AppQuery<ReadonlyArray<CardTree>> {
   return {
     type: "boardCardTrees",
     proof: x => x,
     cardStatuses,
-    subboardRootId,
+    boardId,
   };
 }
 
-export function parentBoardQuery(subboardRootId: string): AppQuery<string | null> {
+export function parentBoardQuery(boardId: BoardId): AppQuery<BoardId> {
   return {
     type: "parentBoard",
     proof: x => x,
-    subboardRootId,
+    boardId,
   };
 }
 

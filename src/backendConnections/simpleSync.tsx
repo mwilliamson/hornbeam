@@ -11,6 +11,7 @@ import { Deferred, createDeferred } from "../util/promises";
 import { AppQuery } from "./queries";
 import { generateCardHistory } from "../app/cards";
 import { cardsToTrees } from "../app/cardTrees";
+import { cardSubboardId, rootBoardId } from "../app/boards";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;
@@ -119,23 +120,23 @@ export function appStateToQueryFunction(appState: AppState, timeTravelSnapshotIn
         const cards = snapshot.allCards()
           .filter(card => query.cardStatuses.has(card.status));
 
-        return query.proof(cardsToTrees(cards, query.subboardRootId));
+        return query.proof(cardsToTrees(cards, query.boardId));
       }
       case "parentBoard": {
-        let cardId: string | null = query.subboardRootId;
+        let cardId: string | null = query.boardId.boardRootId;
 
         while (cardId !== null) {
           const card = snapshot.findCardById(cardId);
           if (card === null) {
             cardId = null;
-          } else if (card.isSubboardRoot && cardId !== query.subboardRootId) {
+          } else if (card.isSubboardRoot && cardId !== query.boardId.boardRootId) {
             break;
           } else {
             cardId = card.parentCardId;
           }
         }
 
-        return query.proof(cardId);
+        return query.proof(cardId === null ? rootBoardId : cardSubboardId(cardId));
       }
       case "allCategories": {
         return query.proof(snapshot);

@@ -2,6 +2,7 @@ import { DndContext, DragEndEvent, PointerSensor, closestCorners, useDraggable, 
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
+import { BoardId, cardSubboardId } from "../app/boards";
 import { CardTree } from "../app/cardTrees";
 import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CategorySet } from "../app/categories";
@@ -20,7 +21,7 @@ interface CardsViewProps {
   onCardMoveToBefore: (request: Omit<CardMoveToBeforeRequest, "createdAt">) => void;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
-  onSubboardOpen: (subboardRootId: string) => void;
+  onBoardOpen: (boardId: BoardId) => void;
 }
 
 export default function CardsView(props: CardsViewProps) {
@@ -33,7 +34,7 @@ export default function CardsView(props: CardsViewProps) {
     onCardMoveToBefore,
     onCardSelect,
     onCardAddChildClick,
-    onSubboardOpen,
+    onBoardOpen,
   } = props;
 
   const cardTops = calculateCardTops(cardTrees);
@@ -99,7 +100,7 @@ export default function CardsView(props: CardsViewProps) {
             isRoot
             onCardSelect={onCardSelect}
             onCardAddChildClick={onCardAddChildClick}
-            onSubboardOpen={onSubboardOpen}
+            onBoardOpen={onBoardOpen}
           />
         </div>
       </div>
@@ -116,7 +117,7 @@ interface CardTreeViewProps {
   isRoot: boolean;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
-  onSubboardOpen: (subboardRootId: string) => void;
+  onBoardOpen: (boardId: BoardId) => void;
 }
 
 function CardTreeView(props: CardTreeViewProps) {
@@ -129,7 +130,7 @@ function CardTreeView(props: CardTreeViewProps) {
     isRoot,
     onCardSelect,
     onCardAddChildClick,
-    onSubboardOpen,
+    onBoardOpen,
   } = props;
 
   const {card} = cardTree;
@@ -144,7 +145,7 @@ function CardTreeView(props: CardTreeViewProps) {
   const handleCardDoubleClick = (event: React.MouseEvent) => {
     if (card.isSubboardRoot) {
       event.stopPropagation();
-      onSubboardOpen(card.id);
+      onBoardOpen(cardSubboardId(card.id));
     }
   };
 
@@ -153,9 +154,9 @@ function CardTreeView(props: CardTreeViewProps) {
     onCardAddChildClick(card);
   };
 
-  const handleOpenSubboard = (event: React.MouseEvent) => {
+  const handleOpenBoard = (event: React.MouseEvent) => {
     event.stopPropagation();
-    onSubboardOpen(card.id);
+    onBoardOpen(cardSubboardId(card.id));
   };
 
   const isSelected = cardSelectedId === card.id;
@@ -213,7 +214,7 @@ function CardTreeView(props: CardTreeViewProps) {
                 type="button"
                 aria-label="Open subboard"
                 className="CardsView-ChildButton"
-                onClick={handleOpenSubboard}
+                onClick={handleOpenBoard}
               >
                 <ArrowRightIcon size={14} className="CardsView-ChildButtonIcon" />
               </button>
@@ -249,7 +250,7 @@ function CardTreeView(props: CardTreeViewProps) {
             isRoot={false}
             onCardSelect={onCardSelect}
             onCardAddChildClick={onCardAddChildClick}
-            onSubboardOpen={onSubboardOpen}
+            onBoardOpen={onBoardOpen}
           />
         </>
       )}
@@ -266,7 +267,7 @@ interface CardListProps {
   isRoot: boolean;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
-  onSubboardOpen: (subboardRootId: string) => void;
+  onBoardOpen: (boardId: BoardId) => void;
 }
 
 function CardList(props: CardListProps) {
@@ -279,7 +280,7 @@ function CardList(props: CardListProps) {
     isRoot,
     onCardSelect,
     onCardAddChildClick,
-    onSubboardOpen,
+    onBoardOpen,
   } = props;
 
   return (
@@ -295,7 +296,7 @@ function CardList(props: CardListProps) {
           isRoot={isRoot}
           onCardSelect={onCardSelect}
           onCardAddChildClick={onCardAddChildClick}
-          onSubboardOpen={onSubboardOpen}
+          onBoardOpen={onBoardOpen}
         />
       ))}
     </div>

@@ -1,3 +1,4 @@
+import { BoardId } from "../app/boards";
 import { cardQuery } from "../backendConnections/queries";
 import Boundary from "./Boundary";
 import { CardFormInitialState } from "./cards/CardForm";
@@ -8,7 +9,7 @@ interface TopBarBoundaryProps {
   onCardAddClick: (cardFormInitialState: CardFormInitialState) => void;
   onSettingsClick: () => void;
   onTimeTravelStart: () => void;
-  subboardRootId: string | null;
+  boardId: BoardId;
 }
 
 export default function TopBarBoundary(props: TopBarBoundaryProps) {
@@ -17,19 +18,19 @@ export default function TopBarBoundary(props: TopBarBoundaryProps) {
     onCardAddClick,
     onSettingsClick,
     onTimeTravelStart,
-    subboardRootId,
+    boardId,
   } = props;
 
   return (
     <Boundary
       queries={{
         // TODO: remove this terrible hack
-        subboardRoot: cardQuery(subboardRootId ?? "")
+        boardRoot: cardQuery(boardId.boardRootId ?? "")
       }}
-      render={({subboardRoot}) => (
+      render={({boardRoot}) => (
         <TopBar
           onBoardUp={onBoardUp}
-          onCardAddClick={() => onCardAddClick({parentCard: subboardRoot})}
+          onCardAddClick={() => onCardAddClick({parentCard: boardRoot})}
           onSettingsClick={onSettingsClick}
           onTimeTravelStart={onTimeTravelStart}
         />

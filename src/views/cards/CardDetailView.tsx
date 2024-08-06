@@ -1,4 +1,5 @@
 import { useId, useState } from "react";
+import { BoardId, cardSubboardId, isCardSubboardId, rootBoardId } from "../../app/boards";
 import { CardStatus } from "../../app/cardStatuses";
 import { Card, CardEditRequest, CardEvent, CardHistory, CardSearcher, validateCardText } from "../../app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "../../app/categories";
@@ -35,9 +36,9 @@ interface CardDetailViewProps {
   onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
-  onSubboardOpen: (subboardRootId: string | null) => void;
+  onBoardOpen: (boardId: BoardId) => void;
   parentCard: Card | null;
-  selectedSubboardRootId: string | null;
+  selectedBoardId: BoardId;
 }
 
 export default function CardDetailView(props: CardDetailViewProps) {
@@ -52,9 +53,9 @@ export default function CardDetailView(props: CardDetailViewProps) {
     onCardEdit,
     onCardMove,
     onCommentAdd,
-    onSubboardOpen,
+    onBoardOpen,
     parentCard,
-    selectedSubboardRootId,
+    selectedBoardId,
   } = props;
 
   const category = allCategories.findCategoryById(card.categoryId);
@@ -113,8 +114,8 @@ export default function CardDetailView(props: CardDetailViewProps) {
         <CardSubboardView
           card={card}
           onCardIsSubboardRootSave={handleCardIsSubboardRootSave}
-          onSubboardOpen={onSubboardOpen}
-          selectedSubboardRootId={selectedSubboardRootId}
+          onBoardOpen={onBoardOpen}
+          selectedBoardId={selectedBoardId}
         />
       </div>
 
@@ -317,12 +318,12 @@ function CardChildrenView(props: CardChildrenViewProps) {
 interface CardIsSubboardRootViewProps {
   card: Card;
   onCardIsSubboardRootSave: (isSubboardRoot: boolean) => Promise<void>;
-  onSubboardOpen: (subboardRootId: string | null) => void;
-  selectedSubboardRootId: string | null;
+  onBoardOpen: (boardId: BoardId) => void;
+  selectedBoardId: BoardId;
 }
 
 function CardSubboardView(props: CardIsSubboardRootViewProps) {
-  const {card, onCardIsSubboardRootSave, onSubboardOpen, selectedSubboardRootId} = props;
+  const {card, onCardIsSubboardRootSave, onBoardOpen, selectedBoardId} = props;
 
   const handleEnableSubboard = () =>
     onCardIsSubboardRootSave(true);
@@ -351,13 +352,16 @@ function CardSubboardView(props: CardIsSubboardRootViewProps) {
       </ControlGroup>
 
       {card.isSubboardRoot && (
+        // TODO: closing the subboard should bring you to the parent. Or perhaps
+        // we just remove thus altogether and leave opening the subboard to the
+        // rest of the UI?
         <ControlGroup>
-          {selectedSubboardRootId === card.id ? (
+          {isCardSubboardId(selectedBoardId, card.id) ? (
             <Button
               type="button"
               fullWidth
               intent="secondary"
-              onClick={() => onSubboardOpen(null)}
+              onClick={() => onBoardOpen(rootBoardId)}
             >
               Close subboard
             </Button>
@@ -366,7 +370,7 @@ function CardSubboardView(props: CardIsSubboardRootViewProps) {
               type="button"
               fullWidth
               intent="secondary"
-              onClick={() => onSubboardOpen(card.id)}
+              onClick={() => onBoardOpen(cardSubboardId(card.id))}
             >
               Open subboard
             </Button>

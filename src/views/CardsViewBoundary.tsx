@@ -1,17 +1,18 @@
 import { Instant } from "@js-joda/core";
+import { BoardId } from "../app/boards";
 import { Card } from "../app/cards";
+import { CardStatus } from "../app/cardStatuses";
 import { requests } from "../app/snapshots";
 import { allCategoriesQuery, allColorsQuery, boardCardTreesQuery } from "../backendConnections/queries";
 import Boundary from "./Boundary";
 import CardsView from "./CardsView";
-import { CardStatus } from "../app/cardStatuses";
 
 interface CardsViewBoundaryProps {
   cardSelectedId: string | null;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
-  onSubboardOpen: (subboardRootId: string) => void;
-  selectedSubboardRootId: string | null;
+  onBoardOpen: (boardId: BoardId) => void;
+  selectedBoardId: BoardId;
   visibleCardStatuses: ReadonlySet<CardStatus>;
 }
 
@@ -20,8 +21,8 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
     cardSelectedId,
     onCardSelect,
     onCardAddChildClick,
-    onSubboardOpen,
-    selectedSubboardRootId,
+    onBoardOpen,
+    selectedBoardId,
     visibleCardStatuses,
   } = props;
 
@@ -32,7 +33,7 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
         allColors: allColorsQuery,
         boardCardTrees: boardCardTreesQuery({
           cardStatuses: visibleCardStatuses,
-          subboardRootId: selectedSubboardRootId,
+          boardId: selectedBoardId,
         }),
       }}
       render={({allCategories, allColors, boardCardTrees: boardCards}, sendRequest) => (
@@ -55,7 +56,7 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
           }}
           onCardSelect={onCardSelect}
           onCardAddChildClick={onCardAddChildClick}
-          onSubboardOpen={onSubboardOpen}
+          onBoardOpen={onBoardOpen}
         />
       )}
     />

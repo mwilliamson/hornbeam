@@ -5,6 +5,7 @@ import { initialAppSnapshot } from "../../app/snapshots";
 import CardDetailView from "./CardDetailView";
 import { Card, generateCardHistory } from "../../app/cards";
 import { CardStatus } from "../../app/cardStatuses";
+import { rootBoardId } from "../../app/boards";
 
 const appSnapshot = initialAppSnapshot()
   .categoryAdd({
@@ -68,9 +69,9 @@ export default (
       onCardEdit={() => Promise.resolve()}
       onCardMove={() => Promise.resolve()}
       onCommentAdd={() => Promise.resolve()}
-      onSubboardOpen={() => {}}
+      onBoardOpen={() => {}}
       parentCard={null}
-      selectedSubboardRootId={null}
+      selectedBoardId={rootBoardId}
     />
   </div>
 );

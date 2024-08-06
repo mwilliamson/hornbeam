@@ -29,7 +29,6 @@ export function ConnectInMemory(props: ConnectInMemoryProps) {
 
   // TODO: ensure connection doesn't change.
   const connection: BackendConnection = {
-    appState,
     query: appStateToQueryFunction(appState, timeTravelSnapshotIndex),
     sendRequest,
     timeTravel: {

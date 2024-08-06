@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 
-import { AppState } from "../app";
 import { AppRequest } from "../app/snapshots";
 import { AppQuery } from "./queries";
 
@@ -20,7 +19,6 @@ export type BackendConnectionState =
   };
 
 export interface BackendConnection {
-  appState: AppState;
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
 

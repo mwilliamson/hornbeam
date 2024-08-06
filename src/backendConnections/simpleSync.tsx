@@ -60,7 +60,6 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
 
   // TODO: ensure connection doesn't change.
   const connection: BackendConnection = {
-    appState,
     query,
     sendRequest,
     timeTravel: {

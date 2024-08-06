@@ -31,6 +31,7 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
   const [queryState, setQueryState] = useState<QueryState<QueryData>>({type: "idle"});
 
   // TODO: more efficient querying instead of clearing on `queries` change?
+  // TODO: deep comparison for queries?
   useEffect(() => {
     const id = nextQueryLoadId++;
     setQueryState({type: "loading", id});

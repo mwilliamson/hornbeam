@@ -40,6 +40,11 @@ export type AppQuery<R> =
     readonly cardStatuses: ReadonlySet<CardStatus>;
     readonly subboardRootId: string | null;
   }
+  | {
+    readonly type: "parentBoard";
+    readonly proof: Leibniz<string | null, R>;
+    readonly subboardRootId: string;
+  }
   // Categories
   | {
     readonly type: "allCategories";
@@ -103,6 +108,14 @@ export function boardCardTreesQuery({
     type: "boardCardTrees",
     proof: x => x,
     cardStatuses,
+    subboardRootId,
+  };
+}
+
+export function parentBoardQuery(subboardRootId: string): AppQuery<string | null> {
+  return {
+    type: "parentBoard",
+    proof: x => x,
     subboardRootId,
   };
 }

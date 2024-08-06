@@ -17,6 +17,7 @@ import { BackendConnection } from "../backendConnections";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
 import TopBar from "./TopBar";
+import { parentBoardQuery } from "../backendConnections/queries";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -48,7 +49,8 @@ interface AppViewProps {
 }
 
 export default function AppView(props: AppViewProps) {
-  const {backendConnection: {appState, sendRequest}} = props;
+  const {backendConnection} = props;
+  const {appState, sendRequest} = backendConnection;
 
   const [viewState, setViewState] = useState(initialViewState);
 
@@ -146,23 +148,14 @@ export default function AppView(props: AppViewProps) {
 
   const handleBoardUp = viewState.selectedSubboardRootId === null
     ? undefined
-    : () => {
-      // TODO: extract and test logic
-      // TODO: deselect selected card if not visible on the board?
-      let cardId = viewState.selectedSubboardRootId;
-
-      while (cardId !== null) {
-        const card = snapshot.findCardById(cardId);
-        if (card === null) {
-          cardId = null;
-        } else if (card.isSubboardRoot && cardId !== viewState.selectedSubboardRootId) {
-          break;
-        } else {
-          cardId = card.parentCardId;
-        }
+    : async () => {
+      if (viewState.selectedSubboardRootId === null) {
+        return;
       }
-
-      handleSubboardOpen(cardId);
+      // TODO: deselect selected card if not visible on the board?
+      const query = parentBoardQuery(viewState.selectedSubboardRootId);
+      const parentBoardRootId = await backendConnection.query(query);
+      handleSubboardOpen(parentBoardRootId);
     };
 
   return (

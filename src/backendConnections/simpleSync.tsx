@@ -112,6 +112,22 @@ export function appStateToQueryFunction(appState: AppState) {
 
         return query.proof(cardsToTrees(cards, query.subboardRootId));
       }
+      case "parentBoard": {
+        let cardId: string | null = query.subboardRootId;
+
+        while (cardId !== null) {
+          const card = snapshot.findCardById(cardId);
+          if (card === null) {
+            cardId = null;
+          } else if (card.isSubboardRoot && cardId !== query.subboardRootId) {
+            break;
+          } else {
+            cardId = card.parentCardId;
+          }
+        }
+
+        return query.proof(cardId);
+      }
       case "allCategories": {
         return query.proof(snapshot);
       }

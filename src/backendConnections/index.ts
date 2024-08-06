@@ -23,6 +23,14 @@ export interface BackendConnection {
   appState: AppState;
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
+
+  timeTravel: {
+    maxSnapshotIndex: number;
+    snapshotIndex: number | null;
+    setSnapshotIndex: (timeTravelSnapshotIndex: number | null) => void;
+    start: () => void;
+    stop: () => void;
+  };
 }
 
 export type SendRequest = (update: AppRequest) => Promise<void>;

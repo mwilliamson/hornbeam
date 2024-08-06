@@ -6,7 +6,7 @@ import { AppState, applyAppUpdate, initialAppState } from "../app";
 import { deserializeAppUpdate, serializeAppUpdate } from "../serialization";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
 import { AppUpdate, AppRequest } from "../app/snapshots";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Deferred, createDeferred } from "../util/promises";
 import { AppQuery } from "./queries";
 import { generateCardHistory } from "../app/cards";
@@ -53,14 +53,23 @@ interface ConnectedSimpleSyncProps {
 function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   const {appState, children, sendAppUpdate} = props;
 
-  const query = appStateToQueryFunction(appState);
+  const [timeTravelSnapshotIndex, setTimeTravelSnapshotIndex] = useState<number | null>(null);
+  const query = appStateToQueryFunction(appState, timeTravelSnapshotIndex);
   const sendRequest = useCreateSendRequest(sendAppUpdate, appState.updateIds);
+
 
   // TODO: ensure connection doesn't change.
   const connection: BackendConnection = {
     appState,
     query,
     sendRequest,
+    timeTravel: {
+      maxSnapshotIndex: appState.latestSnapshotIndex(),
+      snapshotIndex: timeTravelSnapshotIndex,
+      setSnapshotIndex: newSnapshotIndex => setTimeTravelSnapshotIndex(newSnapshotIndex),
+      start: () => setTimeTravelSnapshotIndex(appState.latestSnapshotIndex()),
+      stop: () => setTimeTravelSnapshotIndex(null),
+    },
   };
 
   return (
@@ -74,9 +83,10 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
 }
 
 // TODO: extract to common module?
-export function appStateToQueryFunction(appState: AppState) {
-  // TODO: time travel
-  const snapshot = appState.latestSnapshot();
+export function appStateToQueryFunction(appState: AppState, timeTravelSnapshotIndex: number | null) {
+  const snapshot = timeTravelSnapshotIndex === null
+    ? appState.latestSnapshot()
+    : appState.snapshot(timeTravelSnapshotIndex);
 
   return async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {

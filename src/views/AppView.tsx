@@ -28,8 +28,6 @@ interface ViewState {
   cardFilters: CardFilters;
   selectedCardId: string | null;
   selectedSubboardRootId: string | null;
-  // TODO: should probably be a union (e.g. can't add a card and time travel at the same time)
-  timeTravelSnapshotIndex: number | null;
   viewSettings: boolean;
 }
 
@@ -40,7 +38,6 @@ const initialViewState: ViewState = {
   },
   selectedCardId: null,
   selectedSubboardRootId: null,
-  timeTravelSnapshotIndex: null,
   viewSettings: false,
 };
 
@@ -50,7 +47,7 @@ interface AppViewProps {
 
 export default function AppView(props: AppViewProps) {
   const {backendConnection} = props;
-  const {appState, sendRequest} = backendConnection;
+  const {sendRequest, timeTravel} = backendConnection;
 
   const [viewState, setViewState] = useState(initialViewState);
 
@@ -76,25 +73,18 @@ export default function AppView(props: AppViewProps) {
     });
   };
 
+  // TODO: prevent actions when time travelling
+
   const handleTimeTravelStart = () => {
-    setViewState({
-      ...viewState,
-      timeTravelSnapshotIndex: appState.latestSnapshotIndex(),
-    });
+    timeTravel.start();
   };
 
   const handleTimeTravelStop = () => {
-    setViewState({
-      ...viewState,
-      timeTravelSnapshotIndex: null,
-    });
+    timeTravel.stop();
   };
 
   const handleTimeTravelSnapshotIndexChange = (newSnapshotIndex: number) => {
-    setViewState({
-      ...viewState,
-      timeTravelSnapshotIndex: newSnapshotIndex,
-    });
+    timeTravel.setSnapshotIndex(newSnapshotIndex);
   };
 
   const handleCardFiltersChange = (newCardFilters: CardFilters) => {
@@ -173,11 +163,11 @@ export default function AppView(props: AppViewProps) {
               visibleCardStatuses={viewState.cardFilters.cardStatuses}
             />
           </div>
-          {viewState.timeTravelSnapshotIndex !== null && (
+          {timeTravel.snapshotIndex !== null && (
             <div className="AppView-TimeTravelSlider">
               <TimeTravelSlider
-                currentSnapshotIndex={viewState.timeTravelSnapshotIndex}
-                maxSnapshotIndex={appState.latestSnapshotIndex()}
+                currentSnapshotIndex={timeTravel.snapshotIndex}
+                maxSnapshotIndex={timeTravel.maxSnapshotIndex}
                 onCurrentSnapshotIndexChange={handleTimeTravelSnapshotIndexChange}
                 onTimeTravelStop={handleTimeTravelStop}
               />

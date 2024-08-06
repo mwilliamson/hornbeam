@@ -24,11 +24,21 @@ export function ConnectInMemory(props: ConnectInMemoryProps) {
     setAppState(appState => applyAppUpdate(appState, update));
   };
 
+  // TODO: remove time travel duplication with simpleSync
+  const [timeTravelSnapshotIndex, setTimeTravelSnapshotIndex] = useState<number | null>(null);
+
   // TODO: ensure connection doesn't change.
-  const connection = {
+  const connection: BackendConnection = {
     appState,
-    query: appStateToQueryFunction(appState),
+    query: appStateToQueryFunction(appState, timeTravelSnapshotIndex),
     sendRequest,
+    timeTravel: {
+      maxSnapshotIndex: appState.latestSnapshotIndex(),
+      snapshotIndex: timeTravelSnapshotIndex,
+      setSnapshotIndex: newSnapshotIndex => setTimeTravelSnapshotIndex(newSnapshotIndex),
+      start: () => setTimeTravelSnapshotIndex(appState.latestSnapshotIndex()),
+      stop: () => setTimeTravelSnapshotIndex(null),
+    },
   };
 
   return (

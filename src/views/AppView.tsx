@@ -140,9 +140,6 @@ export default function AppView(props: AppViewProps) {
     ? appState.latestSnapshot()
     : appState.snapshot(viewState.timeTravelSnapshotIndex);
 
-  const cards = snapshot.allCards()
-    .filter(card => viewState.cardFilters.cardStatuses.has(card.status));
-
   const selectedSubboardRoot = viewState.selectedSubboardRootId === null
     ? null
     : snapshot.findCardById(viewState.selectedSubboardRootId);
@@ -184,12 +181,12 @@ export default function AppView(props: AppViewProps) {
         <div className="AppView-Left">
           <div className="AppView-Cards">
             <CardsViewBoundary
-              cards={cards}
               cardSelectedId={viewState.selectedCardId}
               onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
               onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
               onSubboardOpen={(subboardRootId) => setViewState({...viewState, selectedSubboardRootId: subboardRootId})}
               selectedSubboardRootId={viewState.selectedSubboardRootId}
+              visibleCardStatuses={viewState.cardFilters.cardStatuses}
             />
           </div>
           {viewState.timeTravelSnapshotIndex !== null && (

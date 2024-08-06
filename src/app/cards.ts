@@ -135,3 +135,7 @@ export interface CardSet {
 export interface CardSearcher {
   searchCards: (query: string) => Promise<ReadonlyArray<Card>>;
 }
+
+export interface CardQuery {
+  statuses: ReadonlySet<CardStatus>;
+}

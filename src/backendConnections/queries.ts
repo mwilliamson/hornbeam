@@ -1,4 +1,6 @@
 import { Card, CardHistory, CardSearcher } from "../app/cards";
+import { CardStatus } from "../app/cardStatuses";
+import { CardTree } from "../app/cardTrees";
 import { Category, CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
 
@@ -31,6 +33,12 @@ export type AppQuery<R> =
   | {
     readonly type: "cardSearcher";
     readonly proof: Leibniz<CardSearcher, R>;
+  }
+  | {
+    readonly type: "boardCardTrees";
+    readonly proof: Leibniz<ReadonlyArray<CardTree>, R>;
+    readonly cardStatuses: ReadonlySet<CardStatus>;
+    readonly subboardRootId: string | null;
   }
   // Categories
   | {
@@ -83,6 +91,21 @@ export const cardSearcherQuery: AppQuery<CardSearcher> = {
   type: "cardSearcher",
   proof: x => x,
 };
+
+export function boardCardTreesQuery({
+  cardStatuses,
+  subboardRootId,
+}: {
+  readonly cardStatuses: ReadonlySet<CardStatus>;
+  readonly subboardRootId: string | null;
+}): AppQuery<ReadonlyArray<CardTree>> {
+  return {
+    type: "boardCardTrees",
+    proof: x => x,
+    cardStatuses,
+    subboardRootId,
+  };
+}
 
 export const allCategoriesQuery: AppQuery<CategorySet> = {
   type: "allCategories",

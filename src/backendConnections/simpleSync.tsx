@@ -10,6 +10,7 @@ import { useEffect, useRef } from "react";
 import { Deferred, createDeferred } from "../util/promises";
 import { AppQuery } from "./queries";
 import { generateCardHistory } from "../app/cards";
+import { cardsToTrees } from "../app/cardTrees";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;
@@ -104,6 +105,12 @@ export function appStateToQueryFunction(appState: AppState) {
             return snapshot.searchCards(query);
           }
         });
+      }
+      case "boardCardTrees": {
+        const cards = snapshot.allCards()
+          .filter(card => query.cardStatuses.has(card.status));
+
+        return query.proof(cardsToTrees(cards, query.subboardRootId));
       }
       case "allCategories": {
         return query.proof(snapshot);

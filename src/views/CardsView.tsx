@@ -2,7 +2,7 @@ import { DndContext, DragEndEvent, PointerSensor, closestCorners, useDraggable, 
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
-import { CardTree, cardsToTrees } from "../app/cardTrees";
+import { CardTree } from "../app/cardTrees";
 import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
 import { CategorySet } from "../app/categories";
 import { ColorSet } from "../app/colors";
@@ -14,31 +14,27 @@ import assertNever from "../util/assertNever";
 interface CardsViewProps {
   allCategories: CategorySet;
   allColors: ColorSet;
-  cards: ReadonlyArray<Card>;
+  cardTrees: ReadonlyArray<CardTree>;
   cardSelectedId: string | null;
   onCardMoveToAfter: (request: Omit<CardMoveToAfterRequest, "createdAt">) => void;
   onCardMoveToBefore: (request: Omit<CardMoveToBeforeRequest, "createdAt">) => void;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
   onSubboardOpen: (subboardRootId: string) => void;
-  selectedSubboardRootId: string | null;
 }
 
 export default function CardsView(props: CardsViewProps) {
   const {
     allCategories,
     allColors,
-    cards,
+    cardTrees,
     cardSelectedId,
     onCardMoveToAfter,
     onCardMoveToBefore,
     onCardSelect,
     onCardAddChildClick,
     onSubboardOpen,
-    selectedSubboardRootId,
   } = props;
-
-  const cardTrees = cardsToTrees(cards, selectedSubboardRootId);
 
   const cardTops = calculateCardTops(cardTrees);
 

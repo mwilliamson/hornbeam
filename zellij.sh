@@ -1,1 +1,0 @@
-zellij --layout zellij.kdl

@@ -1,4 +1,7 @@
 {
   "name": "hornbeam-common",
+  "scripts": {
+    "prepare": "tsc"
+  },
   "type": "commonjs"
 }

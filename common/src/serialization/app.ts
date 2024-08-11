@@ -7,7 +7,7 @@ import { AppUpdate } from "../app/snapshots";
 import { CardStatus } from "../app/cardStatuses";
 import * as t2 from "../util/io-ts";
 
-const SerializedCardStatus = t.keyof({
+export const SerializedCardStatus = t.keyof({
   [CardStatus.Deleted]: null,
   [CardStatus.Done]: null,
   [CardStatus.None]: null,

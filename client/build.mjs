@@ -48,7 +48,7 @@ const context = await esbuild.context({
       setup(build) {
         build.onResolve({filter: /hornbeam\.log$/}, (args) => {
           const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
-          const hornbeamLogPath = path.join(__dirname, "hornbeam.log");
+          const hornbeamLogPath = path.join(__dirname, "../hornbeam.log");
           const resolvedPath = path.join(args.resolveDir, args.path);
           const isHornbeamLogPath = path.relative(resolvedPath, hornbeamLogPath) === "";
 

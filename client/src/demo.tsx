@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 
 import { applyAppUpdate, initialAppState } from "./app";
 import AppView from "./views/AppView";
-import hornbeamLog from "../hornbeam.log";
+import hornbeamLog from "../../hornbeam.log";
 import { deserializeAppUpdate } from "./serialization";
 import { ConnectInMemory } from "./backendConnections/inMemory";
 

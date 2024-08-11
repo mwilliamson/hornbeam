@@ -1,22 +1,27 @@
 [[processes]]
 name = "Server"
 command = ["npm", "start"]
+working_directory = "client"
 
 [[processes]]
 name = "Cosmos"
 command = ["npm", "run", "cosmos"]
+working_directory = "client"
 
 [[processes]]
 name = "Build"
 command = ["npm", "run", "build-watch"]
+working_directory = "client"
 error_regex = "Build finished with ([0-9]+) errors"
 
 [[processes]]
 name = "tsc"
 command = ["npm", "run", "check:tsc", "--", "--watch"]
+working_directory = "client"
 type = "tsc-watch"
 
 [[processes]]
 name = "eslint"
 command = ["npm", "run", "check:eslint"]
+working_directory = "client"
 after = "tsc"

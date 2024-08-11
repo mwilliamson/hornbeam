@@ -17,7 +17,7 @@ function webSocketUri() {
   return `${webSocketProtocol}://${location.host}/${path}`;
 }
 
-function Client() {
+function SimpleSyncClient() {
   return (
     <ConnectSimpleSync uri={webSocketUri()}>
       {(connectionState) => (
@@ -58,6 +58,6 @@ function BackendConnectionStateView(props: BackendConnectionStateViewProps) {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Client />
+    <SimpleSyncClient />
   </React.StrictMode>,
 );

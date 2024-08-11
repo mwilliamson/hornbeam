@@ -1,4 +1,4 @@
-/.env
+.env
 /client/build.json
 /client/node_modules
 /client/public/*.css

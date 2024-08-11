@@ -7,7 +7,7 @@ interface TopBarProps {
   onBoardUp: (() => void) | undefined;
   onCardAddClick: () => void;
   onSettingsClick: () => void;
-  onTimeTravelStart: () => void;
+  onTimeTravelStart: (() => void) | null;
 }
 
 export default function TopBar(props: TopBarProps) {
@@ -37,11 +37,13 @@ export default function TopBar(props: TopBarProps) {
           </Button>
         </div>
 
-        <div>
-          <Button type="button" intent="secondary" onClick={onTimeTravelStart}>
-            Time travel
-          </Button>
-        </div>
+        {onTimeTravelStart !== null && (
+          <div>
+            <Button type="button" intent="secondary" onClick={onTimeTravelStart}>
+              Time travel
+            </Button>
+          </div>
+        )}
 
         <div>
           <Button type="button" intent="secondary" onClick={onSettingsClick}>

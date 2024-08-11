@@ -76,16 +76,8 @@ export default function BoardView(props: BoardViewProps) {
 
   // TODO: prevent actions when time travelling
 
-  const handleTimeTravelStart = () => {
+  const handleTimeTravelStart = timeTravel === null ? null : () => {
     timeTravel.start();
-  };
-
-  const handleTimeTravelStop = () => {
-    timeTravel.stop();
-  };
-
-  const handleTimeTravelSnapshotIndexChange = (newSnapshotIndex: number) => {
-    timeTravel.setSnapshotIndex(newSnapshotIndex);
   };
 
   const handleCardFiltersChange = (newCardFilters: CardFilters) => {
@@ -164,13 +156,10 @@ export default function BoardView(props: BoardViewProps) {
               visibleCardStatuses={viewState.cardFilters.cardStatuses}
             />
           </div>
-          {timeTravel.snapshotIndex !== null && (
+          {timeTravel !== null && timeTravel.snapshotIndex !== null && (
             <div className="BoardView-TimeTravelSlider">
               <TimeTravelSlider
-                currentSnapshotIndex={timeTravel.snapshotIndex}
-                maxSnapshotIndex={timeTravel.maxSnapshotIndex}
-                onCurrentSnapshotIndexChange={handleTimeTravelSnapshotIndexChange}
-                onTimeTravelStop={handleTimeTravelStop}
+                timeTravel={timeTravel}
               />
             </div>
           )}

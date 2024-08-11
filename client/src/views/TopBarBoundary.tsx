@@ -8,7 +8,7 @@ interface TopBarBoundaryProps {
   onBoardUp: (() => void) | undefined;
   onCardAddClick: (cardFormInitialState: CardFormInitialState) => void;
   onSettingsClick: () => void;
-  onTimeTravelStart: () => void;
+  onTimeTravelStart: (() => void) | null;
   boardId: BoardId;
 }
 

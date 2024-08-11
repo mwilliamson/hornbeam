@@ -1,17 +1,15 @@
 import { useId } from "react";
 
+import { TimeTravel } from "../backendConnections";
 import "./TimeTravelSlider.scss";
 import Button from "./widgets/Button";
 
 interface TimeTravelSliderProps {
-  currentSnapshotIndex: number;
-  maxSnapshotIndex: number;
-  onCurrentSnapshotIndexChange: (snapshotIndex: number) => void;
-  onTimeTravelStop: () => void;
+  timeTravel: TimeTravel;
 }
 
 export default function TimeTravelSlider(props: TimeTravelSliderProps) {
-  const {currentSnapshotIndex, maxSnapshotIndex, onCurrentSnapshotIndexChange, onTimeTravelStop} = props;
+  const {timeTravel} = props;
 
   const sliderId = useId();
 
@@ -25,15 +23,15 @@ export default function TimeTravelSlider(props: TimeTravelSliderProps) {
         <input
           id={sliderId}
           type="range"
-          onChange={event => onCurrentSnapshotIndexChange(parseInt(event.target.value, 10))}
-          value={currentSnapshotIndex}
+          onChange={event => timeTravel.setSnapshotIndex(parseInt(event.target.value, 10))}
+          value={timeTravel.snapshotIndex ?? timeTravel.maxSnapshotIndex}
           min={0}
-          max={maxSnapshotIndex}
+          max={timeTravel.maxSnapshotIndex}
         />
       </div>
 
       <div>
-        <Button type="button" intent="secondary" onClick={onTimeTravelStop}>
+        <Button type="button" intent="secondary" onClick={() => timeTravel.stop()}>
           Stop
         </Button>
       </div>

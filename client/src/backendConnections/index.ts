@@ -18,10 +18,10 @@ export type BackendConnectionState =
     type: "sync-error";
   };
 
-interface TimeTravel {
+export interface TimeTravel {
   maxSnapshotIndex: number;
   snapshotIndex: number | null;
-  setSnapshotIndex: (timeTravelSnapshotIndex: number | null) => void;
+  setSnapshotIndex: (timeTravelSnapshotIndex: number) => void;
   start: () => void;
   stop: () => void;
 }
@@ -29,7 +29,7 @@ interface TimeTravel {
 export interface BackendConnection {
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
-  timeTravel: TimeTravel;
+  timeTravel: TimeTravel | null;
 }
 
 export type SendRequest = (update: AppRequest) => Promise<void>;

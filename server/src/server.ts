@@ -8,13 +8,16 @@ const fastify = Fastify({
 
 // TODO: separate public directories?
 fastify.register(fastifyStatic, {
-  root: path.join(import.meta.dirname, "../../client/public"),
+  root: path.join(__dirname, "../../client/public"),
 });
 
-// Run the server!
-try {
-  await fastify.listen({ port: 3000 })
-} catch (err) {
-  fastify.log.error(err)
-  process.exit(1)
+async function run() {
+  try {
+    await fastify.listen({ port: 3000 })
+  } catch (err) {
+    fastify.log.error(err)
+    process.exit(1)
+  }
 }
+
+run();

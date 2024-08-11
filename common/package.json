@@ -1,3 +1,4 @@
 {
-  "name": "hornbeam-common"
+  "name": "hornbeam-common",
+  "type": "commonjs"
 }

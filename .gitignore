@@ -5,6 +5,8 @@
 /client/public/*.js
 /client/public/fonts
 /client/src/cosmos.imports.ts
+/common/lib
+/common/node_modules
 /node_modules
 /server/lib
 /server/node_modules

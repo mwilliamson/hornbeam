@@ -1,8 +1,8 @@
 import { Instant } from "@js-joda/core";
-import { BoardId } from "../app/boards";
-import { Card } from "../app/cards";
-import { CardStatus } from "../app/cardStatuses";
-import { requests } from "../app/snapshots";
+import { BoardId } from "hornbeam-common/src/app/boards";
+import { Card } from "hornbeam-common/src/app/cards";
+import { CardStatus } from "hornbeam-common/src/app/cardStatuses";
+import { requests } from "hornbeam-common/src/app/snapshots";
 import { allCategoriesQuery, allColorsQuery, boardCardTreesQuery } from "../backendConnections/queries";
 import Boundary from "./Boundary";
 import CardsView from "./CardsView";

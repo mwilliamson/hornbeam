@@ -2,6 +2,7 @@
   "name": "hornbeam",
   "workspaces": [
     "client",
+    "common",
     "server"
   ]
 }

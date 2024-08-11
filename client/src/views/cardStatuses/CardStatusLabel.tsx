@@ -1,5 +1,5 @@
-import { CardStatus } from "../../app/cardStatuses";
-import assertNever from "../../util/assertNever";
+import { CardStatus } from "hornbeam-common/src/app/cardStatuses";
+import assertNever from "hornbeam-common/src/util/assertNever";
 
 interface CardStatusLabelProps {
   showNone?: boolean;

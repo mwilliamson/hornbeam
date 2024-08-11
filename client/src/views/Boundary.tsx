@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { AppRequest } from "../app/snapshots";
+import { AppRequest } from "hornbeam-common/src/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
 import { AppQuery, QueryResult } from "../backendConnections/queries";
 import Spinner from "./widgets/Spinner";

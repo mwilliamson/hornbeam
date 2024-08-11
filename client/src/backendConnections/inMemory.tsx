@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { AppState, applyAppUpdate } from "../app";
-import { AppUpdate, AppRequest } from "../app/snapshots";
+import { AppState, applyAppUpdate } from "hornbeam-common/src/app";
+import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
 import { BackendConnection, BackendConnectionProvider } from ".";
 import { appStateToQueryFunction } from "./simpleSync";
 

@@ -1,6 +1,6 @@
 import { useId } from "react";
 
-import { Color } from "../../app/colors";
+import { Color } from "hornbeam-common/src/app/colors";
 import "./CardRadioButtons.scss";
 
 interface Option {

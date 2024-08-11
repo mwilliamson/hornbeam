@@ -1,17 +1,16 @@
-
+import { useEffect, useRef, useState } from "react";
 import { useSimpleSync } from "simple-sync/lib/react";
 import { uuidv7 } from "uuidv7";
 
-import { AppState, applyAppUpdate, initialAppState } from "../app";
-import { deserializeAppUpdate, serializeAppUpdate } from "../serialization";
+import { AppState, applyAppUpdate, initialAppState } from "hornbeam-common/src/app";
+import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
+import { generateCardHistory } from "hornbeam-common/src/app/cards";
+import { cardsToTrees } from "hornbeam-common/src/app/cardTrees";
+import { cardSubboardId, rootBoardId } from "hornbeam-common/src/app/boards";
+import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization";
+import { Deferred, createDeferred } from "hornbeam-common/src/util/promises";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
-import { AppUpdate, AppRequest } from "../app/snapshots";
-import { useEffect, useRef, useState } from "react";
-import { Deferred, createDeferred } from "../util/promises";
 import { AppQuery } from "./queries";
-import { generateCardHistory } from "../app/cards";
-import { cardsToTrees } from "../app/cardTrees";
-import { cardSubboardId, rootBoardId } from "../app/boards";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;

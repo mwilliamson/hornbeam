@@ -1,9 +1,9 @@
 import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
-import { BoardId, isRootBoardId, rootBoardId } from "../app/boards";
-import { CardStatus, allCardStatuses } from "../app/cardStatuses";
-import { requests } from "../app/snapshots";
+import { BoardId, isRootBoardId, rootBoardId } from "hornbeam-common/src/app/boards";
+import { CardStatus, allCardStatuses } from "hornbeam-common/src/app/cardStatuses";
+import { requests } from "hornbeam-common/src/app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import "./BoardView.scss";

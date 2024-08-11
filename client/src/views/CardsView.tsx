@@ -2,15 +2,15 @@ import { DndContext, DragEndEvent, PointerSensor, closestCorners, useDraggable, 
 import { ArrowRightIcon, PlusIcon } from "lucide-react";
 import React from "react";
 
-import { BoardId, cardSubboardId } from "../app/boards";
-import { CardTree } from "../app/cardTrees";
-import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "../app/cards";
-import { CategorySet } from "../app/categories";
-import { ColorSet } from "../app/colors";
+import { BoardId, cardSubboardId } from "hornbeam-common/src/app/boards";
+import { CardTree } from "hornbeam-common/src/app/cardTrees";
+import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "hornbeam-common/src/app/cards";
+import { CategorySet } from "hornbeam-common/src/app/categories";
+import { ColorSet } from "hornbeam-common/src/app/colors";
+import assertNever from "hornbeam-common/src/util/assertNever";
 import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 import classNames from "classnames";
-import assertNever from "../util/assertNever";
 
 interface CardsViewProps {
   allCategories: CategorySet;

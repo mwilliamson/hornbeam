@@ -1,6 +1,6 @@
 import AsyncSelect from "react-select/async";
 
-import { Card, CardSearcher } from "../../app/cards";
+import { Card, CardSearcher } from "hornbeam-common/src/app/cards";
 
 interface CardSelectProps {
   cardSearcher: CardSearcher;

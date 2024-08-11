@@ -1,4 +1,4 @@
-import { Card } from "../../app/cards";
+import { Card } from "hornbeam-common/src/app/cards";
 
 interface CardParentViewProps {
   id?: string;

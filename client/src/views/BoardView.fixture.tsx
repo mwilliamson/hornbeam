@@ -1,4 +1,4 @@
-import { initialAppState } from "../app";
+import { initialAppState } from "hornbeam-common/src/app";
 import { ConnectInMemory } from "../backendConnections/inMemory";
 import BoardView from "./BoardView";
 

@@ -1,15 +1,15 @@
 import { useId, useState } from "react";
 
-import { Card, validateCardCategory, validateCardText } from "../../app/cards";
-import { Category } from "../../app/categories";
-import { ValidationError, ValidationResult } from "../../util/validation";
+import { Card, validateCardCategory, validateCardText } from "hornbeam-common/src/app/cards";
+import { Category } from "hornbeam-common/src/app/categories";
+import { ColorSet } from "hornbeam-common/src/app/colors";
+import { ValidationError, ValidationResult } from "hornbeam-common/src/util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import { ValidationErrorsInlineView } from "../validation-views";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";
 import Input from "../widgets/Input";
 import CardParentView from "./CardParentView";
-import { ColorSet } from "../../app/colors";
 
 export type CardFormInitialState = Pick<CardFormState, "parentCard">;
 

@@ -1,5 +1,5 @@
-import { Category, CategoryAddRequest } from "../../app/categories";
-import { ColorSet } from "../../app/colors";
+import { Category, CategoryAddRequest } from "hornbeam-common/src/app/categories";
+import { ColorSet } from "hornbeam-common/src/app/colors";
 import AddCategorySection from "./AddCategorySection";
 import CategoryListView from "./CategoryListView";
 

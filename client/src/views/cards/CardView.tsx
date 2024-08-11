@@ -1,8 +1,8 @@
 import classNames from "classnames";
 
-import { Card } from "../../app/cards";
-import { Category, categoryBackgroundColorStyle } from "../../app/categories";
-import { ColorSet } from "../../app/colors";
+import { Card } from "hornbeam-common/src/app/cards";
+import { Category, categoryBackgroundColorStyle } from "hornbeam-common/src/app/categories";
+import { ColorSet } from "hornbeam-common/src/app/colors";
 import "./CardView.scss";
 import CardStatusLabel from "../cardStatuses/CardStatusLabel";
 

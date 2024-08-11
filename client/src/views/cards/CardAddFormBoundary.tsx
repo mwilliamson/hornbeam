@@ -1,7 +1,7 @@
 import { Instant } from "@js-joda/core";
 
-import { generateId } from "../../app/ids";
-import { requests } from "../../app/snapshots";
+import { generateId } from "hornbeam-common/src/app/ids";
+import { requests } from "hornbeam-common/src/app/snapshots";
 import { allColorsQuery, availableCategoriesQuery } from "../../backendConnections/queries";
 import Boundary from "../Boundary";
 import CardAddForm from "./CardAddForm";

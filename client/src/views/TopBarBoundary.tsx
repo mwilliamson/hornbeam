@@ -1,4 +1,4 @@
-import { BoardId } from "../app/boards";
+import { BoardId } from "hornbeam-common/src/app/boards";
 import { cardQuery } from "../backendConnections/queries";
 import Boundary from "./Boundary";
 import { CardFormInitialState } from "./cards/CardForm";

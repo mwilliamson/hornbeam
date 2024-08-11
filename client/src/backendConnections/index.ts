@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { AppRequest } from "../app/snapshots";
+import { AppRequest } from "hornbeam-common/src/app/snapshots";
 import { AppQuery } from "./queries";
 
 export type BackendConnectionState =

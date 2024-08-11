@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import { initialAppSnapshot } from "../../app/snapshots";
+import { initialAppSnapshot } from "hornbeam-common/src/app/snapshots";
 import CategoryListView from "./CategoryListView";
 import { useState } from "react";
 

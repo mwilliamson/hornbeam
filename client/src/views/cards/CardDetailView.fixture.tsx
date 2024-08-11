@@ -1,11 +1,11 @@
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
 
-import { initialAppSnapshot } from "../../app/snapshots";
+import { initialAppSnapshot } from "hornbeam-common/src/app/snapshots";
+import { Card, generateCardHistory } from "hornbeam-common/src/app/cards";
+import { CardStatus } from "hornbeam-common/src/app/cardStatuses";
+import { rootBoardId } from "hornbeam-common/src/app/boards";
 import CardDetailView from "./CardDetailView";
-import { Card, generateCardHistory } from "../../app/cards";
-import { CardStatus } from "../../app/cardStatuses";
-import { rootBoardId } from "../../app/boards";
 
 const appSnapshot = initialAppSnapshot()
   .categoryAdd({

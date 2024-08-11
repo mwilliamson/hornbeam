@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { Category } from "../../app/categories";
-import { ColorSet } from "../../app/colors";
-import { ValidationError } from "../../util/validation";
+import { Category } from "hornbeam-common/src/app/categories";
+import { ColorSet } from "hornbeam-common/src/app/colors";
+import { ValidationError } from "hornbeam-common/src/util/validation";
 import { ValidationErrorsSummaryView } from "../validation-views";
 import Form from "../widgets/Form";
 import CardForm, { CardFormInitialState, ValidCardFormValues, useCardFormState, validateCardForm } from "./CardForm";

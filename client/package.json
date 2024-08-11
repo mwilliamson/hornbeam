@@ -1,4 +1,5 @@
 {
+    "name": "hornbeam-client",
     "scripts": {
         "build": "node build.mjs",
         "build-watch": "npm run build -- --cosmos --watch",

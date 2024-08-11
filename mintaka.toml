@@ -1,27 +1,39 @@
 [[processes]]
-name = "Server"
+name = "Client: simple-sync"
 command = ["npm", "start"]
 working_directory = "client"
 
 [[processes]]
-name = "Cosmos"
+name = "Client: Cosmos"
 command = ["npm", "run", "cosmos"]
 working_directory = "client"
 
 [[processes]]
-name = "Build"
+name = "Client: Build"
 command = ["npm", "run", "build-watch"]
 working_directory = "client"
 error_regex = "Build finished with ([0-9]+) errors"
 
 [[processes]]
-name = "tsc"
+name = "Client: tsc"
 command = ["npm", "run", "check:tsc", "--", "--watch"]
 working_directory = "client"
 type = "tsc-watch"
 
 [[processes]]
-name = "eslint"
+name = "Client: eslint"
 command = ["npm", "run", "check:eslint"]
 working_directory = "client"
-after = "tsc"
+after = "Client: tsc"
+
+[[processes]]
+name = "Server: Build"
+command = ["npm", "run", "build-watch"]
+working_directory = "server"
+type = "tsc-watch"
+
+[[processes]]
+name = "Server: Run"
+command = ["npm", "run", "start"]
+working_directory = "server"
+after = "Server: Build"

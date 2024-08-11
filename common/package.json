@@ -1,7 +1,9 @@
 {
   "name": "hornbeam-common",
   "scripts": {
-    "prepare": "tsc"
+    "prepare": "npm run build",
+    "build": "tsc",
+    "build-watch": "tsc --watch"
   },
   "type": "commonjs"
 }

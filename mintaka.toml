@@ -1,4 +1,10 @@
 [[processes]]
+name = "Common: tsc"
+command = ["npm", "run", "build-watch"]
+working_directory = "common"
+type = "tsc-watch"
+
+[[processes]]
 name = "Client: simple-sync"
 command = ["npm", "start"]
 working_directory = "client"

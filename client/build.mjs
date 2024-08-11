@@ -19,7 +19,10 @@ const args = util.parseArgs({
 
 await fs.cp("node_modules/@fontsource-variable/source-sans-3/files", "public/fonts", {recursive: true});
 
-const entryPoints = ["src/simpleSyncClient.tsx", "src/demo.tsx"];
+const entryPoints = [
+  {in: "src/simpleSyncClient.tsx", out: "simple-sync-client"},
+  "src/demo.tsx"
+];
 
 if (args.values.cosmos) {
   entryPoints.push("src/cosmos.tsx");

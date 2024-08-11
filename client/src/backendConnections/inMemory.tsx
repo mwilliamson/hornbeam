@@ -3,8 +3,8 @@ import { uuidv7 } from "uuidv7";
 
 import { AppState, applyAppUpdate } from "hornbeam-common/src/app";
 import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
+import appStateToQueryFunction from "hornbeam-common/src/appStateToQueryFunction";
 import { BackendConnection, BackendConnectionProvider } from ".";
-import { appStateToQueryFunction } from "./simpleSync";
 
 interface ConnectInMemoryProps {
   children: (connection: BackendConnection) => React.ReactNode;

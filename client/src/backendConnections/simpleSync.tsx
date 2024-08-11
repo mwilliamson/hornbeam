@@ -4,13 +4,10 @@ import { uuidv7 } from "uuidv7";
 
 import { AppState, applyAppUpdate, initialAppState } from "hornbeam-common/src/app";
 import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
-import { generateCardHistory } from "hornbeam-common/src/app/cards";
-import { cardsToTrees } from "hornbeam-common/src/app/cardTrees";
-import { cardSubboardId, rootBoardId } from "hornbeam-common/src/app/boards";
+import appStateToQueryFunction from "hornbeam-common/src/appStateToQueryFunction";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/src/util/promises";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
-import { AppQuery } from "hornbeam-common/src/queries";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;
@@ -79,71 +76,6 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
       })}
     </BackendConnectionProvider>
   );
-}
-
-// TODO: extract to common module?
-export function appStateToQueryFunction(appState: AppState, timeTravelSnapshotIndex: number | null) {
-  const snapshot = timeTravelSnapshotIndex === null
-    ? appState.latestSnapshot()
-    : appState.snapshot(timeTravelSnapshotIndex);
-
-  return async <R,>(query: AppQuery<R>): Promise<R> => {
-    switch (query.type) {
-      case "card": {
-        return query.proof(snapshot.findCardById(query.cardId));
-      }
-      case "parentCard": {
-        const card = snapshot.findCardById(query.cardId);
-        if (card === null || card.parentCardId === null) {
-          return query.proof(null);
-        }
-
-        return query.proof(snapshot.findCardById(card.parentCardId));
-      }
-      case "cardChildCount": {
-        return query.proof(snapshot.countCardChildren(query.cardId));
-      }
-      case "cardHistory": {
-        const card = snapshot.findCardById(query.cardId);
-        const cardHistory = card === null ? [] : generateCardHistory(card, snapshot);
-        return query.proof(cardHistory);
-      }
-      case "searchCards": {
-        return query.proof(snapshot.searchCards(query.searchTerm));
-      }
-      case "boardCardTrees": {
-        const cards = snapshot.allCards()
-          .filter(card => query.cardStatuses.has(card.status));
-
-        return query.proof(cardsToTrees(cards, query.boardId));
-      }
-      case "parentBoard": {
-        let cardId: string | null = query.boardId.boardRootId;
-
-        while (cardId !== null) {
-          const card = snapshot.findCardById(cardId);
-          if (card === null) {
-            cardId = null;
-          } else if (card.isSubboardRoot && cardId !== query.boardId.boardRootId) {
-            break;
-          } else {
-            cardId = card.parentCardId;
-          }
-        }
-
-        return query.proof(cardId === null ? rootBoardId : cardSubboardId(cardId));
-      }
-      case "allCategories": {
-        return query.proof(snapshot);
-      }
-      case "availableCategories": {
-        return query.proof(snapshot.availableCategories());
-      }
-      case "allColors": {
-        return query.proof(snapshot);
-      }
-    }
-  };
 }
 
 function useCreateSendRequest(

@@ -7,7 +7,7 @@ import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
 import { generateCardHistory } from "hornbeam-common/src/app/cards";
 import { cardsToTrees } from "hornbeam-common/src/app/cardTrees";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/src/app/boards";
-import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization";
+import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/src/util/promises";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
 import { AppQuery } from "hornbeam-common/src/queries";

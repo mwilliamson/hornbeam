@@ -3,9 +3,9 @@ import { isLeft } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 
-import { AppUpdate } from "./app/snapshots";
-import { CardStatus } from "./app/cardStatuses";
-import * as t2 from "./util/io-ts";
+import { AppUpdate } from "../app/snapshots";
+import { CardStatus } from "../app/cardStatuses";
+import * as t2 from "../util/io-ts";
 
 const SerializedCardStatus = t.keyof({
   [CardStatus.Deleted]: null,

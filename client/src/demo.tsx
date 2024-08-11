@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import { applyAppUpdate, initialAppState } from "hornbeam-common/src/app";
-import { deserializeAppUpdate } from "hornbeam-common/src/serialization";
+import { deserializeAppUpdate } from "hornbeam-common/src/serialization/app";
 import BoardView from "./views/BoardView";
 import hornbeamLog from "../../hornbeam.log";
 import { ConnectInMemory } from "./backendConnections/inMemory";

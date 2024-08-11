@@ -1,9 +1,9 @@
-import { BoardId } from "hornbeam-common/src/app/boards";
-import { Card, CardHistory, CardSearcher } from "hornbeam-common/src/app/cards";
-import { CardStatus } from "hornbeam-common/src/app/cardStatuses";
-import { CardTree } from "hornbeam-common/src/app/cardTrees";
-import { Category, CategorySet } from "hornbeam-common/src/app/categories";
-import { ColorSet } from "hornbeam-common/src/app/colors";
+import { BoardId } from "./app/boards";
+import { Card, CardHistory, CardSearcher } from "./app/cards";
+import { CardStatus } from "./app/cardStatuses";
+import { CardTree } from "./app/cardTrees";
+import { Category, CategorySet } from "./app/categories";
+import { ColorSet } from "./app/colors";
 
 interface Leibniz<A, B> {
   (a: A): B

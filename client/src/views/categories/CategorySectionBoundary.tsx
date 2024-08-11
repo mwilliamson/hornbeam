@@ -3,7 +3,7 @@ import { Instant } from "@js-joda/core";
 import { CategoryAddRequest } from "hornbeam-common/src/app/categories";
 import { requests } from "hornbeam-common/src/app/snapshots";
 import Boundary from "../Boundary";
-import { allCategoriesQuery, allColorsQuery } from "../../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery } from "hornbeam-common/src/queries";
 import CategorySection from "./CategorySection";
 
 export default function CategorySectionBoundary() {

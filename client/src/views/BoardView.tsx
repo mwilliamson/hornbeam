@@ -15,7 +15,7 @@ import { CardFormInitialState } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
-import { parentBoardQuery } from "../backendConnections/queries";
+import { parentBoardQuery } from "hornbeam-common/src/queries";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
 import TopBarBoundary from "./TopBarBoundary";

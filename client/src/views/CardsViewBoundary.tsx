@@ -3,7 +3,7 @@ import { BoardId } from "hornbeam-common/src/app/boards";
 import { Card } from "hornbeam-common/src/app/cards";
 import { CardStatus } from "hornbeam-common/src/app/cardStatuses";
 import { requests } from "hornbeam-common/src/app/snapshots";
-import { allCategoriesQuery, allColorsQuery, boardCardTreesQuery } from "../backendConnections/queries";
+import { allCategoriesQuery, allColorsQuery, boardCardTreesQuery } from "hornbeam-common/src/queries";
 import Boundary from "./Boundary";
 import CardsView from "./CardsView";
 

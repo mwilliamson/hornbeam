@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { AppRequest } from "hornbeam-common/src/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
-import { AppQuery, QueryResult } from "../backendConnections/queries";
+import { AppQuery, QueryResult } from "hornbeam-common/src/queries";
 import Spinner from "./widgets/Spinner";
 
 let nextQueryLoadId = 1;

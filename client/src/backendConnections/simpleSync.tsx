@@ -10,7 +10,7 @@ import { cardSubboardId, rootBoardId } from "hornbeam-common/src/app/boards";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization";
 import { Deferred, createDeferred } from "hornbeam-common/src/util/promises";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
-import { AppQuery } from "./queries";
+import { AppQuery } from "hornbeam-common/src/queries";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;

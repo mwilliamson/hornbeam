@@ -1,11 +1,14 @@
 import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
+import path from "node:path";
 
 const fastify = Fastify({
   logger: true,
 });
 
-fastify.get("/", async function handler (request, reply) {
-  return {hello: "world"};
+// TODO: separate public directories?
+fastify.register(fastifyStatic, {
+  root: path.join(import.meta.dirname, "../../client/public"),
 });
 
 // Run the server!

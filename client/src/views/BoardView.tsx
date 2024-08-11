@@ -6,7 +6,7 @@ import { CardStatus, allCardStatuses } from "../app/cardStatuses";
 import { requests } from "../app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
-import "./AppView.scss";
+import "./BoardView.scss";
 import CardsViewBoundary from "./CardsViewBoundary";
 import SettingsView from "./SettingsView";
 import TimeTravelSlider from "./TimeTravelSlider";
@@ -42,11 +42,11 @@ const initialViewState: ViewState = {
   viewSettings: false,
 };
 
-interface AppViewProps {
+interface BoardViewProps {
   backendConnection: BackendConnection;
 }
 
-export default function AppView(props: AppViewProps) {
+export default function BoardView(props: BoardViewProps) {
   const {backendConnection} = props;
   const {sendRequest, timeTravel} = backendConnection;
 
@@ -142,8 +142,8 @@ export default function AppView(props: AppViewProps) {
     };
 
   return (
-    <div className="AppView">
-      <div className="AppView-Top">
+    <div className="BoardView">
+      <div className="BoardView-Top">
         <TopBarBoundary
           onBoardUp={handleBoardUp}
           onCardAddClick={handleCardAddClick}
@@ -152,9 +152,9 @@ export default function AppView(props: AppViewProps) {
           boardId={viewState.selectedBoardId}
         />
       </div>
-      <div className="AppView-Bottom">
-        <div className="AppView-Left">
-          <div className="AppView-Cards">
+      <div className="BoardView-Bottom">
+        <div className="BoardView-Left">
+          <div className="BoardView-Cards">
             <CardsViewBoundary
               cardSelectedId={viewState.selectedCardId}
               onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
@@ -165,7 +165,7 @@ export default function AppView(props: AppViewProps) {
             />
           </div>
           {timeTravel.snapshotIndex !== null && (
-            <div className="AppView-TimeTravelSlider">
+            <div className="BoardView-TimeTravelSlider">
               <TimeTravelSlider
                 currentSnapshotIndex={timeTravel.snapshotIndex}
                 maxSnapshotIndex={timeTravel.maxSnapshotIndex}
@@ -175,8 +175,8 @@ export default function AppView(props: AppViewProps) {
             </div>
           )}
         </div>
-        <div className="AppView-Sidebar">
-          <div className="AppView-Sidebar-Main">
+        <div className="BoardView-Sidebar">
+          <div className="BoardView-Sidebar-Main">
             <Sidebar
               onCardAddClick={handleCardAddClick}
               onCardAddClose={handleCardAddClose}
@@ -185,7 +185,7 @@ export default function AppView(props: AppViewProps) {
               viewState={viewState}
             />
           </div>
-          <div className="AppView-Sidebar-CardFilters">
+          <div className="BoardView-Sidebar-CardFilters">
             <CardFiltersView
               cardFilters={viewState.cardFilters}
               onCardFiltersChange={handleCardFiltersChange}
@@ -309,13 +309,13 @@ function Pane(props: PaneProps) {
   const [isCollapsed, setIsCollapsed] = useState(collapsible);
 
   return (
-    <section className="AppView-CollapsiblePane">
-      <h2 className="AppView-CollapsiblePane-Header" onClick={() => setIsCollapsed(!isCollapsed)}>
+    <section className="BoardView-CollapsiblePane">
+      <h2 className="BoardView-CollapsiblePane-Header" onClick={() => setIsCollapsed(!isCollapsed)}>
         {collapsible && <ExpanderIcon isCollapsed={isCollapsed} />}
         {header}
       </h2>
 
-      <div className="AppView-CollapsiblePane-Body" hidden={isCollapsed}>
+      <div className="BoardView-CollapsiblePane-Body" hidden={isCollapsed}>
         {children}
       </div>
     </section>

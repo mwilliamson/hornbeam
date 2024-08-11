@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import AppView from "./views/AppView";
+import BoardView from "./views/BoardView";
 import { ConnectSimpleSync } from "./backendConnections/simpleSync";
 import { BackendConnectionState } from "./backendConnections";
 
@@ -43,7 +43,7 @@ function BackendConnectionStateView(props: BackendConnectionStateViewProps) {
       );
     case "connected":
       return (
-        <AppView backendConnection={connectionState.connection} />
+        <BoardView backendConnection={connectionState.connection} />
       );
     case "connection-error":
       return (

@@ -1,13 +1,13 @@
 import { initialAppState } from "../app";
 import { ConnectInMemory } from "../backendConnections/inMemory";
-import AppView from "./AppView";
+import BoardView from "./BoardView";
 
-export default function AppViewFixture() {
+export default function BoardViewFixture() {
   return (
     <ConnectInMemory initialState={initialAppState}>
       {backendConnection => (
         <div style={{height: "100vh", width: "100vw", margin: -20}}>
-          <AppView backendConnection={backendConnection} />
+          <BoardView backendConnection={backendConnection} />
         </div>
       )}
     </ConnectInMemory>

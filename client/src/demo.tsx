@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 
 import { applyAppUpdate, initialAppState } from "./app";
-import AppView from "./views/AppView";
+import BoardView from "./views/BoardView";
 import hornbeamLog from "../../hornbeam.log";
 import { deserializeAppUpdate } from "./serialization";
 import { ConnectInMemory } from "./backendConnections/inMemory";
@@ -22,7 +22,7 @@ function Client() {
   return (
     <ConnectInMemory initialState={initialDemoState}>
       {backendConnection => (
-        <AppView backendConnection={backendConnection} />
+        <BoardView backendConnection={backendConnection} />
       )}
     </ConnectInMemory>
   );

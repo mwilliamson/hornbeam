@@ -5,9 +5,11 @@
 .Button {
   @include buttons.button-reset;
 
-  border-radius: 0.4rem;
-  padding: 0.4rem spacing.$md;
-  font-weight: normal;
+  & {
+    border-radius: 0.4rem;
+    padding: 0.4rem spacing.$md;
+    font-weight: normal;
+  }
 
   &:disabled {
     opacity: 0.4;

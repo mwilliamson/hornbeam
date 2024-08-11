@@ -1,0 +1,7 @@
+{
+  "name": "hornbeam",
+  "workspaces": [
+    "client",
+    "server"
+  ]
+}

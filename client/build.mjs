@@ -17,7 +17,7 @@ const args = util.parseArgs({
   strict: true,
 });
 
-await fs.cp("node_modules/@fontsource-variable/source-sans-3/files", "public/fonts", {recursive: true});
+await fs.cp("../node_modules/@fontsource-variable/source-sans-3/files", "public/fonts", {recursive: true});
 
 const entryPoints = [
   {in: "src/simpleSyncClient.tsx", out: "simple-sync-client"},

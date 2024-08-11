@@ -7,7 +7,7 @@
         "check:tsc": "tsc",
         "check:eslint": "eslint src && echo 'No lint errors' 1>&2",
         "check-watch": "tsc-watch --onSuccess 'npm run check:eslint'",
-        "start": "node -r dotenv/config node_modules/simple-sync/lib/server.js public/",
+        "start": "node -r dotenv/config ../node_modules/simple-sync/lib/server.js public/",
         "cosmos": "cosmos --expose-imports=src/cosmos.imports.ts"
     },
     "dependencies": {

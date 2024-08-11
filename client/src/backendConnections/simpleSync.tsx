@@ -108,12 +108,8 @@ export function appStateToQueryFunction(appState: AppState, timeTravelSnapshotIn
         const cardHistory = card === null ? [] : generateCardHistory(card, snapshot);
         return query.proof(cardHistory);
       }
-      case "cardSearcher": {
-        return query.proof({
-          searchCards: async (query: string) => {
-            return snapshot.searchCards(query);
-          }
-        });
+      case "searchCards": {
+        return query.proof(snapshot.searchCards(query.searchTerm));
       }
       case "boardCardTrees": {
         const cards = snapshot.allCards()

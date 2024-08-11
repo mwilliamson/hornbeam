@@ -2,7 +2,7 @@ import { Instant } from "@js-joda/core";
 import { BoardId } from "hornbeam-common/src/app/boards";
 import { generateId } from "hornbeam-common/src/app/ids";
 import { requests } from "hornbeam-common/src/app/snapshots";
-import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, cardSearcherQuery, parentCardQuery } from "hornbeam-common/src/queries";
+import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/src/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 import { CardFormInitialState } from "./CardForm";
@@ -25,7 +25,6 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
         card: cardQuery(cardId),
         cardChildCount: cardChildCountQuery(cardId),
         cardHistory: cardHistoryQuery(cardId),
-        cardSearcher: cardSearcherQuery,
         parentCard: parentCardQuery(cardId),
       }}
       render={(
@@ -35,10 +34,10 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
           card,
           cardChildCount,
           cardHistory,
-          cardSearcher,
           parentCard,
         },
-        sendRequest
+        sendRequest,
+        query
       // TODO: handle null card
       ) => card === null ? null : (
         <CardDetailView
@@ -47,7 +46,9 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
           card={card}
           cardChildCount={cardChildCount}
           cardHistory={cardHistory}
-          cardSearcher={cardSearcher}
+          cardSearcher={{
+            searchCards: searchTerm => query(searchCardsQuery(searchTerm)),
+          }}
           onAddChildClick={() => onCardAddClick({parentCard: card})}
           onCardEdit={(request) => sendRequest(requests.cardEdit({
             ...request,

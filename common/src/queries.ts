@@ -1,5 +1,5 @@
 import { BoardId } from "./app/boards";
-import { Card, CardHistory, CardSearcher } from "./app/cards";
+import { Card, CardHistory } from "./app/cards";
 import { CardStatus } from "./app/cardStatuses";
 import { CardTree } from "./app/cardTrees";
 import { Category, CategorySet } from "./app/categories";
@@ -32,8 +32,9 @@ export type AppQuery<R> =
     readonly cardId: string;
   }
   | {
-    readonly type: "cardSearcher";
-    readonly proof: Leibniz<CardSearcher, R>;
+    readonly type: "searchCards";
+    readonly proof: Leibniz<ReadonlyArray<Card>, R>;
+    readonly searchTerm: string;
   }
   | {
     readonly type: "boardCardTrees";
@@ -93,10 +94,13 @@ export function cardHistoryQuery(cardId: string): AppQuery<CardHistory> {
   };
 }
 
-export const cardSearcherQuery: AppQuery<CardSearcher> = {
-  type: "cardSearcher",
-  proof: x => x,
-};
+export function searchCardsQuery(searchTerm: string): AppQuery<ReadonlyArray<Card>> {
+  return {
+    type: "searchCards",
+    searchTerm,
+    proof: x => x,
+  };
+}
 
 export function boardCardTreesQuery({
   cardStatuses,

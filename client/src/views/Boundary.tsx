@@ -18,6 +18,7 @@ interface BoundaryProps<Q extends {[k: string]: AppQuery<unknown>}> {
   render: (
     queryData: {[K in keyof Q]: QueryResult<Q[K]>},
     sendRequest: (update: AppRequest) => Promise<void>,
+    query: <R>(query: AppQuery<R>) => Promise<R>,
   ) => React.ReactNode;
 }
 
@@ -91,6 +92,6 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
         <p>Query error.</p>
       );
     case "success":
-      return render(queryState.value, backendConnection.sendRequest);
+      return render(queryState.value, backendConnection.sendRequest, backendConnection.query);
   }
 }

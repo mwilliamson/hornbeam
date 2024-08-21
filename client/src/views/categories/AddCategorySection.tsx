@@ -40,6 +40,7 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
 
   const handleSubmit = async () => {
     if (validCategoryAddRequest !== null) {
+      // TODO: handle errors (here and elsewhere)
       await onCategoryAdd({
         color: {presetColorId: validCategoryAddRequest.presetColorId},
         createdAt: Instant.now(),

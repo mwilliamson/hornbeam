@@ -1,8 +1,8 @@
 import { isLeft } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
-import { Card } from "./cards";
-import { Category } from "./categories";
+import { SerializedCard } from "./cards";
+import { SerializedCategory } from "./categories";
 
 const CardServerQuery = t.type({
   type: t.literal("card"),
@@ -10,7 +10,7 @@ const CardServerQuery = t.type({
 }, "CardServerQuery");
 
 const CardResponse = t.union([
-  Card,
+  SerializedCard,
   t.null,
 ]);
 
@@ -23,7 +23,7 @@ const ParentCardServerQuery = t.type({
 }, "ParentCardServerQuery");
 
 const ParentCardResponse = t.union([
-  Card,
+  SerializedCard,
   t.null,
 ]);
 
@@ -44,7 +44,7 @@ const AllCategoriesServerQuery = t.type({
   type: t.literal("allCategories"),
 }, "AllCategoriesServerQuery");
 
-const AllCategoriesResponse = t.readonlyArray(Category);
+const AllCategoriesResponse = t.readonlyArray(SerializedCategory);
 
 export const serializeAllCategoriesResponse = AllCategoriesResponse.encode;
 export const deserializeAllCategoriesResponse = deserializer(AllCategoriesResponse);

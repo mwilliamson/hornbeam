@@ -1,9 +1,9 @@
 import * as t from "io-ts";
 
-import { Color } from "./colors";
+import { SerializedColor } from "./colors";
 
-export const Category = t.readonly(t.type({
-  color: Color,
+export const SerializedCategory = t.readonly(t.type({
+  color: SerializedColor,
   id: t.string,
   name: t.string,
-}, "Category"));
+}, "SerializedCategory"));

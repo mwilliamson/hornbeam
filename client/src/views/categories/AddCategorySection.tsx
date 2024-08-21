@@ -32,6 +32,7 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
   const colorControlId = useId();
 
   // TODO: extract validation
+  // TODO: add validation feedback
   const validCategoryAddRequest = state !== null && state.name !== "" && state.presetColorId !== null ? {
     name: state.name,
     presetColorId: state.presetColorId,

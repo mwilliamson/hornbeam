@@ -1,7 +1,7 @@
 import { Instant } from "@js-joda/core";
 import assertNever from "../util/assertNever";
 import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest, CardSet, createCard, updateCard } from "./cards";
-import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, createCategory } from "./categories";
+import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
 import { reorder } from "../util/arrays";
@@ -9,13 +9,13 @@ import { reorder } from "../util/arrays";
 export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   private readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
-  private readonly categories: ReadonlyArray<Category>;
+  private readonly categories: CategorySetInMemory;
   private readonly comments: ReadonlyArray<Comment>;
 
   public constructor(
     cards: ReadonlyArray<Card>,
     nextCardNumber: number,
-    categories: ReadonlyArray<Category>,
+    categories: CategorySetInMemory,
     comments: ReadonlyArray<Comment>,
   ) {
     this.cards = cards;
@@ -194,36 +194,29 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   }
 
   public categoryAdd(request: CategoryAddRequest): AppSnapshot {
-    const category = createCategory(request);
     return new AppSnapshot(
       this.cards,
       this.nextCardNumber,
-      [...this.categories, category],
+      this.categories.categoryAdd(request),
       this.comments,
     );
   }
 
   public categoryReorder(request: CategoryReorderRequest): AppSnapshot {
-    const newCategories = reorder(
-      this.categories,
-      category => category.id,
-      request.ids,
-    );
-
     return new AppSnapshot(
       this.cards,
       this.nextCardNumber,
-      newCategories,
+      this.categories.categoryReorder(request),
       this.comments,
     );
   }
 
   public availableCategories(): ReadonlyArray<Category> {
-    return this.categories;
+    return this.categories.availableCategories();
   }
 
   public allCategories(): ReadonlyArray<Category> {
-    return this.categories;
+    return this.categories.allCategories();
   }
 
   public allPresetColors(): ReadonlyArray<PresetColor> {
@@ -250,7 +243,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
 }
 
 export function initialAppSnapshot(): AppSnapshot {
-  return new AppSnapshot([], 1, [], []);
+  return new AppSnapshot([], 1, new CategorySetInMemory([]), []);
 }
 
 export interface AppUpdate {

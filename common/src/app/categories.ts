@@ -1,6 +1,7 @@
 import { Instant } from "@js-joda/core";
 
 import { ColorSet, PresetColor, presetColorWhite } from "./colors";
+import { reorder } from "../util/arrays";
 
 export interface Category {
   id: string;
@@ -51,4 +52,39 @@ export interface CategorySet {
   allCategories(): ReadonlyArray<Category>;
   availableCategories(): ReadonlyArray<Category>;
   findCategoryById: (categoryId: string) => Category | null;
+}
+
+export class CategorySetInMemory implements CategorySet {
+  private readonly categories: ReadonlyArray<Category>;
+
+  public constructor(categories: ReadonlyArray<Category>) {
+    this.categories = categories;
+  }
+
+  public findCategoryById(categoryId: string): Category | null {
+    return this.allCategories().find(category => category.id == categoryId) ?? null;
+  }
+
+  public categoryAdd(request: CategoryAddRequest): CategorySetInMemory {
+    const category = createCategory(request);
+    return new CategorySetInMemory([...this.categories, category]);
+  }
+
+  public categoryReorder(request: CategoryReorderRequest): CategorySetInMemory {
+    const newCategories = reorder(
+      this.categories,
+      category => category.id,
+      request.ids,
+    );
+
+    return new CategorySetInMemory(newCategories);
+  }
+
+  public availableCategories(): ReadonlyArray<Category> {
+    return this.categories;
+  }
+
+  public allCategories(): ReadonlyArray<Category> {
+    return this.categories;
+  }
 }

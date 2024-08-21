@@ -1,5 +1,5 @@
 import { AppQuery } from "hornbeam-common/src/queries";
-import { deserializeCardChildCountResponse, deserializeCardResponse, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
+import { deserializeCardChildCountResponse, deserializeCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
 import { BackendConnection, BackendConnectionProvider } from ".";
 
 interface ConnectServerProps {
@@ -51,7 +51,7 @@ export function ConnectServer(props: ConnectServerProps) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query,
+        query: serializeServerQuery(query),
       }),
     });
 

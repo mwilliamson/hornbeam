@@ -1,5 +1,5 @@
 import { AppQuery } from "hornbeam-common/src/queries";
-import { deserializeCardChildCountResponse, deserializeCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
+import { deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
 import { BackendConnection, BackendConnectionProvider } from ".";
 
 interface ConnectServerProps {
@@ -27,7 +27,7 @@ export function ConnectServer(props: ConnectServerProps) {
           cardId: query.cardId,
         });
 
-        return query.proof(deserializeCardResponse(response));
+        return query.proof(deserializeParentCardResponse(response));
       }
 
       case "cardChildCount": {

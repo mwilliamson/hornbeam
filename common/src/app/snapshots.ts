@@ -4,7 +4,6 @@ import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfter
 import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, PresetColor, presetColors } from "./colors";
 import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
-import { reorder } from "../util/arrays";
 
 export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   private readonly cards: ReadonlyArray<Card>;

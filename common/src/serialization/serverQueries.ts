@@ -3,6 +3,7 @@ import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 import { SerializedCard } from "./cards";
 import { SerializedCategory } from "./categories";
+import { SerializedPresetColor } from "./colors";
 
 const CardServerQuery = t.type({
   type: t.literal("card"),
@@ -49,11 +50,21 @@ const AllCategoriesResponse = t.readonlyArray(SerializedCategory);
 export const serializeAllCategoriesResponse = AllCategoriesResponse.encode;
 export const deserializeAllCategoriesResponse = deserializer(AllCategoriesResponse);
 
+const AllColorsServerQuery = t.type({
+  type: t.literal("allColors"),
+}, "AllColorsServerQuery");
+
+const AllColorsResponse = t.readonlyArray(SerializedPresetColor);
+
+export const serializeAllColorsResponse = AllColorsResponse.encode;
+export const deserializeAllColorsResponse = deserializer(AllColorsResponse);
+
 const ServerQuery = t.union([
   CardServerQuery,
   ParentCardServerQuery,
   CardChildCountServerQuery,
   AllCategoriesServerQuery,
+  AllColorsServerQuery,
 ], "SerializedAppQuery");
 
 export type ServerQuery = t.TypeOf<typeof ServerQuery>;

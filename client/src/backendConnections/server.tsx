@@ -1,5 +1,5 @@
 import { AppQuery } from "hornbeam-common/src/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
 import { BackendConnection, BackendConnectionProvider } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
@@ -39,6 +39,16 @@ export function ConnectServer(props: ConnectServerProps) {
         });
 
         return query.proof(deserializeCardChildCountResponse(response));
+      }
+
+      case "boardCardTrees": {
+        const response = await fetchQuery({
+          type: "boardCardTrees",
+          boardId: query.boardId,
+          cardStatuses: Array.from(query.cardStatuses),
+        });
+
+        return query.proof(deserializeBoardCardTreesResponse(response));
       }
 
       case "allCategories": {

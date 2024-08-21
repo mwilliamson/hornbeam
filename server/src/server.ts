@@ -2,8 +2,8 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
 import {initialAppState} from "hornbeam-common/lib/app";
-import {allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
-import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
+import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
 import assertNever from "hornbeam-common/lib/util/assertNever";
 
@@ -35,6 +35,13 @@ fastify.post("/query", async (request, response) => {
     case "cardChildCount": {
       const result = await executeQuery(cardChildCountQuery(serverQuery.cardId));
       return serializeCardChildCountResponse(result);
+    }
+    case "boardCardTrees": {
+      const result = await executeQuery(boardCardTreesQuery({
+        boardId: serverQuery.boardId,
+        cardStatuses: new Set(serverQuery.cardStatuses),
+      }));
+      return serializeBoardCardTreesResponse(result);
     }
     case "allCategories": {
       const result = await executeQuery(allCategoriesQuery);

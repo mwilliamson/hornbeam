@@ -4,6 +4,9 @@ import { PathReporter } from "io-ts/PathReporter";
 import { SerializedCard } from "./cards";
 import { SerializedCategory } from "./categories";
 import { SerializedPresetColor } from "./colors";
+import { SerializedCardTree } from "./cardTrees";
+import { SerializedBoardId } from "./boards";
+import { SerializedCardStatus } from "./cardStatuses";
 
 const CardServerQuery = t.type({
   type: t.literal("card"),
@@ -41,6 +44,17 @@ const CardChildCountResponse = t.number;
 export const serializeCardChildCountResponse = CardChildCountResponse.encode;
 export const deserializeCardChildCountResponse = deserializer(CardChildCountResponse);
 
+const BoardCardTreesServerQuery = t.type({
+  type: t.literal("boardCardTrees"),
+  boardId: SerializedBoardId,
+  cardStatuses: t.readonlyArray(SerializedCardStatus),
+}, "BoardCardTreesServerQuery");
+
+const BoardCardTreesResponse = t.readonlyArray(SerializedCardTree);
+
+export const serializeBoardCardTreesResponse = BoardCardTreesResponse.encode;
+export const deserializeBoardCardTreesResponse = deserializer(BoardCardTreesResponse);
+
 const AllCategoriesServerQuery = t.type({
   type: t.literal("allCategories"),
 }, "AllCategoriesServerQuery");
@@ -63,6 +77,7 @@ const ServerQuery = t.union([
   CardServerQuery,
   ParentCardServerQuery,
   CardChildCountServerQuery,
+  BoardCardTreesServerQuery,
   AllCategoriesServerQuery,
   AllColorsServerQuery,
 ], "SerializedAppQuery");

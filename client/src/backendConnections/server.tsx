@@ -2,6 +2,7 @@ import { AppQuery } from "hornbeam-common/src/queries";
 import { deserializeAllCategoriesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
 import { BackendConnection, BackendConnectionProvider } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
+import { colorSetPresetsOnly } from "hornbeam-common/src/app/colors";
 
 interface ConnectServerProps {
   children: (connectionState: BackendConnection) => React.ReactNode;
@@ -48,6 +49,10 @@ export function ConnectServer(props: ConnectServerProps) {
         const allCategories = deserializeAllCategoriesResponse(response);
 
         return query.proof(new CategorySetInMemory(allCategories));
+      }
+
+      case "allColors": {
+        return query.proof(colorSetPresetsOnly);
       }
 
       default:

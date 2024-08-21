@@ -106,7 +106,9 @@ function createConnection(uri: string): BackendConnection {
       body: JSON.stringify(body),
     });
 
-    // TODO: check status code
+    if (response.status !== 200) {
+      throw new Error(`Unexpected status code from server: ${response.status}`);
+    }
 
     return response.json();
   };

@@ -94,14 +94,16 @@ function createConnection(uri: string): BackendConnection {
   };
 
   const fetchQuery = async (query: ServerQuery) => {
-    const response = await fetch(uri + "query", {
+    return fetchJson("query", {query: serializeServerQuery(query)});
+  };
+
+  const fetchJson = async (path: string, body: unknown) => {
+    const response = await fetch(uri + path, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        query: serializeServerQuery(query),
-      }),
+      body: JSON.stringify(body),
     });
 
     // TODO: check status code

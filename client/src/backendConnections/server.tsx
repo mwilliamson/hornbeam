@@ -3,6 +3,7 @@ import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deseria
 import { BackendConnection, BackendConnectionProvider } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
+import { useRef } from "react";
 
 interface ConnectServerProps {
   children: (connectionState: BackendConnection) => React.ReactNode;
@@ -12,6 +13,20 @@ interface ConnectServerProps {
 export function ConnectServer(props: ConnectServerProps) {
   const {children, uri} = props;
 
+  const connectionRef = useRef<BackendConnection | null>(null);
+
+  if (connectionRef.current === null) {
+    connectionRef.current = createConnection(uri);
+  }
+
+  return (
+    <BackendConnectionProvider value={connectionRef.current}>
+      {children(connectionRef.current)}
+    </BackendConnectionProvider>
+  );
+}
+
+function createConnection(uri: string): BackendConnection {
   const query = async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
       case "card": {
@@ -99,16 +114,9 @@ export function ConnectServer(props: ConnectServerProps) {
     throw new Error("sending requests not supported");
   };
 
-  // TODO: ensure connection doesn't change.
-  const connection: BackendConnection = {
+  return {
     query,
     sendRequest,
     timeTravel: null,
   };
-
-  return (
-    <BackendConnectionProvider value={connection}>
-      {children(connection)}
-    </BackendConnectionProvider>
-  );
 }

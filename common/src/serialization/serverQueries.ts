@@ -1,30 +1,8 @@
 import { isLeft } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
-
-import * as t2 from "../util/io-ts";
-import { SerializedCardStatus } from "./app";
-
-const Card = t.type({
-  categoryId: t.string,
-  createdAt: t2.instant,
-  id: t.string,
-  isSubboardRoot: t.boolean,
-  number: t.number,
-  parentCardId: t.union([t.string, t.null]),
-  status: SerializedCardStatus,
-  text: t.string,
-}, "Card");
-
-const Color = t.readonly(t.type({
-  presetColorId: t.string,
-}, "Color"));
-
-const Category = t.readonly(t.type({
-  color: Color,
-  id: t.string,
-  name: t.string,
-}, "Category"));
+import { Card } from "./cards";
+import { Category } from "./categories";
 
 const CardServerQuery = t.type({
   type: t.literal("card"),

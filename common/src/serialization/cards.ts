@@ -1,7 +1,7 @@
 import * as t from "io-ts";
 
 import * as t2 from "../util/io-ts";
-import { SerializedCardStatus } from "./app";
+import { SerializedCardStatus } from "./cardStatuses";
 
 export const SerializedCard = t.type({
   categoryId: t.string,

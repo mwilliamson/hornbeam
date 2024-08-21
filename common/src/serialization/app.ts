@@ -4,14 +4,8 @@ import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
 
 import { AppUpdate } from "../app/snapshots";
-import { CardStatus } from "../app/cardStatuses";
 import * as t2 from "../util/io-ts";
-
-export const SerializedCardStatus = t.keyof({
-  [CardStatus.Deleted]: null,
-  [CardStatus.Done]: null,
-  [CardStatus.None]: null,
-});
+import { SerializedCardStatus } from "./cardStatuses";
 
 const SerializedCardAddRequest = t.type({
   categoryId: t.string,

@@ -63,6 +63,7 @@ export function ConnectServer(props: ConnectServerProps) {
       }
 
       default:
+        console.error(`missing support for query: ${query.type}`);
         throw new Error("not supported");
     }
   };

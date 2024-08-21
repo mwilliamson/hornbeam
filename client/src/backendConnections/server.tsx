@@ -1,8 +1,8 @@
 import { AppQuery } from "hornbeam-common/src/queries";
-import { deserializeAllCategoriesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
 import { BackendConnection, BackendConnectionProvider } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
-import { colorSetPresetsOnly } from "hornbeam-common/src/app/colors";
+import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
 
 interface ConnectServerProps {
   children: (connectionState: BackendConnection) => React.ReactNode;
@@ -52,7 +52,14 @@ export function ConnectServer(props: ConnectServerProps) {
       }
 
       case "allColors": {
-        return query.proof(colorSetPresetsOnly);
+        const response = await fetchQuery({
+          type: "allColors",
+        });
+
+        const presetColors = deserializeAllColorsResponse(response)
+          .map(presetColor => new PresetColor(presetColor));
+
+        return query.proof(new ColorSetInMemory(presetColors));
       }
 
       default:

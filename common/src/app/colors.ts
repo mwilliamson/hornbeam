@@ -68,12 +68,20 @@ export interface ColorSet {
   findPresetColorById: (presetColorId: string) => PresetColor | null;
 }
 
-export const colorSetPresetsOnly: ColorSet = {
-  allPresetColors(): ReadonlyArray<PresetColor> {
-    return presetColors;
-  },
+export class ColorSetInMemory implements ColorSet {
+  private readonly presetColors: ReadonlyArray<PresetColor>;
 
-  findPresetColorById(presetColorId: string): PresetColor | null {
-    return presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
-  },
-};
+  public constructor(presetColors: ReadonlyArray<PresetColor>) {
+    this.presetColors = presetColors;
+  }
+
+  public allPresetColors(): ReadonlyArray<PresetColor> {
+    return this.presetColors;
+  }
+
+  public findPresetColorById(presetColorId: string): PresetColor | null {
+    return this.presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
+  }
+}
+
+export const colorSetPresetsOnly: ColorSet = new ColorSetInMemory(presetColors);

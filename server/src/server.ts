@@ -2,8 +2,8 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
 import {initialAppState} from "hornbeam-common/lib/app";
-import {cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
-import {deserializeServerQuery, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import {allCategoriesQuery, cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
+import {deserializeServerQuery, serializeAllCategoriesResponse, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
 import assertNever from "hornbeam-common/lib/util/assertNever";
 
@@ -35,6 +35,10 @@ fastify.post("/query", async (request, response) => {
     case "cardChildCount": {
       const result = await executeQuery(cardChildCountQuery(serverQuery.cardId));
       return serializeCardChildCountResponse(result);
+    }
+    case "allCategories": {
+      const result = await executeQuery(allCategoriesQuery);
+      return serializeAllCategoriesResponse(result.allCategories());
     }
     default: {
       assertNever(serverQuery, null);

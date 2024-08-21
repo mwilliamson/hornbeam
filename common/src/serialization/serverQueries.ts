@@ -16,6 +16,16 @@ const Card = t.type({
   text: t.string,
 }, "Card");
 
+const Color = t.readonly(t.type({
+  presetColorId: t.string,
+}, "Color"));
+
+const Category = t.readonly(t.type({
+  color: Color,
+  id: t.string,
+  name: t.string,
+}, "Category"));
+
 const CardServerQuery = t.type({
   type: t.literal("card"),
   cardId: t.string,
@@ -52,10 +62,20 @@ const CardChildCountResponse = t.number;
 export const serializeCardChildCountResponse = CardChildCountResponse.encode;
 export const deserializeCardChildCountResponse = deserializer(CardChildCountResponse);
 
+const AllCategoriesServerQuery = t.type({
+  type: t.literal("allCategories"),
+}, "AllCategoriesServerQuery");
+
+const AllCategoriesResponse = t.readonlyArray(Category);
+
+export const serializeAllCategoriesResponse = AllCategoriesResponse.encode;
+export const deserializeAllCategoriesResponse = deserializer(AllCategoriesResponse);
+
 const ServerQuery = t.union([
   CardServerQuery,
   ParentCardServerQuery,
   CardChildCountServerQuery,
+  AllCategoriesServerQuery,
 ], "SerializedAppQuery");
 
 export type ServerQuery = t.TypeOf<typeof ServerQuery>;

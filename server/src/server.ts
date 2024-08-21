@@ -5,6 +5,7 @@ import {initialAppState} from "hornbeam-common/lib/app";
 import {cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
 import {deserializeServerQuery, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
+import assertNever from "hornbeam-common/lib/util/assertNever";
 
 const fastify = Fastify({
   logger: true,
@@ -34,6 +35,9 @@ fastify.post("/query", async (request, response) => {
     case "cardChildCount": {
       const result = await executeQuery(cardChildCountQuery(serverQuery.cardId));
       return serializeCardChildCountResponse(result);
+    }
+    default: {
+      assertNever(serverQuery, null);
     }
   }
 })

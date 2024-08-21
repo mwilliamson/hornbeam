@@ -6,6 +6,7 @@ import { PathReporter } from "io-ts/PathReporter";
 import { AppUpdate } from "../app/snapshots";
 import * as t2 from "../util/io-ts";
 import { SerializedCardStatus } from "./cardStatuses";
+import { SerializedColorRef } from "./colors";
 
 const SerializedCardAddRequest = t.type({
   categoryId: t.string,
@@ -51,7 +52,7 @@ const SerializedCardMoveToBeforeRequest = t.type({
 
 const SerializedCategoryAddRequest = t.type({
   createdAt: t2.instant,
-  color: t.type({presetColorId: t.string}),
+  color: SerializedColorRef,
   id: t.string,
   name: t.string,
 }, "SerializedCategoryAddRequest");

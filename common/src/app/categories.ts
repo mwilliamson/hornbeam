@@ -1,12 +1,12 @@
 import { Instant } from "@js-joda/core";
 
-import { ColorSet, PresetColor, presetColorWhite } from "./colors";
+import { ColorRef, ColorSet, PresetColor, presetColorWhite } from "./colors";
 import { reorder } from "../util/arrays";
 
 export interface Category {
   id: string;
   name: string;
-  color: {presetColorId: string};
+  color: ColorRef;
 }
 
 export function categoryBackgroundColorStyle(
@@ -30,7 +30,7 @@ export function categoryBackgroundColor(
 
 export interface CategoryAddRequest {
   createdAt: Instant;
-  color: {presetColorId: string};
+  color: ColorRef;
   id: string;
   name: string;
 }

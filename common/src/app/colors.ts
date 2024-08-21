@@ -1,3 +1,7 @@
+export interface ColorRef {
+  presetColorId: string;
+}
+
 export interface Color {
   hex: string;
 }

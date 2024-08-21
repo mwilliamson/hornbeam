@@ -29,6 +29,7 @@ export interface TimeTravel {
 export interface BackendConnection {
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
+  lastUpdateId: string | null;
   timeTravel: TimeTravel | null;
 }
 

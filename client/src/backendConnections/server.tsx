@@ -117,6 +117,7 @@ function createConnection(uri: string): BackendConnection {
   return {
     query,
     sendRequest,
+    lastUpdateId: null,
     timeTravel: null,
   };
 }

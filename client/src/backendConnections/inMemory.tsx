@@ -1,3 +1,4 @@
+import { last } from "lodash";
 import { useState } from "react";
 import { uuidv7 } from "uuidv7";
 
@@ -31,6 +32,7 @@ export function ConnectInMemory(props: ConnectInMemoryProps) {
   const connection: BackendConnection = {
     query: appStateToQueryFunction(appState, timeTravelSnapshotIndex),
     sendRequest,
+    lastUpdateId: last(appState.updateIds) ?? null,
     timeTravel: {
       maxSnapshotIndex: appState.latestSnapshotIndex(),
       snapshotIndex: timeTravelSnapshotIndex,

@@ -1,3 +1,4 @@
+import { last } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { useSimpleSync } from "simple-sync/lib/react";
 import { uuidv7 } from "uuidv7";
@@ -59,6 +60,7 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   const connection: BackendConnection = {
     query,
     sendRequest,
+    lastUpdateId: last(appState.updateIds) ?? null,
     timeTravel: {
       maxSnapshotIndex: appState.latestSnapshotIndex(),
       snapshotIndex: timeTravelSnapshotIndex,

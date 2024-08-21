@@ -2,24 +2,27 @@ import { Instant } from "@js-joda/core";
 import assertNever from "../util/assertNever";
 import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, CategorySetInMemory } from "./categories";
-import { ColorSet, PresetColor, presetColors } from "./colors";
+import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
 import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
 
 export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   private readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
   private readonly categories: CategorySetInMemory;
+  private readonly colors: ColorSet;
   private readonly comments: ReadonlyArray<Comment>;
 
   public constructor(
     cards: ReadonlyArray<Card>,
     nextCardNumber: number,
     categories: CategorySetInMemory,
+    colors: ColorSet,
     comments: ReadonlyArray<Comment>,
   ) {
     this.cards = cards;
     this.nextCardNumber = nextCardNumber;
     this.categories = categories;
+    this.colors = colors;
     this.comments = comments;
   }
 
@@ -29,6 +32,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       [...this.cards, card],
       this.nextCardNumber + 1,
       this.categories,
+      this.colors,
       this.comments,
     );
   }
@@ -44,6 +48,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       }),
       this.nextCardNumber,
       this.categories,
+      this.colors,
       this.comments,
     );
   }
@@ -91,6 +96,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       }),
       this.nextCardNumber,
       this.categories,
+      this.colors,
       this.comments,
     );
   }
@@ -125,6 +131,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       }),
       this.nextCardNumber,
       this.categories,
+      this.colors,
       this.comments,
     );
   }
@@ -159,6 +166,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       }),
       this.nextCardNumber,
       this.categories,
+      this.colors,
       this.comments,
     );
   }
@@ -197,6 +205,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       this.cards,
       this.nextCardNumber,
       this.categories.categoryAdd(request),
+      this.colors,
       this.comments,
     );
   }
@@ -206,6 +215,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       this.cards,
       this.nextCardNumber,
       this.categories.categoryReorder(request),
+      this.colors,
       this.comments,
     );
   }
@@ -219,11 +229,11 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   }
 
   public allPresetColors(): ReadonlyArray<PresetColor> {
-    return presetColors;
+    return this.colors.allPresetColors();
   }
 
   public findPresetColorById(presetColorId: string): PresetColor | null {
-    return presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
+    return this.colors.findPresetColorById(presetColorId);
   }
 
   public commentAdd(request: CommentAddRequest): AppSnapshot {
@@ -232,6 +242,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       this.cards,
       this.nextCardNumber,
       this.categories,
+      this.colors,
       [...this.comments, comment],
     );
   }
@@ -242,7 +253,13 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
 }
 
 export function initialAppSnapshot(): AppSnapshot {
-  return new AppSnapshot([], 1, new CategorySetInMemory([]), []);
+  return new AppSnapshot(
+    [],
+    1,
+    new CategorySetInMemory([]),
+    colorSetPresetsOnly,
+    [],
+  );
 }
 
 export interface AppUpdate {

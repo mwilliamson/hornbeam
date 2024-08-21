@@ -67,3 +67,13 @@ export interface ColorSet {
   allPresetColors(): ReadonlyArray<PresetColor>;
   findPresetColorById: (presetColorId: string) => PresetColor | null;
 }
+
+export const colorSetPresetsOnly: ColorSet = {
+  allPresetColors(): ReadonlyArray<PresetColor> {
+    return presetColors;
+  },
+
+  findPresetColorById(presetColorId: string): PresetColor | null {
+    return presetColors.find(presetColor => presetColor.id === presetColorId) ?? null;
+  },
+};

@@ -9,6 +9,10 @@ interface Leibniz<A, B> {
   (a: A): B
 }
 
+function proof<T>(value: T): T {
+  return value;
+}
+
 export type AppQuery<R> =
   // Cards
   | {
@@ -65,7 +69,7 @@ export type AppQuery<R> =
 export function cardQuery(cardId: string): AppQuery<Card | null> {
   return {
     type: "card",
-    proof: x => x,
+    proof,
     cardId,
   };
 }
@@ -73,7 +77,7 @@ export function cardQuery(cardId: string): AppQuery<Card | null> {
 export function parentCardQuery(cardId: string): AppQuery<Card | null> {
   return {
     type: "parentCard",
-    proof: x => x,
+    proof,
     cardId,
   };
 }
@@ -81,7 +85,7 @@ export function parentCardQuery(cardId: string): AppQuery<Card | null> {
 export function cardChildCountQuery(cardId: string): AppQuery<number> {
   return {
     type: "cardChildCount",
-    proof: x => x,
+    proof,
     cardId,
   };
 }
@@ -89,7 +93,7 @@ export function cardChildCountQuery(cardId: string): AppQuery<number> {
 export function cardHistoryQuery(cardId: string): AppQuery<CardHistory> {
   return {
     type: "cardHistory",
-    proof: x => x,
+    proof,
     cardId,
   };
 }
@@ -98,7 +102,7 @@ export function searchCardsQuery(searchTerm: string): AppQuery<ReadonlyArray<Car
   return {
     type: "searchCards",
     searchTerm,
-    proof: x => x,
+    proof,
   };
 }
 
@@ -111,7 +115,7 @@ export function boardCardTreesQuery({
 }): AppQuery<ReadonlyArray<CardTree>> {
   return {
     type: "boardCardTrees",
-    proof: x => x,
+    proof,
     cardStatuses,
     boardId,
   };
@@ -120,24 +124,24 @@ export function boardCardTreesQuery({
 export function parentBoardQuery(boardId: BoardId): AppQuery<BoardId> {
   return {
     type: "parentBoard",
-    proof: x => x,
+    proof,
     boardId,
   };
 }
 
 export const allCategoriesQuery: AppQuery<CategorySet> = {
   type: "allCategories",
-  proof: x => x,
+  proof,
 };
 
 export const availableCategoriesQuery: AppQuery<ReadonlyArray<Category>> = {
   type: "availableCategories",
-  proof: x => x,
+  proof,
 };
 
 export const allColorsQuery: AppQuery<ColorSet> = {
   type: "allColors",
-  proof: x => x,
+  proof,
 };
 
 export type QueryResult<Q extends AppQuery<unknown>> = Q extends AppQuery<infer R> ? R : never;

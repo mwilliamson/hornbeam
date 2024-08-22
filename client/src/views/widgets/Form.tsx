@@ -25,9 +25,14 @@ export default function Form(props: FormProps) {
   const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
     setState(state => ({...state, isLoading: true}));
-    // TODO: handle errors
-    await onSubmit();
-    setState(state => ({...state, isLoading: false}));
+    try {
+      await onSubmit();
+      setState(state => ({...state, isLoading: false}));
+    } catch (error) {
+      // TODO: indicate error to user
+      console.error(error);
+      setState(state => ({...state, isLoading: false}));
+    }
   };
 
   return (

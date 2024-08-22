@@ -1,6 +1,6 @@
 import { AppQuery } from "hornbeam-common/src/queries";
 import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
-import { BackendConnection, BackendConnectionProvider } from ".";
+import { BackendConnection, BackendConnectionProvider, BackendSubscriptions } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
 import { useRef } from "react";
@@ -103,12 +103,17 @@ function createConnection(uri: string): BackendConnection {
   const sendRequest = async (request: AppRequest): Promise<void> => {
     // TODO: also update data (send active queries as part of request?)
 
+    const updateId = uuidv7();
+
     const update: AppUpdate = {
       request,
-      updateId: uuidv7(),
+      updateId,
     };
 
     await fetchJson("update", {update: serializeAppUpdate(update)});
+
+    // TODO: actually subscribe to server
+    subscriptions.setLastUpdateId(updateId);
   };
 
   const fetchJson = async (path: string, body: unknown) => {
@@ -127,10 +132,14 @@ function createConnection(uri: string): BackendConnection {
     return response.json();
   };
 
+  const subscriptions = new BackendSubscriptions();
+  // TODO: get real last update ID
+  subscriptions.setLastUpdateId(null);
+
   return {
     query,
     sendRequest,
-    lastUpdateId: null,
+    subscribe: subscriptions.subscribe,
     timeTravel: null,
   };
 }

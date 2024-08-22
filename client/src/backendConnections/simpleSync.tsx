@@ -8,7 +8,7 @@ import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
 import appStateToQueryFunction from "hornbeam-common/src/appStateToQueryFunction";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/src/util/promises";
-import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from ".";
+import { BackendConnection, BackendConnectionProvider, BackendConnectionState, BackendSubscriptions } from ".";
 
 interface ConnectSimpleSyncProps {
   children: (connectionState: BackendConnectionState) => React.ReactNode;
@@ -55,12 +55,17 @@ function ConnectedSimpleSync(props: ConnectedSimpleSyncProps) {
   const query = appStateToQueryFunction(appState, timeTravelSnapshotIndex);
   const sendRequest = useCreateSendRequest(sendAppUpdate, appState.updateIds);
 
+  const subscriptionsRef = useRef(new BackendSubscriptions());
+  const lastUpdateId = last(appState.updateIds) ?? null;
+  useEffect(() => {
+    subscriptionsRef.current.setLastUpdateId(lastUpdateId);
+  }, [lastUpdateId]);
 
   // TODO: ensure connection doesn't change.
   const connection: BackendConnection = {
     query,
     sendRequest,
-    lastUpdateId: last(appState.updateIds) ?? null,
+    subscribe: subscriptionsRef.current.subscribe,
     timeTravel: {
       maxSnapshotIndex: appState.latestSnapshotIndex(),
       snapshotIndex: timeTravelSnapshotIndex,

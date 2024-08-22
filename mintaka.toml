@@ -5,6 +5,12 @@ working_directory = "common"
 type = "tsc-watch"
 
 [[processes]]
+name = "Common: eslint"
+command = ["npm", "run", "check:eslint"]
+working_directory = "common"
+after = "Common: tsc"
+
+[[processes]]
 name = "Client: simple-sync"
 command = ["npm", "start"]
 working_directory = "client"

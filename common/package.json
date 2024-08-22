@@ -3,7 +3,9 @@
   "scripts": {
     "prepare": "npm run build",
     "build": "tsc",
-    "build-watch": "tsc --watch"
+    "build-watch": "tsc --watch",
+    "check": "npm run check:eslint",
+    "check:eslint": "eslint src && echo 'No lint errors' 1>&2"
   },
   "type": "commonjs"
 }

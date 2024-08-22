@@ -18,7 +18,8 @@ fastify.register(fastifyStatic, {
   root: path.join(__dirname, "../../client/public"),
 });
 
-fastify.post("/query", async (request, response) => {
+fastify.post("/query", async (request) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const serverQuery = deserializeServerQuery((request.body as any).query);
 
   const executeQuery = appStateToQueryFunction(appState, null);
@@ -55,14 +56,14 @@ fastify.post("/query", async (request, response) => {
       assertNever(serverQuery, null);
     }
   }
-})
+});
 
 async function run() {
   try {
-    await fastify.listen({ port: 3000 })
+    await fastify.listen({ port: 3000 });
   } catch (err) {
-    fastify.log.error(err)
-    process.exit(1)
+    fastify.log.error(err);
+    process.exit(1);
   }
 }
 

@@ -45,6 +45,12 @@ working_directory = "server"
 type = "tsc-watch"
 
 [[processes]]
+name = "Server: eslint"
+command = ["npm", "run", "check:eslint"]
+working_directory = "server"
+after = "Server: Build"
+
+[[processes]]
 name = "Server: Run"
 command = ["npm", "run", "start"]
 working_directory = "server"

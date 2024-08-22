@@ -108,7 +108,7 @@ function createConnection(uri: string): BackendConnection {
       updateId: uuidv7(),
     };
 
-    await fetchJson("update", serializeAppUpdate(update));
+    await fetchJson("update", {update: serializeAppUpdate(update)});
   };
 
   const fetchJson = async (path: string, body: unknown) => {

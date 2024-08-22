@@ -1,8 +1,9 @@
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import {initialAppState} from "hornbeam-common/lib/app";
+import {applyAppUpdate, initialAppState} from "hornbeam-common/lib/app";
 import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
+import {deserializeAppUpdate} from "hornbeam-common/lib/serialization/app";
 import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
 import assertNever from "hornbeam-common/lib/util/assertNever";
@@ -11,7 +12,7 @@ const fastify = Fastify({
   logger: true,
 });
 
-const appState = initialAppState();
+let appState = initialAppState();
 
 // TODO: separate public directories?
 fastify.register(fastifyStatic, {
@@ -56,6 +57,15 @@ fastify.post("/query", async (request) => {
       assertNever(serverQuery, null);
     }
   }
+});
+
+fastify.post("/update", async (request) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const update = deserializeAppUpdate((request.body as any).update);
+
+  appState = applyAppUpdate(appState, update);
+
+  return {};
 });
 
 async function run() {

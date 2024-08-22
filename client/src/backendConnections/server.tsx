@@ -4,6 +4,9 @@ import { BackendConnection, BackendConnectionProvider } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
 import { useRef } from "react";
+import { AppRequest, AppUpdate } from "hornbeam-common/src/app/snapshots";
+import { serializeAppUpdate } from "hornbeam-common/src/serialization/app";
+import { uuidv7 } from "uuidv7";
 
 interface ConnectServerProps {
   children: (connectionState: BackendConnection) => React.ReactNode;
@@ -97,6 +100,17 @@ function createConnection(uri: string): BackendConnection {
     return fetchJson("query", {query: serializeServerQuery(query)});
   };
 
+  const sendRequest = async (request: AppRequest): Promise<void> => {
+    // TODO: also update data (send active queries as part of request?)
+
+    const update: AppUpdate = {
+      request,
+      updateId: uuidv7(),
+    };
+
+    await fetchJson("update", serializeAppUpdate(update));
+  };
+
   const fetchJson = async (path: string, body: unknown) => {
     const response = await fetch(uri + path, {
       method: "POST",
@@ -111,11 +125,6 @@ function createConnection(uri: string): BackendConnection {
     }
 
     return response.json();
-  };
-
-  const sendRequest = () => {
-    // TODO: refresh data after sending request.
-    throw new Error("sending requests not supported");
   };
 
   return {

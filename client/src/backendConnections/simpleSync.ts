@@ -34,7 +34,10 @@ export function connectSimpleSync(
           appState = state.appState;
           requestSender.useSendAppUpdate(state.sendAppUpdate);
           requestSender.receiveUpdateIds(appState.updateIds);
-          subscriptions.setLastUpdateId(last(appState.updateIds) ?? null);
+          subscriptions.onLastUpdate({
+            updateId: last(appState.updateIds) ?? null,
+            snapshotIndex: appState.latestSnapshotIndex(),
+          });
           return;
         }
         case "connection-error": {
@@ -62,7 +65,7 @@ export function connectSimpleSync(
     },
     sendRequest: requestSender.sendRequest,
     subscribe: subscriptions.subscribe,
-    timeTravel: null
+    setTimeTravelSnapshotIndex: null
     // timeTravel: {
     //   maxSnapshotIndex: appState.latestSnapshotIndex(),
     //   snapshotIndex: timeTravelSnapshotIndex,

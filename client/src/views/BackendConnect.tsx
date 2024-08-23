@@ -23,6 +23,8 @@ export default function BackendConnect(props: BackendConnectProps) {
       },
       onUpdate: () => {
       },
+      onTimeTravel: () => {
+      },
     });
 
     return () => {

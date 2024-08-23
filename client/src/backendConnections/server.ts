@@ -91,7 +91,10 @@ export function connectServer(uri: string): BackendConnection {
     await fetchJson("update", {update: serializeAppUpdate(update)});
 
     // TODO: actually subscribe to server
-    subscriptions.setLastUpdateId(updateId);
+    subscriptions.onLastUpdate({
+      updateId: null,
+      snapshotIndex: 0,
+    });
   };
 
   const fetchJson = async (path: string, body: unknown) => {
@@ -112,13 +115,16 @@ export function connectServer(uri: string): BackendConnection {
 
   const subscriptions = new BackendSubscriptions();
   // TODO: get real last update ID
-  subscriptions.setLastUpdateId(null);
+  subscriptions.onLastUpdate({
+    updateId: null,
+    snapshotIndex: 0,
+  });
 
   return {
     close: () => {},
     query,
     sendRequest,
     subscribe: subscriptions.subscribe,
-    timeTravel: null,
+    setTimeTravelSnapshotIndex: null,
   };
 }

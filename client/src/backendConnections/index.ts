@@ -26,9 +26,15 @@ export interface TimeTravel {
   stop: () => void;
 }
 
+interface OnUpdateArgs {
+  updateId: string | null;
+  snapshotIndex: number;
+}
+
 export interface BackendSubscriber {
-  onConnect: (lastUpdateId: string | null) => void;
-  onUpdate: (updateId: string | null) => void;
+  onConnect: (lastUpdate: OnUpdateArgs) => void;
+  onUpdate: (update: OnUpdateArgs) => void;
+  onTimeTravel: (newSnapshotIndex: number | null) => void;
 }
 
 export interface BackendSubscription {
@@ -39,19 +45,21 @@ let nextSubscriptionId = 1;
 
 export class BackendSubscriptions {
   private readonly subscriptions: Map<number, BackendSubscriber>;
-  private lastUpdateId: string | null | undefined;
+  private lastUpdate: OnUpdateArgs | null;
+  private timeTravelSnapshotIndex: number | null;
 
   public constructor() {
     this.subscriptions = new Map();
-    this.lastUpdateId = undefined;
+    this.lastUpdate = null;
+    this.timeTravelSnapshotIndex = null;
   }
 
   public subscribe = (subscriber: BackendSubscriber) => {
     const subscriptionId = nextSubscriptionId++;
     this.subscriptions.set(subscriptionId, subscriber);
 
-    if (this.lastUpdateId !== undefined) {
-      subscriber.onConnect(this.lastUpdateId);
+    if (this.lastUpdate !== null) {
+      subscriber.onConnect(this.lastUpdate);
     }
 
     return {
@@ -61,15 +69,22 @@ export class BackendSubscriptions {
     };
   };
 
-  public setLastUpdateId = (lastUpdateId: string | null) => {
+  public onLastUpdate = (lastUpdate: OnUpdateArgs) => {
     for (const subscriber of this.subscriptions.values()) {
-      if (this.lastUpdateId === undefined) {
-        subscriber.onConnect(lastUpdateId);
+      if (this.lastUpdate === null) {
+        subscriber.onConnect(lastUpdate);
       } else {
-        subscriber.onUpdate(lastUpdateId);
+        subscriber.onUpdate(lastUpdate);
       }
     }
-    this.lastUpdateId = lastUpdateId;
+    this.lastUpdate = lastUpdate;
+  };
+
+  public onTimeTravel = (newSnapshotIndex: number | null) => {
+    this.timeTravelSnapshotIndex = newSnapshotIndex;
+    for (const subscriber of this.subscriptions.values()) {
+      subscriber.onTimeTravel(newSnapshotIndex);
+    }
   };
 }
 
@@ -78,7 +93,7 @@ export interface BackendConnection {
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
   subscribe: (subscriber: BackendSubscriber) => BackendSubscription;
-  timeTravel: TimeTravel | null;
+  setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;
 }
 
 export type SendRequest = (update: AppRequest) => Promise<void>;

@@ -37,53 +37,29 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
   // TODO: more efficient querying instead of clearing on `queries` change?
   // TODO: use single subscription instead of clearing on `queries` change
   useEffect(() => {
-    const onUpdate = (lastUpdateId: string | null) => {
-      setQueryState(queryState => {
-        if (
-          queryState.type !== "idle" &&
-          lastUpdateId === queryState.lastUpdateId &&
-          isEqual(queries, queryState.queries)
-        ) {
-          return queryState;
-        }
+    const load = (lastUpdateId: string | null): QueryState<QueryData> => {
+      const id = nextQueryLoadId++;
 
-        const id = nextQueryLoadId++;
+      const partialQueryData: {[k: string]: unknown} = {};
 
-        const partialQueryData: {[k: string]: unknown} = {};
+      let completedQueryCount = 0;
 
-        let completedQueryCount = 0;
+      const queryEntries = Object.entries(queries);
+      const queryCount = queryEntries.length;
 
-        const queryEntries = Object.entries(queries);
-        const queryCount = queryEntries.length;
+      for (const [key, query] of queryEntries) {
+        const promise = backendConnection.query(query);
 
-        for (const [key, query] of queryEntries) {
-          const promise = backendConnection.query(query);
-
-          promise.then(
-            value => {
-              partialQueryData[key] = value;
-              completedQueryCount++;
-              if (completedQueryCount === queryCount) {
-                setQueryState(queryState => {
-                  if (queryState.type === "loading" && queryState.id === id) {
-                    return {
-                      type: "success",
-                      value: partialQueryData as QueryData,
-                      lastUpdateId,
-                      queries,
-                    };
-                  } else {
-                    return queryState;
-                  }
-                });
-              }
-            },
-            error => {
+        promise.then(
+          value => {
+            partialQueryData[key] = value;
+            completedQueryCount++;
+            if (completedQueryCount === queryCount) {
               setQueryState(queryState => {
                 if (queryState.type === "loading" && queryState.id === id) {
                   return {
-                    type: "error",
-                    error,
+                    type: "success",
+                    value: partialQueryData as QueryData,
                     lastUpdateId,
                     queries,
                   };
@@ -92,21 +68,58 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
                 }
               });
             }
-          );
-        }
+          },
+          error => {
+            setQueryState(queryState => {
+              if (queryState.type === "loading" && queryState.id === id) {
+                return {
+                  type: "error",
+                  error,
+                  lastUpdateId,
+                  queries,
+                };
+              } else {
+                return queryState;
+              }
+            });
+          }
+        );
+      }
 
-        return {
-          type: "loading",
-          id,
-          lastUpdateId,
-          queries,
-        };
+      return {
+        type: "loading",
+        id,
+        lastUpdateId,
+        queries,
+      };
+    };
+
+    const onLastUpdate = ({updateId}: {updateId: string | null}) => {
+      setQueryState(queryState => {
+        if (
+          queryState.type !== "idle" &&
+          updateId === queryState.lastUpdateId &&
+          isEqual(queries, queryState.queries)
+        ) {
+          return queryState;
+        } else {
+          return load(updateId);
+        }
       });
     };
 
     const subscription = backendConnection.subscribe({
-      onConnect: onUpdate,
-      onUpdate: onUpdate,
+      onConnect: onLastUpdate,
+      onUpdate: onLastUpdate,
+      onTimeTravel: () => {
+        setQueryState(queryState => {
+          if (queryState.type === "idle") {
+            return queryState;
+          } else {
+            return load(queryState.lastUpdateId);
+          }
+        });
+      },
     });
 
     return () => {

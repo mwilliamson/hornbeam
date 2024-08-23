@@ -19,6 +19,7 @@ import { parentBoardQuery } from "hornbeam-common/src/queries";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
 import TopBarBoundary from "./TopBarBoundary";
+import { useTimeTravel } from "./useTimeTravel";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
@@ -48,7 +49,8 @@ interface BoardViewProps {
 
 export default function BoardView(props: BoardViewProps) {
   const {backendConnection} = props;
-  const {sendRequest, timeTravel} = backendConnection;
+  const {sendRequest} = backendConnection;
+  const timeTravel = useTimeTravel();
 
   const [viewState, setViewState] = useState(initialViewState);
 

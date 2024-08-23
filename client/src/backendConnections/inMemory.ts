@@ -9,7 +9,13 @@ import { last } from "lodash";
 export function connectInMemory(initialState: AppState): BackendConnection {
   let appState = initialState;
   const subscriptions = new BackendSubscriptions();
-  const timeTravelSnapshotIndex: number | null = null;
+
+  const generateLastUpdate = () => {
+    return {
+      updateId: last(appState.updateIds) ?? null,
+      snapshotIndex: appState.latestSnapshotIndex(),
+    };
+  };
 
   const sendRequest = async (request: AppRequest) => {
     const update: AppUpdate = {
@@ -18,26 +24,22 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     };
 
     appState = applyAppUpdate(appState, update);
-    subscriptions.setLastUpdateId(last(appState.updateIds) ?? null);
+    subscriptions.onLastUpdate(generateLastUpdate());
   };
 
-  // TODO: remove time travel duplication with simpleSync
-  // TODO: restore time travel
+  let timeTravelSnapshotIndex: number | null = null;
+  const setTimeTravelSnapshotIndex = (newSnapshotIndex: number | null) => {
+    timeTravelSnapshotIndex = newSnapshotIndex;
+    subscriptions.onTimeTravel(newSnapshotIndex);
+  };
 
-  subscriptions.setLastUpdateId(last(appState.updateIds) ?? null);
+  subscriptions.onLastUpdate(generateLastUpdate());
 
   return {
     close: () => {},
     query: query => queryAppState(appState, timeTravelSnapshotIndex, query),
     sendRequest,
     subscribe: subscriptions.subscribe,
-    timeTravel: null,
-    // timeTravel: {
-    //   maxSnapshotIndex: appState.latestSnapshotIndex(),
-    //   snapshotIndex: timeTravelSnapshotIndex,
-    //   setSnapshotIndex: newSnapshotIndex => setTimeTravelSnapshotIndex(newSnapshotIndex),
-    //   start: () => setTimeTravelSnapshotIndex(appState.latestSnapshotIndex()),
-    //   stop: () => setTimeTravelSnapshotIndex(null),
-    // },
+    setTimeTravelSnapshotIndex,
   };
 }

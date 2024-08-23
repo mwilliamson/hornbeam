@@ -15,11 +15,13 @@ export default function BackendConnect(props: BackendConnectProps) {
     const connection = connect();
 
     connection.subscribe({
-      onLastUpdateId: () => {
+      onConnect: () => {
         setConnectionState({
           type: "connected",
           connection,
         });
+      },
+      onUpdate: () => {
       },
     });
 

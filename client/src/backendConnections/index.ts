@@ -28,7 +28,8 @@ export interface TimeTravel {
 }
 
 export interface BackendSubscriber {
-  onLastUpdateId: (lastUpdateId: string | null) => void;
+  onConnect: (lastUpdateId: string | null) => void;
+  onUpdate: (updateId: string | null) => void;
 }
 
 export interface BackendSubscription {
@@ -50,7 +51,7 @@ export class BackendSubscriptions {
     this.subscriptions.set(subscriptionId, subscriber);
 
     if (this.lastUpdateId !== undefined) {
-      subscriber.onLastUpdateId(this.lastUpdateId);
+      subscriber.onConnect(this.lastUpdateId);
     }
 
     return {
@@ -61,11 +62,14 @@ export class BackendSubscriptions {
   };
 
   public setLastUpdateId = (lastUpdateId: string | null) => {
-    this.lastUpdateId = lastUpdateId;
-
     for (const subscriber of this.subscriptions.values()) {
-      subscriber.onLastUpdateId(lastUpdateId);
+      if (this.lastUpdateId === undefined) {
+        subscriber.onConnect(lastUpdateId);
+      } else {
+        subscriber.onUpdate(lastUpdateId);
+      }
     }
+    this.lastUpdateId = lastUpdateId;
   };
 }
 

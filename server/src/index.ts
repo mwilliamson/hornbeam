@@ -8,7 +8,12 @@ import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColo
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
 import assertNever from "hornbeam-common/lib/util/assertNever";
 
-export function startServer({port}: {port: number}) {
+interface Server {
+  close: () => Promise<void>;
+  port: () => number | null;
+}
+
+export async function startServer({port}: {port: number}): Promise<Server> {
   const fastify = Fastify({
     logger: true,
   });
@@ -69,14 +74,24 @@ export function startServer({port}: {port: number}) {
     return {};
   });
 
-  async function run() {
-    try {
-      await fastify.listen({ port });
-    } catch (error) {
-      fastify.log.error(error);
-      throw error;
-    }
+  try {
+    await fastify.listen({ port });
+  } catch (error) {
+    fastify.log.error(error);
+    throw error;
   }
 
-  run();
+  return {
+    close: async () => {
+      await fastify.close();
+    },
+    port: () => {
+      const address = fastify.addresses()[0];
+      if (address === undefined) {
+        return null;
+      } else {
+        return fastify.addresses()[0].port;
+      }
+    },
+  };
 }

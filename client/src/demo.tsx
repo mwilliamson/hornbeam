@@ -3,28 +3,30 @@ import ReactDOM from "react-dom/client";
 
 import { applyAppUpdate, initialAppState } from "hornbeam-common/src/app";
 import { deserializeAppUpdate } from "hornbeam-common/src/serialization/app";
-import BoardView from "./views/BoardView";
 import hornbeamLog from "../../hornbeam.log";
-import { ConnectInMemory } from "./backendConnections/inMemory";
+import { connectInMemory } from "./backendConnections/inMemory";
+import BackendConnect from "./views/BackendConnect";
+import { BackendConnection } from "./backendConnections";
+import BoardView from "./views/BoardView";
+
+function connect(): BackendConnection {
+  let appState = initialAppState();
+
+  for (const message of hornbeamLog) {
+    const appUpdate = deserializeAppUpdate(message.payload);
+    appState = applyAppUpdate(appState, appUpdate);
+  }
+
+  return connectInMemory(appState);
+}
 
 function Client() {
-  const initialDemoState = () => {
-    let appState = initialAppState();
-
-    for (const message of hornbeamLog) {
-      const appUpdate = deserializeAppUpdate(message.payload);
-      appState = applyAppUpdate(appState, appUpdate);
-    }
-
-    return appState;
-  };
-
   return (
-    <ConnectInMemory initialState={initialDemoState}>
+    <BackendConnect connect={connect}>
       {backendConnection => (
         <BoardView backendConnection={backendConnection} />
       )}
-    </ConnectInMemory>
+    </BackendConnect>
   );
 }
 

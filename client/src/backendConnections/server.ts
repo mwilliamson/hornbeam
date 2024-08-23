@@ -1,35 +1,13 @@
 import { AppQuery } from "hornbeam-common/src/queries";
 import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
-import { BackendConnection, BackendConnectionProvider, BackendSubscriptions } from ".";
+import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
-import { useRef } from "react";
 import { AppRequest, AppUpdate } from "hornbeam-common/src/app/snapshots";
 import { serializeAppUpdate } from "hornbeam-common/src/serialization/app";
 import { uuidv7 } from "uuidv7";
 
-interface ConnectServerProps {
-  children: (connectionState: BackendConnection) => React.ReactNode;
-  uri: string;
-}
-
-export function ConnectServer(props: ConnectServerProps) {
-  const {children, uri} = props;
-
-  const connectionRef = useRef<BackendConnection | null>(null);
-
-  if (connectionRef.current === null) {
-    connectionRef.current = createConnection(uri);
-  }
-
-  return (
-    <BackendConnectionProvider value={connectionRef.current}>
-      {children(connectionRef.current)}
-    </BackendConnectionProvider>
-  );
-}
-
-function createConnection(uri: string): BackendConnection {
+export function connectServer(uri: string): BackendConnection {
   const query = async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
       case "card": {
@@ -137,6 +115,7 @@ function createConnection(uri: string): BackendConnection {
   subscriptions.setLastUpdateId(null);
 
   return {
+    close: () => {},
     query,
     sendRequest,
     subscribe: subscriptions.subscribe,

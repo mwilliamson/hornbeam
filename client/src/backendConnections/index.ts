@@ -70,6 +70,7 @@ export class BackendSubscriptions {
 }
 
 export interface BackendConnection {
+  close: () => void;
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
   subscribe: (subscriber: BackendSubscriber) => BackendSubscription;

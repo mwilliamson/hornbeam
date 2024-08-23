@@ -1,11 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
+import { connectSimpleSync } from "./backendConnections/simpleSync";
+import { BackendConnection } from "./backendConnections";
+import BackendConnect from "./views/BackendConnect";
 import BoardView from "./views/BoardView";
-import { ConnectSimpleSync } from "./backendConnections/simpleSync";
-import { BackendConnectionState } from "./backendConnections";
 
-function webSocketUri() {
+function webSocketUri(): string {
   const location = window.location;
   const webSocketProtocol = location.protocol === "https:" ? "wss" : "ws";
 
@@ -17,43 +18,18 @@ function webSocketUri() {
   return `${webSocketProtocol}://${location.host}/${path}`;
 }
 
+function connect(): BackendConnection {
+  return connectSimpleSync(webSocketUri());
+}
+
 function SimpleSyncClient() {
   return (
-    <ConnectSimpleSync uri={webSocketUri()}>
-      {(connectionState) => (
-        <BackendConnectionStateView
-          connectionState={connectionState}
-        />
+    <BackendConnect connect={connect}>
+      {backendConnection => (
+        <BoardView backendConnection={backendConnection} />
       )}
-    </ConnectSimpleSync>
+    </BackendConnect>
   );
-}
-
-interface BackendConnectionStateViewProps {
-  connectionState: BackendConnectionState;
-}
-
-function BackendConnectionStateView(props: BackendConnectionStateViewProps) {
-  const {connectionState} = props;
-
-  switch (connectionState.type) {
-    case "connecting":
-      return (
-        <p>Connecting...</p>
-      );
-    case "connected":
-      return (
-        <BoardView backendConnection={connectionState.connection} />
-      );
-    case "connection-error":
-      return (
-        <p>Connection error, please reload the page.</p>
-      );
-    case "sync-error":
-      return (
-        <p>Synchronisation error, please reload the page.</p>
-      );
-  }
 }
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

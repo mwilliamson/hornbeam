@@ -1,3 +1,4 @@
 {
-  "rendererUrl": "http://localhost:8080/cosmos.html"
+  "rendererUrl": "http://localhost:8080/cosmos.html",
+  "ignore": ["lib/**"]
 }

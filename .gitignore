@@ -1,5 +1,6 @@
 .env
 /client/build.json
+/client/lib
 /client/node_modules
 /client/public/*.css
 /client/public/*.js

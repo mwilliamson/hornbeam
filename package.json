@@ -4,5 +4,8 @@
     "client",
     "common",
     "server"
-  ]
+  ],
+  "dependencies": {
+    "@types/mocha": "^10.0.7"
+  }
 }

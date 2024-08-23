@@ -8,8 +8,6 @@ import { createDeferred } from "hornbeam-common/lib/util/promises";
 createBackendConnectionTestSuite(
   "backendConnections/simpleSync",
   async () => {
-    // TODO: find free port
-    const port = 8081;
     const webSocketPath = "/ws";
 
     const httpServer = http.createServer();
@@ -19,7 +17,13 @@ createBackendConnectionTestSuite(
       webSocketPath,
     });
 
-    httpServer.listen(port);
+    httpServer.listen();
+
+    const address = httpServer.address();
+    if (address === null || typeof address === "string") {
+      throw new Error("could not find port of HTTP server");
+    }
+    const port = address.port;
 
     const backendConnection = connectSimpleSync(`ws://localhost:${port}${webSocketPath}`);
 

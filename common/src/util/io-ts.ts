@@ -15,6 +15,21 @@ export function withDefault<T extends t.Any>(
   );
 }
 
+export function stringEnum<T extends object>(
+  enumObj: T,
+  name: string,
+): t.Type<T[keyof T], string> {
+  const enumValues = new Set(Object.values(enumObj));
+  return new t.Type<T[keyof T], string>(
+    name,
+    (unknown): unknown is T[keyof T] => enumValues.has(unknown),
+    (input, context) => enumValues.has(input)
+      ? t.success(input as T[keyof T])
+      : t.failure(input, context),
+    value => value as unknown as string,
+  );
+}
+
 export const instant: t.Type<Instant, [number, number], unknown> = new t.Type(
   "Instant",
   (input: unknown): input is Instant => input instanceof Instant,

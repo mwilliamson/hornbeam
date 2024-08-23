@@ -1,9 +1,4 @@
-import * as t from "io-ts";
-
+import * as t2 from "../util/io-ts";
 import { CardStatus } from "../app/cardStatuses";
 
-export const SerializedCardStatus = t.keyof({
-  [CardStatus.Deleted]: null,
-  [CardStatus.Done]: null,
-  [CardStatus.None]: null,
-});
+export const SerializedCardStatus = t2.stringEnum(CardStatus, "CardStatus");

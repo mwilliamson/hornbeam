@@ -1,9 +1,9 @@
 import { useId, useState } from "react";
 
-import { Card, validateCardCategory, validateCardText } from "hornbeam-common/src/app/cards";
-import { Category } from "hornbeam-common/src/app/categories";
-import { ColorSet } from "hornbeam-common/src/app/colors";
-import { ValidationError, ValidationResult } from "hornbeam-common/src/util/validation";
+import { Card, validateCardCategory, validateCardText } from "hornbeam-common/lib/app/cards";
+import { Category } from "hornbeam-common/lib/app/categories";
+import { ColorSet } from "hornbeam-common/lib/app/colors";
+import { ValidationError, ValidationResult } from "hornbeam-common/lib/util/validation";
 import CategorySelect from "../categories/CategorySelect";
 import { ValidationErrorsInlineView } from "../validation-views";
 import ControlGroup from "../widgets/ControlGroup";

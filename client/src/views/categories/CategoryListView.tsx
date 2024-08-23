@@ -3,9 +3,9 @@ import { SortableContext, sortableKeyboardCoordinates, useSortable } from "@dnd-
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 
-import { Category, categoryBackgroundColorStyle } from "hornbeam-common/src/app/categories";
-import { ColorSet } from "hornbeam-common/src/app/colors";
-import { reorder } from "hornbeam-common/src/util/arrays";
+import { Category, categoryBackgroundColorStyle } from "hornbeam-common/lib/app/categories";
+import { ColorSet } from "hornbeam-common/lib/app/colors";
+import { reorder } from "hornbeam-common/lib/util/arrays";
 import "./CategoryListView.scss";
 
 interface CategoryListViewProps {

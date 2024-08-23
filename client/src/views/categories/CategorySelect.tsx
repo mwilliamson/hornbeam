@@ -1,5 +1,5 @@
-import { Category, categoryBackgroundColor } from "hornbeam-common/src/app/categories";
-import { ColorSet } from "hornbeam-common/src/app/colors";
+import { Category, categoryBackgroundColor } from "hornbeam-common/lib/app/categories";
+import { ColorSet } from "hornbeam-common/lib/app/colors";
 import CardRadioButtons from "../widgets/CardRadioButtons";
 
 interface CategorySelectProps {

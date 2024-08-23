@@ -1,8 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import { applyAppUpdate, initialAppState } from "hornbeam-common/src/app";
-import { deserializeAppUpdate } from "hornbeam-common/src/serialization/app";
+import { applyAppUpdate, initialAppState } from "hornbeam-common/lib/app";
+import { deserializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import hornbeamLog from "../../hornbeam.log";
 import { connectInMemory } from "./backendConnections/inMemory";
 import BackendConnect from "./views/BackendConnect";

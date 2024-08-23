@@ -1,9 +1,9 @@
 import { Instant } from "@js-joda/core";
 
-import { CategoryAddRequest } from "hornbeam-common/src/app/categories";
-import { requests } from "hornbeam-common/src/app/snapshots";
+import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
+import { requests } from "hornbeam-common/lib/app/snapshots";
 import Boundary from "../Boundary";
-import { allCategoriesQuery, allColorsQuery } from "hornbeam-common/src/queries";
+import { allCategoriesQuery, allColorsQuery } from "hornbeam-common/lib/queries";
 import CategorySection from "./CategorySection";
 
 export default function CategorySectionBoundary() {

@@ -1,4 +1,4 @@
-import { ColorSet } from "hornbeam-common/src/app/colors";
+import { ColorSet } from "hornbeam-common/lib/app/colors";
 import CardRadioButtons from "../widgets/CardRadioButtons";
 
 interface ColorSelectProps {

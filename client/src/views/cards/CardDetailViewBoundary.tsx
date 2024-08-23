@@ -1,8 +1,8 @@
 import { Instant } from "@js-joda/core";
-import { BoardId } from "hornbeam-common/src/app/boards";
-import { generateId } from "hornbeam-common/src/app/ids";
-import { requests } from "hornbeam-common/src/app/snapshots";
-import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/src/queries";
+import { BoardId } from "hornbeam-common/lib/app/boards";
+import { generateId } from "hornbeam-common/lib/app/ids";
+import { requests } from "hornbeam-common/lib/app/snapshots";
+import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
 import { CardFormInitialState } from "./CardForm";

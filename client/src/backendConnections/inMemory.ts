@@ -1,8 +1,8 @@
 import { uuidv7 } from "uuidv7";
 
-import { AppState, applyAppUpdate } from "hornbeam-common/src/app";
-import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
-import { queryAppState } from "hornbeam-common/src/appStateToQueryFunction";
+import { AppState, applyAppUpdate } from "hornbeam-common/lib/app";
+import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
+import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { last } from "lodash";
 

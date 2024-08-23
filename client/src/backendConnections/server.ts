@@ -1,10 +1,10 @@
-import { AppQuery } from "hornbeam-common/src/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/src/serialization/serverQueries";
+import { AppQuery } from "hornbeam-common/lib/queries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
-import { CategorySetInMemory } from "hornbeam-common/src/app/categories";
-import { ColorSetInMemory, PresetColor } from "hornbeam-common/src/app/colors";
-import { AppRequest, AppUpdate } from "hornbeam-common/src/app/snapshots";
-import { serializeAppUpdate } from "hornbeam-common/src/serialization/app";
+import { CategorySetInMemory } from "hornbeam-common/lib/app/categories";
+import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
+import { AppRequest, AppUpdate } from "hornbeam-common/lib/app/snapshots";
+import { serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { uuidv7 } from "uuidv7";
 
 export function connectServer(uri: string): BackendConnection {

@@ -1,4 +1,4 @@
-import intersperse from "hornbeam-common/src/util/intersperse";
+import intersperse from "hornbeam-common/lib/util/intersperse";
 
 interface PlainTextViewProps {
   value: string;

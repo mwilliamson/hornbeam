@@ -2,13 +2,13 @@ import { last } from "lodash";
 import * as simpleSync from "simple-sync/lib/client";
 import { uuidv7 } from "uuidv7";
 
-import { applyAppUpdate, initialAppState } from "hornbeam-common/src/app";
-import { AppUpdate, AppRequest } from "hornbeam-common/src/app/snapshots";
-import { queryAppState } from "hornbeam-common/src/appStateToQueryFunction";
-import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/src/serialization/app";
-import { Deferred, createDeferred } from "hornbeam-common/src/util/promises";
+import { applyAppUpdate, initialAppState } from "hornbeam-common/lib/app";
+import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
+import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
+import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
+import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
 import { BackendConnection, BackendSubscriptions } from ".";
-import assertNever from "hornbeam-common/src/util/assertNever";
+import assertNever from "hornbeam-common/lib/util/assertNever";
 
 export function connectSimpleSync(
   uri: string,

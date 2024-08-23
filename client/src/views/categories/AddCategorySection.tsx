@@ -3,8 +3,8 @@ import { Instant } from "@js-joda/core";
 import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { CategoryAddRequest } from "hornbeam-common/src/app/categories";
-import { ColorSet } from "hornbeam-common/src/app/colors";
+import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
+import { ColorSet } from "hornbeam-common/lib/app/colors";
 import ColorSelect from "../colors/ColorSelect";
 import ControlGroup from "../widgets/ControlGroup";
 import ControlLabel from "../widgets/ControlLabel";

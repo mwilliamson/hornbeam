@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CardStatus } from "hornbeam-common/src/app/cardStatuses";
+import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import CardStatusSelect from "./CardStatusSelect";
 
 export default {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
-import { AppRequest } from "hornbeam-common/src/app/snapshots";
+import { AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
-import { AppQuery, QueryResult } from "hornbeam-common/src/queries";
+import { AppQuery, QueryResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
 

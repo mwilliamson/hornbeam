@@ -1,4 +1,4 @@
-import { initialAppSnapshot } from "hornbeam-common/src/app/snapshots";
+import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import CardForm, { useCardFormState } from "./CardForm";
 
 export default {

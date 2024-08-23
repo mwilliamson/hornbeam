@@ -1,4 +1,4 @@
-import { ValidationError } from "hornbeam-common/src/util/validation";
+import { ValidationError } from "hornbeam-common/lib/util/validation";
 import "./validation-views.scss";
 
 interface ValidationErrorsSummaryViewProps {

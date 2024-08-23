@@ -1,4 +1,4 @@
-import { CardStatus, allCardStatuses } from "hornbeam-common/src/app/cardStatuses";
+import { CardStatus, allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
 import CardStatusLabel from "./CardStatusLabel";
 
 interface CardStatusSelectProps {

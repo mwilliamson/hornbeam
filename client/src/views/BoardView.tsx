@@ -1,9 +1,9 @@
 import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
-import { BoardId, isRootBoardId, rootBoardId } from "hornbeam-common/src/app/boards";
-import { CardStatus, allCardStatuses } from "hornbeam-common/src/app/cardStatuses";
-import { requests } from "hornbeam-common/src/app/snapshots";
+import { BoardId, isRootBoardId, rootBoardId } from "hornbeam-common/lib/app/boards";
+import { CardStatus, allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
+import { requests } from "hornbeam-common/lib/app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import "./BoardView.scss";
@@ -15,7 +15,7 @@ import { CardFormInitialState } from "./cards/CardForm";
 import ControlGroup from "./widgets/ControlGroup";
 import ExpanderIcon from "./widgets/ExpanderIcon";
 import { BackendConnection } from "../backendConnections";
-import { parentBoardQuery } from "hornbeam-common/src/queries";
+import { parentBoardQuery } from "hornbeam-common/lib/queries";
 import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
 import TopBarBoundary from "./TopBarBoundary";

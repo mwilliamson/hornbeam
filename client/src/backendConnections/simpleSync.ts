@@ -80,7 +80,7 @@ interface RequestSender {
 }
 
 function createRequestSender(): RequestSender {
-  let sendAppUpdate: ((update: AppUpdate) => void) | null;
+  let sendAppUpdate: ((update: AppUpdate) => void) | null = null;
   const pendingUpdates = new Map<string, Deferred<void>>();
   let lastUpdateIndex = -1;
 

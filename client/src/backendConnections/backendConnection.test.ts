@@ -7,30 +7,12 @@ import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
 import { allCategoriesQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
+import { createDeferred } from "hornbeam-common/lib/util/promises";
 
 export function createBackendConnectionTestSuite(
   name: string,
   createBackendConnection: () => Promise<[BackendConnection, () => Promise<void>]>,
 ): void {
-  function testBackendConnection(
-    name: string,
-    f: (backendConnection: BackendConnection) => Promise<void>,
-  ) {
-    test(name, async () => {
-      const [backendConnection, tearDown] = await createBackendConnection();
-
-      try {
-        try {
-          await f(backendConnection);
-        } finally {
-          backendConnection.close();
-        }
-      } finally {
-        await tearDown();
-      }
-    });
-  }
-
   suite(name, () => {
     suite("queries", () => {
       testBackendConnection("can fetch all categories", async (backendConnection) => {
@@ -50,6 +32,45 @@ export function createBackendConnectionTestSuite(
       });
     });
   });
+
+  function testBackendConnection(
+    name: string,
+    f: (backendConnection: BackendConnection) => Promise<void>,
+  ) {
+    test(name, async () => {
+      const [backendConnection, tearDown] = await createBackendConnection();
+
+      try {
+        try {
+          const connected = createDeferred<void>();
+
+          const subscription = backendConnection.subscribe({
+            onConnect: () => {
+              connected.resolve();
+            },
+            onConnectionError: () => {
+              connected.reject(new Error("connection error"));
+            },
+            onSyncError: () => {
+              connected.reject(new Error("sync error"));
+            },
+            onUpdate: () => {},
+            onTimeTravel: () => {},
+          });
+
+          await connected.promise;
+
+          subscription.close();
+
+          await f(backendConnection);
+        } finally {
+          backendConnection.close();
+        }
+      } finally {
+        await tearDown();
+      }
+    });
+  }
 }
 
 const testRequests = {

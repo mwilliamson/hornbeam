@@ -10,9 +10,9 @@ let nextQueryLoadId = 1;
 
 type QueryState<T> =
   | {type: "idle"}
-  | {type: "loading", id: number, lastUpdateId: string | null, queries: unknown}
-  | {type: "error", error: unknown, lastUpdateId: string | null, queries: unknown}
-  | {type: "success", value: T, lastUpdateId: string | null, queries: unknown};
+  | {type: "loading", id: number, queries: unknown}
+  | {type: "error", error: unknown, queries: unknown}
+  | {type: "success", value: T, queries: unknown};
 
 
 interface BoundaryProps<Q extends {[k: string]: AppQuery<unknown>}> {
@@ -32,50 +32,60 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
   const backendConnection = useBackendConnection();
 
   const [queryState, setQueryState] = useState<QueryState<QueryData>>({type: "idle"});
+  const [pendingLoad, setPendingLoad] = useState(false);
 
   // TODO: indicate stale data
   // TODO: more efficient querying instead of clearing on `queries` change?
   // TODO: use single subscription instead of clearing on `queries` change
   useEffect(() => {
-    const load = (lastUpdateId: string | null): QueryState<QueryData> => {
-      const id = nextQueryLoadId++;
+    const subscription = backendConnection.subscribe({
+      onConnect: () => {
+        setPendingLoad(true);
+      },
+      onUpdate: () => {
+        setPendingLoad(true);
+      },
+      onTimeTravel: () => {
+        setPendingLoad(true);
+      },
+    });
 
-      const partialQueryData: {[k: string]: unknown} = {};
+    return () => {
+      subscription.close();
+    };
+  }, [backendConnection]);
 
-      let completedQueryCount = 0;
+  useEffect(() => {
+    if (
+      queryState.type !== "idle" &&
+      !pendingLoad &&
+      isEqual(queries, queryState.queries)
+    ) {
+      return;
+    }
 
-      const queryEntries = Object.entries(queries);
-      const queryCount = queryEntries.length;
+    const id = nextQueryLoadId++;
 
-      for (const [key, query] of queryEntries) {
-        const promise = backendConnection.query(query);
+    const partialQueryData: {[k: string]: unknown} = {};
 
-        promise.then(
-          value => {
-            partialQueryData[key] = value;
-            completedQueryCount++;
-            if (completedQueryCount === queryCount) {
-              setQueryState(queryState => {
-                if (queryState.type === "loading" && queryState.id === id) {
-                  return {
-                    type: "success",
-                    value: partialQueryData as QueryData,
-                    lastUpdateId,
-                    queries,
-                  };
-                } else {
-                  return queryState;
-                }
-              });
-            }
-          },
-          error => {
+    let completedQueryCount = 0;
+
+    const queryEntries = Object.entries(queries);
+    const queryCount = queryEntries.length;
+
+    for (const [key, query] of queryEntries) {
+      const promise = backendConnection.query(query);
+
+      promise.then(
+        value => {
+          partialQueryData[key] = value;
+          completedQueryCount++;
+          if (completedQueryCount === queryCount) {
             setQueryState(queryState => {
               if (queryState.type === "loading" && queryState.id === id) {
                 return {
-                  type: "error",
-                  error,
-                  lastUpdateId,
+                  type: "success",
+                  value: partialQueryData as QueryData,
                   queries,
                 };
               } else {
@@ -83,49 +93,30 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
               }
             });
           }
-        );
-      }
-
-      return {
-        type: "loading",
-        id,
-        lastUpdateId,
-        queries,
-      };
-    };
-
-    const onLastUpdate = ({updateId}: {updateId: string | null}) => {
-      setQueryState(queryState => {
-        if (
-          queryState.type !== "idle" &&
-          updateId === queryState.lastUpdateId &&
-          isEqual(queries, queryState.queries)
-        ) {
-          return queryState;
-        } else {
-          return load(updateId);
+        },
+        error => {
+          setQueryState(queryState => {
+            if (queryState.type === "loading" && queryState.id === id) {
+              return {
+                type: "error",
+                error,
+                queries,
+              };
+            } else {
+              return queryState;
+            }
+          });
         }
-      });
-    };
+      );
+    }
 
-    const subscription = backendConnection.subscribe({
-      onConnect: onLastUpdate,
-      onUpdate: onLastUpdate,
-      onTimeTravel: () => {
-        setQueryState(queryState => {
-          if (queryState.type === "idle") {
-            return queryState;
-          } else {
-            return load(queryState.lastUpdateId);
-          }
-        });
-      },
+    setQueryState({
+      type: "loading",
+      id,
+      queries,
     });
-
-    return () => {
-      subscription.close();
-    };
-  }, [backendConnection, queries]);
+    setPendingLoad(false);
+  }, [backendConnection, pendingLoad, queries, queryState]);
 
   switch (queryState.type) {
     case "idle":

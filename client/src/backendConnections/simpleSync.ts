@@ -16,7 +16,6 @@ export function connectSimpleSync(
   let appState = initialAppState();
   const requestSender: RequestSender = createRequestSender();
   const subscriptions = new BackendSubscriptions();
-  const timeTravelSnapshotIndex: number | null = null;
 
   const client = simpleSync.connect({
     applyAppUpdate,
@@ -56,7 +55,11 @@ export function connectSimpleSync(
     },
   });
 
-  // TODO: time travel
+  let timeTravelSnapshotIndex: number | null = null;
+  const setTimeTravelSnapshotIndex = (newSnapshotIndex: number | null) => {
+    timeTravelSnapshotIndex = newSnapshotIndex;
+    subscriptions.onTimeTravel(newSnapshotIndex);
+  };
 
   return {
     close: () => client.close(),
@@ -65,14 +68,7 @@ export function connectSimpleSync(
     },
     sendRequest: requestSender.sendRequest,
     subscribe: subscriptions.subscribe,
-    setTimeTravelSnapshotIndex: null
-    // timeTravel: {
-    //   maxSnapshotIndex: appState.latestSnapshotIndex(),
-    //   snapshotIndex: timeTravelSnapshotIndex,
-    //   setSnapshotIndex: newSnapshotIndex => setTimeTravelSnapshotIndex(newSnapshotIndex),
-    //   start: () => setTimeTravelSnapshotIndex(appState.latestSnapshotIndex()),
-    //   stop: () => setTimeTravelSnapshotIndex(null),
-    // },
+    setTimeTravelSnapshotIndex,
   };
 }
 

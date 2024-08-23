@@ -2,7 +2,6 @@ import React, { useContext } from "react";
 
 import { AppRequest } from "hornbeam-common/src/app/snapshots";
 import { AppQuery } from "hornbeam-common/src/queries";
-import { uuidv7 } from "uuidv7";
 
 export type BackendConnectionState =
   | {
@@ -36,8 +35,10 @@ export interface BackendSubscription {
   close: () => void;
 }
 
+let nextSubscriptionId = 1;
+
 export class BackendSubscriptions {
-  private readonly subscriptions: Map<string, BackendSubscriber>;
+  private readonly subscriptions: Map<number, BackendSubscriber>;
   private lastUpdateId: string | null | undefined;
 
   public constructor() {
@@ -46,8 +47,7 @@ export class BackendSubscriptions {
   }
 
   public subscribe = (subscriber: BackendSubscriber) => {
-    // TODO: could use a simpler key
-    const subscriptionId = uuidv7();
+    const subscriptionId = nextSubscriptionId++;
     this.subscriptions.set(subscriptionId, subscriber);
 
     if (this.lastUpdateId !== undefined) {

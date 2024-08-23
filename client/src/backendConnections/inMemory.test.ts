@@ -4,5 +4,8 @@ import { connectInMemory } from "./inMemory";
 
 createBackendConnectionTestSuite(
   "backendConnections/inMemory",
-  () => connectInMemory(initialAppState()),
+  async () => [
+    connectInMemory(initialAppState()),
+    async () => {},
+  ],
 );

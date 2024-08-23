@@ -18,6 +18,8 @@ export function useTimeTravel(): TimeTravel | null {
       onTimeTravel: (newSnapshotIndex) => {
         setSnapshotIndex(newSnapshotIndex);
       },
+      onConnectionError: () => {},
+      onSyncError: () => {},
     });
 
     return () => {

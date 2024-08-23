@@ -40,13 +40,14 @@ export function connectSimpleSync(
           return;
         }
         case "connection-error": {
-          // TODO: error
           requestSender.useSendAppUpdate(null);
+          subscriptions.onConnectionError();
           return;
         }
         case "sync-error": {
           // TODO: error
           requestSender.useSendAppUpdate(null);
+          subscriptions.onSyncError();
           return;
         }
         default:

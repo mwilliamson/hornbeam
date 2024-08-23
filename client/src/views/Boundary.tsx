@@ -48,6 +48,8 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
       onTimeTravel: () => {
         setPendingLoad(true);
       },
+      onConnectionError: () => {},
+      onSyncError: () => {},
     });
 
     return () => {

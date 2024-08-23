@@ -35,6 +35,8 @@ export interface BackendSubscriber {
   onConnect: (lastUpdate: OnUpdateArgs) => void;
   onUpdate: (update: OnUpdateArgs) => void;
   onTimeTravel: (newSnapshotIndex: number | null) => void;
+  onConnectionError: () => void;
+  onSyncError: () => void;
 }
 
 export interface BackendSubscription {
@@ -84,6 +86,20 @@ export class BackendSubscriptions {
     this.timeTravelSnapshotIndex = newSnapshotIndex;
     for (const subscriber of this.subscriptions.values()) {
       subscriber.onTimeTravel(newSnapshotIndex);
+    }
+  };
+
+  public onConnectionError = () => {
+    this.lastUpdate = null;
+    for (const subscriber of this.subscriptions.values()) {
+      subscriber.onConnectionError();
+    }
+  };
+
+  public onSyncError = () => {
+    this.lastUpdate = null;
+    for (const subscriber of this.subscriptions.values()) {
+      subscriber.onSyncError();
     }
   };
 }

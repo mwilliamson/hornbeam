@@ -25,6 +25,12 @@ export default function BackendConnect(props: BackendConnectProps) {
       },
       onTimeTravel: () => {
       },
+      onConnectionError: () => {
+        setConnectionState({type: "connection-error"});
+      },
+      onSyncError: () => {
+        setConnectionState({type: "sync-error"});
+      },
     });
 
     return () => {

@@ -1,4 +1,4 @@
-import { last } from "lodash";
+import { last, mapValues } from "lodash";
 import * as simpleSync from "simple-sync/lib/client";
 import { uuidv7 } from "uuidv7";
 
@@ -9,6 +9,7 @@ import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/se
 import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
 import { BackendConnection, BackendSubscriptions } from ".";
 import assertNever from "hornbeam-common/lib/util/assertNever";
+import { AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 
 export function connectSimpleSync(
   uri: string,
@@ -67,6 +68,10 @@ export function connectSimpleSync(
     query: async query => {
       return queryAppState(appState, timeTravelSnapshotIndex, query);
     },
+    queryMany: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
+      queries,
+      query => queryAppState(appState, timeTravelSnapshotIndex, query),
+    ) as AppQueriesResult<TQueries>,
     sendRequest: requestSender.sendRequest,
     subscribe: subscriptions.subscribe,
     setTimeTravelSnapshotIndex,

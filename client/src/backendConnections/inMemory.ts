@@ -4,7 +4,8 @@ import { AppState, applyAppUpdate } from "hornbeam-common/lib/app";
 import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BackendConnection, BackendSubscriptions } from ".";
-import { last } from "lodash";
+import { last, mapValues } from "lodash";
+import { AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 
 export function connectInMemory(initialState: AppState): BackendConnection {
   let appState = initialState;
@@ -38,6 +39,10 @@ export function connectInMemory(initialState: AppState): BackendConnection {
   return {
     close: () => {},
     query: async query => queryAppState(appState, timeTravelSnapshotIndex, query),
+    queryMany: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
+      queries,
+      query => queryAppState(appState, timeTravelSnapshotIndex, query),
+    ) as AppQueriesResult<TQueries>,
     sendRequest,
     subscribe: subscriptions.subscribe,
     setTimeTravelSnapshotIndex,

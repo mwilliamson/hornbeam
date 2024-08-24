@@ -1,4 +1,4 @@
-import { AppQuery } from "hornbeam-common/lib/queries";
+import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
@@ -6,9 +6,10 @@ import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
 import { AppRequest, AppUpdate } from "hornbeam-common/lib/app/snapshots";
 import { serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { uuidv7 } from "uuidv7";
+import { asyncMapValues } from "hornbeam-common/lib/util/promises";
 
 export function connectServer(uri: string): BackendConnection {
-  const query = async <R,>(query: AppQuery<R>): Promise<R> => {
+  const executeQuery = async <R,>(query: AppQuery<R>): Promise<R> => {
     switch (query.type) {
       case "card": {
         const response = await fetchQuery({
@@ -73,6 +74,13 @@ export function connectServer(uri: string): BackendConnection {
     }
   };
 
+  async function queryMany<TQueries extends AppQueries>(queries: TQueries): Promise<AppQueriesResult<TQueries>> {
+    return asyncMapValues(
+      queries,
+      query => executeQuery(query),
+    ) as AppQueriesResult<TQueries>;
+  }
+
   const fetchAllCategories = async (): Promise<CategorySet> => {
     const response = await fetchQuery({
       type: "allCategories",
@@ -131,7 +139,8 @@ export function connectServer(uri: string): BackendConnection {
 
   return {
     close: () => {},
-    query,
+    query: executeQuery,
+    queryMany,
     sendRequest,
     subscribe: subscriptions.subscribe,
     setTimeTravelSnapshotIndex: null,

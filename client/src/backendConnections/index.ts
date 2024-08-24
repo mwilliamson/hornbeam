@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import { AppRequest } from "hornbeam-common/lib/app/snapshots";
-import { AppQuery } from "hornbeam-common/lib/queries";
+import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 
 export type BackendConnectionState =
   | {
@@ -108,6 +108,9 @@ export interface BackendConnection {
   close: () => void;
   sendRequest: SendRequest;
   query: <R>(query: AppQuery<R>) => Promise<R>;
+  queryMany: <TQueries extends AppQueries>(
+    queries: TQueries,
+  ) => Promise<AppQueriesResult<TQueries>>;
   subscribe: (subscriber: BackendSubscriber) => BackendSubscription;
   setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;
 }

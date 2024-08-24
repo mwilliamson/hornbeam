@@ -37,7 +37,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
 
   return {
     close: () => {},
-    query: query => queryAppState(appState, timeTravelSnapshotIndex, query),
+    query: async query => queryAppState(appState, timeTravelSnapshotIndex, query),
     sendRequest,
     subscribe: subscriptions.subscribe,
     setTimeTravelSnapshotIndex,

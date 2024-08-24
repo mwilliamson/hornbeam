@@ -9,11 +9,11 @@ export default function appStateToQueryFunction(appState: AppState, timeTravelSn
     queryAppState(appState, timeTravelSnapshotIndex, query);
 }
 
-export async function queryAppState<R>(
+export function queryAppState<R>(
   appState: AppState,
   timeTravelSnapshotIndex: number | null,
   query: AppQuery<R>,
-): Promise<R> {
+): R {
   const snapshot = timeTravelSnapshotIndex === null
     ? appState.latestSnapshot()
     : appState.snapshot(timeTravelSnapshotIndex);

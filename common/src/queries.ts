@@ -144,4 +144,6 @@ export const allColorsQuery: AppQuery<ColorSet> = {
   proof,
 };
 
-export type QueryResult<Q extends AppQuery<unknown>> = Q extends AppQuery<infer R> ? R : never;
+export type AppQueries = {[k: string]: AppQuery<unknown>};
+export type AppQueryResult<Q extends AppQuery<unknown>> = Q extends AppQuery<infer R> ? R : never;
+export type AppQueriesResult<TQueries extends AppQueries> = {[K in keyof TQueries]: AppQueryResult<TQueries[K]>};

@@ -2,36 +2,34 @@ import { useEffect, useState } from "react";
 
 import { AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
-import { AppQuery, QueryResult } from "hornbeam-common/lib/queries";
+import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
 
 let nextQueryLoadId = 1;
 
-type QueryState<T> =
+type QueryState<TQueries extends AppQueries> =
   | {type: "idle"}
   | {type: "loading", id: number, queries: unknown}
   | {type: "error", error: unknown, queries: unknown}
-  | {type: "success", value: T, queries: unknown};
+  | {type: "success", value: AppQueriesResult<TQueries>, queries: unknown};
 
 
-interface BoundaryProps<Q extends {[k: string]: AppQuery<unknown>}> {
-  queries: Q,
+interface BoundaryProps<TQueries extends AppQueries> {
+  queries: TQueries,
   render: (
-    queryData: {[K in keyof Q]: QueryResult<Q[K]>},
+    queryData: AppQueriesResult<TQueries>,
     sendRequest: (update: AppRequest) => Promise<void>,
     query: <R>(query: AppQuery<R>) => Promise<R>,
   ) => React.ReactNode;
 }
 
-export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(props: BoundaryProps<Q>) {
-  type QueryData = {[K in keyof Q]: QueryResult<Q[K]>};
-
+export default function Boundary<TQueries extends AppQueries>(props: BoundaryProps<TQueries>) {
   const {queries, render} = props;
 
   const backendConnection = useBackendConnection();
 
-  const [queryState, setQueryState] = useState<QueryState<QueryData>>({type: "idle"});
+  const [queryState, setQueryState] = useState<QueryState<TQueries>>({type: "idle"});
   const [pendingLoad, setPendingLoad] = useState(false);
 
   // TODO: indicate stale data
@@ -87,7 +85,7 @@ export default function Boundary<Q extends {[k: string]: AppQuery<unknown>}>(pro
               if (queryState.type === "loading" && queryState.id === id) {
                 return {
                   type: "success",
-                  value: partialQueryData as QueryData,
+                  value: partialQueryData as AppQueriesResult<TQueries>,
                   queries,
                 };
               } else {

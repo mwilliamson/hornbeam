@@ -11,6 +11,7 @@ import { createDeferred } from "hornbeam-common/lib/util/promises";
 import { CardAddRequest } from "hornbeam-common/lib/app/cards";
 import { rootBoardId } from "hornbeam-common/lib/app/boards";
 import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
+import assertNever from "hornbeam-common/lib/util/assertNever";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -272,7 +273,9 @@ export function createBackendConnectionTestSuite(
                 connected.reject(new Error("sync error"));
                 return;
               case "unconnected":
-                break;
+                return;
+              default:
+                assertNever(status, null);
             }
           });
 

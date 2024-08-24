@@ -5,10 +5,12 @@ import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, cardChildCountQuery, cardQuery, parentCardQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardQuery, parentCardQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
 import { CardAddRequest } from "hornbeam-common/lib/app/cards";
+import { rootBoardId } from "hornbeam-common/lib/app/boards";
+import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -156,6 +158,52 @@ export function createBackendConnectionTestSuite(
           const card = await backendConnection.query(cardChildCountQuery(parentCardId));
 
           assertThat(card, equalTo(2));
+        });
+      });
+
+      suite("boardCardTrees", () => {
+        testBackendConnection("root board", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+            name: "<category name 1>",
+          }));
+
+          const parentCardId = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: parentCardId,
+            parentCardId: null,
+            text: "<parent card text>",
+          }));
+
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: uuidv7(),
+            parentCardId,
+            text: "<child card text>",
+          }));
+
+          const boardCardTrees = await backendConnection.query(boardCardTreesQuery({
+            boardId: rootBoardId,
+            cardStatuses: new Set(allCardStatuses),
+          }));
+
+          assertThat(boardCardTrees, containsExactly(
+            hasProperties({
+              card: hasProperties({
+                text: "<parent card text>",
+              }),
+              children: containsExactly(
+                hasProperties({
+                  card: hasProperties({
+                    text: "<child card text>",
+                  }),
+                  children: containsExactly(),
+                }),
+              ),
+            }),
+          ));
         });
       });
 

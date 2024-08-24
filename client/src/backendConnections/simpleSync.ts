@@ -65,10 +65,10 @@ export function connectSimpleSync(
 
   return {
     close: () => client.close(),
-    query: async query => {
+    executeQuery: async query => {
       return queryAppState(appState, timeTravelSnapshotIndex, query);
     },
-    queryMany: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
+    executeQueries: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
       queries,
       query => queryAppState(appState, timeTravelSnapshotIndex, query),
     ) as AppQueriesResult<TQueries>,

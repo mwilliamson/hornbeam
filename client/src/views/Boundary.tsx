@@ -66,7 +66,7 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
 
     const id = nextQueryLoadId++;
 
-    backendConnection.queryMany(queries).then(
+    backendConnection.executeQueries(queries).then(
       result => {
         setQueryState(queryState => {
           if (queryState.type === "loading" && queryState.id === id) {
@@ -116,6 +116,6 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
         <p>Query error.</p>
       );
     case "success":
-      return render(queryState.value, backendConnection.sendRequest, backendConnection.query);
+      return render(queryState.value, backendConnection.sendRequest, backendConnection.executeQuery);
   }
 }

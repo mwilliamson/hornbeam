@@ -144,8 +144,8 @@ export class BackendSubscriptions {
 export interface BackendConnection {
   close: () => void;
   sendRequest: SendRequest;
-  query: <R>(query: AppQuery<R>) => Promise<R>;
-  queryMany: <TQueries extends AppQueries>(
+  executeQuery: <R>(query: AppQuery<R>) => Promise<R>;
+  executeQueries: <TQueries extends AppQueries>(
     queries: TQueries,
   ) => Promise<AppQueriesResult<TQueries>>;
   subscribe: (subscriber: BackendSubscriber) => BackendSubscription;

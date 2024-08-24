@@ -38,8 +38,8 @@ export function connectInMemory(initialState: AppState): BackendConnection {
 
   return {
     close: () => {},
-    query: async query => queryAppState(appState, timeTravelSnapshotIndex, query),
-    queryMany: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
+    executeQuery: async query => queryAppState(appState, timeTravelSnapshotIndex, query),
+    executeQueries: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
       queries,
       query => queryAppState(appState, timeTravelSnapshotIndex, query),
     ) as AppQueriesResult<TQueries>,

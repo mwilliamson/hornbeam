@@ -193,8 +193,8 @@ export function connectServer(uri: string): BackendConnection {
 
   return {
     close: () => {},
-    query: executeQuery,
-    queryMany,
+    executeQuery: executeQuery,
+    executeQueries: queryMany,
     sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,

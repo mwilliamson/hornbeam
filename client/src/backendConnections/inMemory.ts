@@ -4,7 +4,7 @@ import { AppState, applyAppUpdate } from "hornbeam-common/lib/app";
 import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BackendConnection, BackendSubscriptions } from ".";
-import { last, mapValues } from "lodash";
+import { mapValues } from "lodash";
 import { AppQueries, AppQueriesResult, AppQuery } from "hornbeam-common/lib/queries";
 
 export function connectInMemory(initialState: AppState): BackendConnection {
@@ -25,7 +25,6 @@ export function connectInMemory(initialState: AppState): BackendConnection {
 
   const generateLastUpdate = () => {
     return {
-      updateId: last(appState.updateIds) ?? null,
       snapshotIndex: appState.latestSnapshotIndex(),
     };
   };
@@ -53,7 +52,6 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     executeQuery,
     executeQueries,
     sendRequest,
-    subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
     subscribeTimeTravel: subscriptions.subscribeTimeTravel,

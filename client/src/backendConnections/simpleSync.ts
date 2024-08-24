@@ -1,4 +1,4 @@
-import { last, mapValues } from "lodash";
+import { mapValues } from "lodash";
 import * as simpleSync from "simple-sync/lib/client";
 import { uuidv7 } from "uuidv7";
 
@@ -47,7 +47,6 @@ export function connectSimpleSync(
           requestSender.useSendAppUpdate(state.sendAppUpdate);
           requestSender.receiveUpdateIds(appState.updateIds);
           subscriptions.onLastUpdate({
-            updateId: last(appState.updateIds) ?? null,
             snapshotIndex: appState.latestSnapshotIndex(),
           });
           return;
@@ -80,7 +79,6 @@ export function connectSimpleSync(
     executeQuery,
     executeQueries,
     sendRequest: requestSender.sendRequest,
-    subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
     subscribeTimeTravel: subscriptions.subscribeTimeTravel,

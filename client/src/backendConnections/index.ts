@@ -27,16 +27,7 @@ export interface TimeTravel {
 }
 
 interface OnUpdateArgs {
-  updateId: string | null;
   snapshotIndex: number;
-}
-
-export interface BackendSubscriber {
-  onConnect: (lastUpdate: OnUpdateArgs) => void;
-  onUpdate: (update: OnUpdateArgs) => void;
-  onTimeTravel: (newSnapshotIndex: number | null) => void;
-  onConnectionError: () => void;
-  onSyncError: () => void;
 }
 
 type BackendConnectionStatusSubscriber = (status: BackendConnectionStatus) => void;
@@ -69,7 +60,6 @@ let nextSubscriptionId = 1;
 
 export class BackendSubscriptions {
   private readonly executeQueries: ExecuteQueries;
-  private readonly subscriptions: Map<number, BackendSubscriber>;
   private readonly connectionStatusSubscriptions: Map<number, BackendConnectionStatusSubscriber>;
   private readonly queriesSubscriptions: Map<number, AppQueriesSubscription>;
   private connectionStatus: BackendConnectionStatus;
@@ -79,7 +69,6 @@ export class BackendSubscriptions {
 
   public constructor(executeQueries: ExecuteQueries) {
     this.executeQueries = executeQueries;
-    this.subscriptions = new Map();
     this.connectionStatusSubscriptions = new Map();
     this.queriesSubscriptions = new Map();
     this.timeTravelSubscriptions = new Map();
@@ -87,21 +76,6 @@ export class BackendSubscriptions {
     this.lastUpdate = null;
     this.timeTravelSnapshotIndex = null;
   }
-
-  public subscribe = (subscriber: BackendSubscriber) => {
-    const subscriptionId = nextSubscriptionId++;
-    this.subscriptions.set(subscriptionId, subscriber);
-
-    if (this.lastUpdate !== null) {
-      subscriber.onConnect(this.lastUpdate);
-    }
-
-    return {
-      close: () => {
-        this.subscriptions.delete(subscriptionId);
-      },
-    };
-  };
 
   public subscribeConnectionStatus = (subscriber: BackendConnectionStatusSubscriber) => {
     const subscriptionId = nextSubscriptionId++;
@@ -163,7 +137,7 @@ export class BackendSubscriptions {
     this.timeTravelSubscriptions.set(subscriptionId, subscriber);
 
     if (this.lastUpdate !== null) {
-      subscriber.onMaxSnapshotIndex(this.lastUpdate.snapshotIndex)
+      subscriber.onMaxSnapshotIndex(this.lastUpdate.snapshotIndex);
     }
 
     subscriber.onTimeTravel(this.timeTravelSnapshotIndex);
@@ -173,7 +147,7 @@ export class BackendSubscriptions {
         this.timeTravelSubscriptions.delete(subscriptionId);
       }
     };
-  }
+  };
 
   public onLastUpdate = (lastUpdate: OnUpdateArgs) => {
     if (this.connectionStatus.type !== "connected") {
@@ -182,14 +156,6 @@ export class BackendSubscriptions {
 
     for (const subscriber of this.queriesSubscriptions.values()) {
       subscriber.execute();
-    }
-
-    for (const subscriber of this.subscriptions.values()) {
-      if (this.lastUpdate === null) {
-        subscriber.onConnect(lastUpdate);
-      } else {
-        subscriber.onUpdate(lastUpdate);
-      }
     }
 
     for (const subscriber of this.timeTravelSubscriptions.values()) {
@@ -204,10 +170,6 @@ export class BackendSubscriptions {
       subscriber.execute();
     }
 
-    for (const subscriber of this.subscriptions.values()) {
-      subscriber.onTimeTravel(newSnapshotIndex);
-    }
-
     for (const subscriber of this.timeTravelSubscriptions.values()) {
       subscriber.onTimeTravel(newSnapshotIndex);
     }
@@ -216,17 +178,11 @@ export class BackendSubscriptions {
   public onConnectionError = () => {
     this.lastUpdate = null;
     this.updateConnectionStatus({type: "connection-error"});
-    for (const subscriber of this.subscriptions.values()) {
-      subscriber.onConnectionError();
-    }
   };
 
   public onSyncError = () => {
-    this.updateConnectionStatus({type: "sync-error"});
     this.lastUpdate = null;
-    for (const subscriber of this.subscriptions.values()) {
-      subscriber.onSyncError();
-    }
+    this.updateConnectionStatus({type: "sync-error"});
   };
 
   private updateConnectionStatus = (newConnectionStatus: BackendConnectionStatus): void => {
@@ -248,7 +204,6 @@ export interface BackendConnection {
   sendRequest: SendRequest;
   executeQuery: <R>(query: AppQuery<R>) => Promise<R>;
   executeQueries: ExecuteQueries;
-  subscribe: (subscriber: BackendSubscriber) => BackendSubscription;
   subscribeStatus: (subscriber: BackendConnectionStatusSubscriber) => BackendSubscription;
   subscribeQueries: <TQueries extends AppQueries>(
     queries: TQueries,

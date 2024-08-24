@@ -157,9 +157,8 @@ export function connectServer(uri: string): BackendConnection {
 
     await fetchJson("update", {update: serializeAppUpdate(update)});
 
-    // TODO: actually subscribe to server
+    // TODO: get real snapshot index
     subscriptions.onLastUpdate({
-      updateId: null,
       snapshotIndex: 0,
     });
   };
@@ -185,9 +184,8 @@ export function connectServer(uri: string): BackendConnection {
   };
 
   const subscriptions = new BackendSubscriptions(executeQueries);
-  // TODO: get real last update ID
+  // TODO: get real snapshot index
   subscriptions.onLastUpdate({
-    updateId: null,
     snapshotIndex: 0,
   });
 
@@ -196,7 +194,6 @@ export function connectServer(uri: string): BackendConnection {
     executeQuery,
     executeQueries,
     sendRequest,
-    subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
     subscribeTimeTravel: subscriptions.subscribeTimeTravel,

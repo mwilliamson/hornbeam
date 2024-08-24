@@ -260,18 +260,20 @@ export function createBackendConnectionTestSuite(
         try {
           const connected = createDeferred<void>();
 
-          const subscription = backendConnection.subscribe({
-            onConnect: () => {
-              connected.resolve();
-            },
-            onConnectionError: () => {
-              connected.reject(new Error("connection error"));
-            },
-            onSyncError: () => {
-              connected.reject(new Error("sync error"));
-            },
-            onUpdate: () => {},
-            onTimeTravel: () => {},
+          const subscription = backendConnection.subscribeStatus(status => {
+            switch (status.type) {
+              case "connected":
+                connected.resolve();
+                return;
+              case "connection-error":
+                connected.reject(new Error("connection error"));
+                return;
+              case "sync-error":
+                connected.reject(new Error("sync error"));
+                return;
+              case "unconnected":
+                break;
+            }
           });
 
           await connected.promise;

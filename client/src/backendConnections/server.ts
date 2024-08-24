@@ -197,6 +197,7 @@ export function connectServer(uri: string): BackendConnection {
     queryMany,
     sendRequest,
     subscribe: subscriptions.subscribe,
+    subscribeStatus: subscriptions.subscribeConnectionStatus,
     setTimeTravelSnapshotIndex: null,
   };
 }

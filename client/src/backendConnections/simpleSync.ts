@@ -74,6 +74,7 @@ export function connectSimpleSync(
     ) as AppQueriesResult<TQueries>,
     sendRequest: requestSender.sendRequest,
     subscribe: subscriptions.subscribe,
+    subscribeStatus: subscriptions.subscribeConnectionStatus,
     setTimeTravelSnapshotIndex,
   };
 }

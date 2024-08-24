@@ -45,6 +45,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     ) as AppQueriesResult<TQueries>,
     sendRequest,
     subscribe: subscriptions.subscribe,
+    subscribeStatus: subscriptions.subscribeConnectionStatus,
     setTimeTravelSnapshotIndex,
   };
 }

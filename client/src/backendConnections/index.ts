@@ -56,6 +56,11 @@ interface AppQueriesSubscription {
   execute: () => void;
 }
 
+interface TimeTravelSubscriber {
+  onMaxSnapshotIndex: (maxSnapshotIndex: number) => void;
+  onTimeTravel: (newSnapshotIndex: number | null) => void;
+}
+
 export interface BackendSubscription {
   close: () => void;
 }
@@ -69,14 +74,18 @@ export class BackendSubscriptions {
   private readonly queriesSubscriptions: Map<number, AppQueriesSubscription>;
   private connectionStatus: BackendConnectionStatus;
   private lastUpdate: OnUpdateArgs | null;
+  private readonly timeTravelSubscriptions: Map<number, TimeTravelSubscriber>;
+  private timeTravelSnapshotIndex: number | null;
 
   public constructor(executeQueries: ExecuteQueries) {
     this.executeQueries = executeQueries;
     this.subscriptions = new Map();
     this.connectionStatusSubscriptions = new Map();
     this.queriesSubscriptions = new Map();
+    this.timeTravelSubscriptions = new Map();
     this.connectionStatus = {type: "unconnected"};
     this.lastUpdate = null;
+    this.timeTravelSnapshotIndex = null;
   }
 
   public subscribe = (subscriber: BackendSubscriber) => {
@@ -148,6 +157,24 @@ export class BackendSubscriptions {
     };
   };
 
+  public subscribeTimeTravel = (subscriber: TimeTravelSubscriber) => {
+    const subscriptionId = nextSubscriptionId++;
+
+    this.timeTravelSubscriptions.set(subscriptionId, subscriber);
+
+    if (this.lastUpdate !== null) {
+      subscriber.onMaxSnapshotIndex(this.lastUpdate.snapshotIndex)
+    }
+
+    subscriber.onTimeTravel(this.timeTravelSnapshotIndex);
+
+    return {
+      close: () => {
+        this.timeTravelSubscriptions.delete(subscriptionId);
+      }
+    };
+  }
+
   public onLastUpdate = (lastUpdate: OnUpdateArgs) => {
     if (this.connectionStatus.type !== "connected") {
       this.updateConnectionStatus({type: "connected"});
@@ -165,6 +192,10 @@ export class BackendSubscriptions {
       }
     }
 
+    for (const subscriber of this.timeTravelSubscriptions.values()) {
+      subscriber.onMaxSnapshotIndex(lastUpdate.snapshotIndex);
+    }
+
     this.lastUpdate = lastUpdate;
   };
 
@@ -174,6 +205,10 @@ export class BackendSubscriptions {
     }
 
     for (const subscriber of this.subscriptions.values()) {
+      subscriber.onTimeTravel(newSnapshotIndex);
+    }
+
+    for (const subscriber of this.timeTravelSubscriptions.values()) {
       subscriber.onTimeTravel(newSnapshotIndex);
     }
   };
@@ -219,6 +254,7 @@ export interface BackendConnection {
     queries: TQueries,
     subscriber: AppQueriesSubscriber<TQueries>,
   ) => BackendSubscription;
+  subscribeTimeTravel: (subscriber: TimeTravelSubscriber) => BackendSubscription;
   setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;
 }
 

@@ -199,6 +199,7 @@ export function connectServer(uri: string): BackendConnection {
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
+    subscribeTimeTravel: subscriptions.subscribeTimeTravel,
     setTimeTravelSnapshotIndex: null,
   };
 }

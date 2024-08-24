@@ -8,18 +8,13 @@ export function useTimeTravel(): TimeTravel | null {
   const [maxSnapshotIndex, setMaxSnapshotIndex] = useState(0);
 
   useEffect(() => {
-    const subscription = backendConnection.subscribe({
-      onConnect: ({snapshotIndex}) => {
-        setMaxSnapshotIndex(snapshotIndex);
-      },
-      onUpdate: ({snapshotIndex}) => {
-        setMaxSnapshotIndex(snapshotIndex);
+    const subscription = backendConnection.subscribeTimeTravel({
+      onMaxSnapshotIndex: (newMaxSnapshotIndex) => {
+        setMaxSnapshotIndex(newMaxSnapshotIndex);
       },
       onTimeTravel: (newSnapshotIndex) => {
         setSnapshotIndex(newSnapshotIndex);
       },
-      onConnectionError: () => {},
-      onSyncError: () => {},
     });
 
     return () => {

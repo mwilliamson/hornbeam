@@ -56,6 +56,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
+    subscribeTimeTravel: subscriptions.subscribeTimeTravel,
     setTimeTravelSnapshotIndex,
   };
 }

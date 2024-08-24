@@ -83,6 +83,7 @@ export function connectSimpleSync(
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
+    subscribeTimeTravel: subscriptions.subscribeTimeTravel,
     setTimeTravelSnapshotIndex,
   };
 }

@@ -59,27 +59,32 @@ export interface BackendSubscription {
 let nextSubscriptionId = 1;
 
 export class BackendSubscriptions {
-  private readonly executeQueries: ExecuteQueries;
-  private readonly connectionStatusSubscriptions: Map<number, BackendConnectionStatusSubscriber>;
-  private readonly queriesSubscriptions: Map<number, AppQueriesSubscription>;
   private connectionStatus: BackendConnectionStatus;
+  private readonly connectionStatusSubscriptions: Map<number, BackendConnectionStatusSubscriber>;
+
+  private readonly executeQueries: ExecuteQueries;
+  private readonly queriesSubscriptions: Map<number, AppQueriesSubscription>;
+
   private lastUpdate: OnUpdateArgs | null;
-  private readonly timeTravelSubscriptions: Map<number, TimeTravelSubscriber>;
   private timeTravelSnapshotIndex: number | null;
+  private readonly timeTravelSubscriptions: Map<number, TimeTravelSubscriber>;
 
   public constructor(executeQueries: ExecuteQueries) {
-    this.executeQueries = executeQueries;
-    this.connectionStatusSubscriptions = new Map();
-    this.queriesSubscriptions = new Map();
-    this.timeTravelSubscriptions = new Map();
     this.connectionStatus = {type: "unconnected"};
+    this.connectionStatusSubscriptions = new Map();
+
+    this.executeQueries = executeQueries;
+    this.queriesSubscriptions = new Map();
+
     this.lastUpdate = null;
     this.timeTravelSnapshotIndex = null;
+    this.timeTravelSubscriptions = new Map();
   }
 
   public subscribeConnectionStatus = (subscriber: BackendConnectionStatusSubscriber) => {
     const subscriptionId = nextSubscriptionId++;
     this.connectionStatusSubscriptions.set(subscriptionId, subscriber);
+
     subscriber(this.connectionStatus);
 
     return {
@@ -150,6 +155,8 @@ export class BackendSubscriptions {
   };
 
   public onLastUpdate = (lastUpdate: OnUpdateArgs) => {
+    this.lastUpdate = lastUpdate;
+
     if (this.connectionStatus.type !== "connected") {
       this.updateConnectionStatus({type: "connected"});
     }
@@ -161,8 +168,6 @@ export class BackendSubscriptions {
     for (const subscriber of this.timeTravelSubscriptions.values()) {
       subscriber.onMaxSnapshotIndex(lastUpdate.snapshotIndex);
     }
-
-    this.lastUpdate = lastUpdate;
   };
 
   public onTimeTravel = (newSnapshotIndex: number | null) => {

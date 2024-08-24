@@ -1,13 +1,14 @@
-import { assertThat, containsExactly, hasProperties } from "@mwilliamson/precisely";
+import { assertThat, containsExactly, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { BackendConnection } from ".";
 import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, cardQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
+import { CardAddRequest } from "hornbeam-common/lib/app/cards";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -15,6 +16,40 @@ export function createBackendConnectionTestSuite(
 ): void {
   suite(name, () => {
     suite("queries", () => {
+      suite("card", () => {
+        testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
+          const card = await backendConnection.query(cardQuery(uuidv7()));
+
+          assertThat(card, equalTo(null));
+        });
+
+        testBackendConnection("can find card by ID", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+            name: "<category name 1>",
+          }));
+
+          const card1Id = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: card1Id,
+            text: "<card text 1>",
+          }));
+
+          const card2Id = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: card2Id,
+            text: "<card text 2>",
+          }));
+
+          const card = await backendConnection.query(cardQuery(card2Id));
+
+          assertThat(card, hasProperties({text: "<card text 2>"}));
+        });
+      });
+
       testBackendConnection("allCategories", async (backendConnection) => {
         await backendConnection.sendRequest(testRequests.categoryAdd({
           name: "<category name 1>",
@@ -97,11 +132,24 @@ export function createBackendConnectionTestSuite(
   }
 }
 
+const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
+
 const testRequests = {
+  cardAdd: (request: Partial<CardAddRequest>): AppRequest => {
+    return requests.cardAdd({
+      categoryId: uuidv7(),
+      createdAt: defaultCreatedAt,
+      id: uuidv7(),
+      parentCardId: null,
+      text: "<default test text>",
+      ...request,
+    });
+  },
+
   categoryAdd: (request: Partial<CategoryAddRequest>): AppRequest => {
     return requests.categoryAdd({
       color: {presetColorId: presetColorWhite.id},
-      createdAt: Instant.ofEpochSecond(1724429942),
+      createdAt: defaultCreatedAt,
       id: uuidv7(),
       name: "<default test name>",
       ...request,

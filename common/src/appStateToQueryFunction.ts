@@ -5,7 +5,7 @@ import { cardsToTrees } from "./app/cardTrees";
 import { AppQuery } from "./queries";
 
 export default function appStateToQueryFunction(appState: AppState, timeTravelSnapshotIndex: number | null) {
-  return async <R>(query: AppQuery<R>): Promise<R> =>
+  return <R>(query: AppQuery<R>) =>
     queryAppState(appState, timeTravelSnapshotIndex, query);
 }
 

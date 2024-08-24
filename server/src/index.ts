@@ -26,43 +26,49 @@ export async function startServer({port}: {port: number}): Promise<Server> {
   });
 
   fastify.post("/query", async (request) => {
+    // TODO: handle invalid request body
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const serverQuery = deserializeServerQuery((request.body as any).query);
+    const serializedServerQueries: ReadonlyArray<unknown> = ((request.body as any).queries);
+    const serverQueries = serializedServerQueries.map(
+      serializedServerQuery => deserializeServerQuery(serializedServerQuery),
+    );
 
-    const executeQuery = appStateToQueryFunction(appState, null);
+    return serverQueries.map(serverQuery => {
+      const executeQuery = appStateToQueryFunction(appState, null);
 
-    switch (serverQuery.type) {
-      case "card": {
-        const result = await executeQuery(cardQuery(serverQuery.cardId));
-        return serializeCardResponse(result);
+      switch (serverQuery.type) {
+        case "card": {
+          const result = executeQuery(cardQuery(serverQuery.cardId));
+          return serializeCardResponse(result);
+        }
+        case "parentCard": {
+          const result = executeQuery(parentCardQuery(serverQuery.cardId));
+          return serializeParentCardResponse(result);
+        }
+        case "cardChildCount": {
+          const result = executeQuery(cardChildCountQuery(serverQuery.cardId));
+          return serializeCardChildCountResponse(result);
+        }
+        case "boardCardTrees": {
+          const result = executeQuery(boardCardTreesQuery({
+            boardId: serverQuery.boardId,
+            cardStatuses: new Set(serverQuery.cardStatuses),
+          }));
+          return serializeBoardCardTreesResponse(result);
+        }
+        case "allCategories": {
+          const result = executeQuery(allCategoriesQuery);
+          return serializeAllCategoriesResponse(result.allCategories());
+        }
+        case "allColors": {
+          const result = executeQuery(allColorsQuery);
+          return serializeAllColorsResponse(result.allPresetColors());
+        }
+        default: {
+          assertNever(serverQuery, null);
+        }
       }
-      case "parentCard": {
-        const result = await executeQuery(parentCardQuery(serverQuery.cardId));
-        return serializeParentCardResponse(result);
-      }
-      case "cardChildCount": {
-        const result = await executeQuery(cardChildCountQuery(serverQuery.cardId));
-        return serializeCardChildCountResponse(result);
-      }
-      case "boardCardTrees": {
-        const result = await executeQuery(boardCardTreesQuery({
-          boardId: serverQuery.boardId,
-          cardStatuses: new Set(serverQuery.cardStatuses),
-        }));
-        return serializeBoardCardTreesResponse(result);
-      }
-      case "allCategories": {
-        const result = await executeQuery(allCategoriesQuery);
-        return serializeAllCategoriesResponse(result.allCategories());
-      }
-      case "allColors": {
-        const result = await executeQuery(allColorsQuery);
-        return serializeAllColorsResponse(result.allPresetColors());
-      }
-      default: {
-        assertNever(serverQuery, null);
-      }
-    }
+    });
   });
 
   fastify.post("/update", async (request) => {

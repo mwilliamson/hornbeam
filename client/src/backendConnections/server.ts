@@ -184,7 +184,7 @@ export function connectServer(uri: string): BackendConnection {
     return (await executeQueries({query})).query;
   };
 
-  const subscriptions = new BackendSubscriptions();
+  const subscriptions = new BackendSubscriptions(executeQueries);
   // TODO: get real last update ID
   subscriptions.onLastUpdate({
     updateId: null,
@@ -198,6 +198,7 @@ export function connectServer(uri: string): BackendConnection {
     sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
+    subscribeQueries: subscriptions.subscribeQueries,
     setTimeTravelSnapshotIndex: null,
   };
 }

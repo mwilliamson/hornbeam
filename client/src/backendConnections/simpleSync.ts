@@ -28,7 +28,7 @@ export function connectSimpleSync(
   };
 
   const requestSender: RequestSender = createRequestSender();
-  const subscriptions = new BackendSubscriptions();
+  const subscriptions = new BackendSubscriptions(executeQueries);
 
   const client = simpleSync.connect({
     applyAppUpdate,
@@ -82,6 +82,7 @@ export function connectSimpleSync(
     sendRequest: requestSender.sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
+    subscribeQueries: subscriptions.subscribeQueries,
     setTimeTravelSnapshotIndex,
   };
 }

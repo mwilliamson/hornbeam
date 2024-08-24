@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
@@ -6,14 +6,11 @@ import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/quer
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
 
-let nextQueryLoadId = 1;
-
 type QueryState<TQueries extends AppQueries> =
   | {type: "idle"}
   | {type: "loading", id: number, queries: unknown}
   | {type: "error", error: unknown, queries: unknown}
   | {type: "success", value: AppQueriesResult<TQueries>, queries: unknown};
-
 
 interface BoundaryProps<TQueries extends AppQueries> {
   queries: TQueries,
@@ -27,82 +24,32 @@ interface BoundaryProps<TQueries extends AppQueries> {
 export default function Boundary<TQueries extends AppQueries>(props: BoundaryProps<TQueries>) {
   const {queries, render} = props;
 
+  const stableQueries = useStable(queries);
+
   const backendConnection = useBackendConnection();
 
   const [queryState, setQueryState] = useState<QueryState<TQueries>>({type: "idle"});
-  const [pendingLoad, setPendingLoad] = useState(false);
 
   // TODO: indicate stale data
   // TODO: more efficient querying instead of clearing on `queries` change?
   // TODO: use single subscription instead of clearing on `queries` change
   useEffect(() => {
-    const subscription = backendConnection.subscribe({
-      onConnect: () => {
-        setPendingLoad(true);
-      },
-      onUpdate: () => {
-        setPendingLoad(true);
-      },
-      onTimeTravel: () => {
-        setPendingLoad(true);
-      },
-      onConnectionError: () => {},
-      onSyncError: () => {},
-    });
+    const subscription = backendConnection.subscribeQueries(
+      stableQueries,
+      {
+        onSuccess: result => {
+          setQueryState({type: "success", queries: stableQueries, value: result});
+        },
+        onError: error => {
+          setQueryState({type: "error", queries: stableQueries, error});
+        },
+      }
+    );
 
     return () => {
       subscription.close();
     };
-  }, [backendConnection]);
-
-  useEffect(() => {
-    if (
-      queryState.type !== "idle" &&
-      !pendingLoad &&
-      isEqual(queries, queryState.queries)
-    ) {
-      return;
-    }
-
-    const id = nextQueryLoadId++;
-
-    backendConnection.executeQueries(queries).then(
-      result => {
-        setQueryState(queryState => {
-          if (queryState.type === "loading" && queryState.id === id) {
-            return {
-              type: "success",
-              value: result,
-              queries,
-            };
-          } else {
-            return queryState;
-          }
-        });
-      },
-
-      error => {
-        setQueryState(queryState => {
-          if (queryState.type === "loading" && queryState.id === id) {
-            return {
-              type: "error",
-              error,
-              queries,
-            };
-          } else {
-            return queryState;
-          }
-        });
-      },
-    );
-
-    setQueryState({
-      type: "loading",
-      id,
-      queries,
-    });
-    setPendingLoad(false);
-  }, [backendConnection, pendingLoad, queries, queryState]);
+  }, [backendConnection, stableQueries]);
 
   switch (queryState.type) {
     case "idle":
@@ -118,4 +65,14 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
     case "success":
       return render(queryState.value, backendConnection.sendRequest, backendConnection.executeQuery);
   }
+}
+
+function useStable<T>(value: T): T {
+  const ref = useRef<T>(value);
+
+  if (!isEqual(ref.current, value)) {
+    ref.current = value;
+  }
+
+  return ref.current;
 }

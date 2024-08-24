@@ -21,7 +21,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     ) as AppQueriesResult<TQueries>;
   };
 
-  const subscriptions = new BackendSubscriptions();
+  const subscriptions = new BackendSubscriptions(executeQueries);
 
   const generateLastUpdate = () => {
     return {
@@ -55,6 +55,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
+    subscribeQueries: subscriptions.subscribeQueries,
     setTimeTravelSnapshotIndex,
   };
 }

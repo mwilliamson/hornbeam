@@ -141,13 +141,15 @@ export class BackendSubscriptions {
   };
 }
 
+export type ExecuteQueries = <TQueries extends AppQueries>(
+  queries: TQueries,
+) => Promise<AppQueriesResult<TQueries>>;
+
 export interface BackendConnection {
   close: () => void;
   sendRequest: SendRequest;
   executeQuery: <R>(query: AppQuery<R>) => Promise<R>;
-  executeQueries: <TQueries extends AppQueries>(
-    queries: TQueries,
-  ) => Promise<AppQueriesResult<TQueries>>;
+  executeQueries: ExecuteQueries;
   subscribe: (subscriber: BackendSubscriber) => BackendSubscription;
   subscribeStatus: (subscriber: BackendConnectionStatusSubscriber) => BackendSubscription;
   setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from "../backendConnections";
+import assertNever from "hornbeam-common/lib/util/assertNever";
 
 interface BackendConnectProps {
   connect: () => BackendConnection;
@@ -14,23 +15,27 @@ export default function BackendConnect(props: BackendConnectProps) {
   useEffect(() => {
     const connection = connect();
 
-    connection.subscribe({
-      onConnect: () => {
-        setConnectionState({
-          type: "connected",
-          connection,
-        });
-      },
-      onUpdate: () => {
-      },
-      onTimeTravel: () => {
-      },
-      onConnectionError: () => {
-        setConnectionState({type: "connection-error"});
-      },
-      onSyncError: () => {
-        setConnectionState({type: "sync-error"});
-      },
+    connection.subscribeStatus(status => {
+      switch (status.type) {
+        case "unconnected":
+          setConnectionState({type: "connecting"});
+          return;
+        case "connected":
+          setConnectionState({
+            type: "connected",
+            connection,
+          });
+          return;
+        case "connection-error":
+          setConnectionState({type: "connection-error"});
+          return;
+        case "sync-error":
+          setConnectionState({type: "sync-error"});
+          return;
+        default:
+          assertNever(status, null);
+          return;
+      }
     });
 
     return () => {

@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 
 import { AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
-import { AppQuery, AppQueries, AppQueriesResult, AppQueryResult } from "hornbeam-common/lib/queries";
+import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
-import { asyncMapValues } from "hornbeam-common/lib/util/promises";
 
 let nextQueryLoadId = 1;
 
@@ -67,11 +66,7 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
 
     const id = nextQueryLoadId++;
 
-    asyncMapValues<TQueries, AppQueriesResult<TQueries>>(
-      queries,
-      async <K extends keyof TQueries>(query: TQueries[K]) =>
-        (await backendConnection.query(query)) as AppQueryResult<TQueries[K]>,
-    ).then(
+    backendConnection.queryMany(queries).then(
       result => {
         setQueryState(queryState => {
           if (queryState.type === "loading" && queryState.id === id) {
@@ -85,6 +80,7 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
           }
         });
       },
+
       error => {
         setQueryState(queryState => {
           if (queryState.type === "loading" && queryState.id === id) {
@@ -97,7 +93,7 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
             return queryState;
           }
         });
-      }
+      },
     );
 
     setQueryState({

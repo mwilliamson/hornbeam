@@ -9,12 +9,24 @@ import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/se
 import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
 import { BackendConnection, BackendSubscriptions } from ".";
 import assertNever from "hornbeam-common/lib/util/assertNever";
-import { AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
+import { AppQueries, AppQueriesResult, AppQuery } from "hornbeam-common/lib/queries";
 
 export function connectSimpleSync(
   uri: string,
 ): BackendConnection {
   let appState = initialAppState();
+
+  const executeQuery = async <R>(query: AppQuery<R>): Promise<R> => {
+    return queryAppState(appState, timeTravelSnapshotIndex, query);
+  };
+
+  const executeQueries = async <TQueries extends AppQueries>(queries: TQueries) => {
+    return mapValues(
+      queries,
+      query => queryAppState(appState, timeTravelSnapshotIndex, query),
+    ) as AppQueriesResult<TQueries>;
+  };
+
   const requestSender: RequestSender = createRequestSender();
   const subscriptions = new BackendSubscriptions();
 
@@ -65,13 +77,8 @@ export function connectSimpleSync(
 
   return {
     close: () => client.close(),
-    executeQuery: async query => {
-      return queryAppState(appState, timeTravelSnapshotIndex, query);
-    },
-    executeQueries: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
-      queries,
-      query => queryAppState(appState, timeTravelSnapshotIndex, query),
-    ) as AppQueriesResult<TQueries>,
+    executeQuery,
+    executeQueries,
     sendRequest: requestSender.sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,

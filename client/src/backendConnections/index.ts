@@ -48,12 +48,10 @@ let nextSubscriptionId = 1;
 export class BackendSubscriptions {
   private readonly subscriptions: Map<number, BackendSubscriber>;
   private lastUpdate: OnUpdateArgs | null;
-  private timeTravelSnapshotIndex: number | null;
 
   public constructor() {
     this.subscriptions = new Map();
     this.lastUpdate = null;
-    this.timeTravelSnapshotIndex = null;
   }
 
   public subscribe = (subscriber: BackendSubscriber) => {
@@ -83,7 +81,6 @@ export class BackendSubscriptions {
   };
 
   public onTimeTravel = (newSnapshotIndex: number | null) => {
-    this.timeTravelSnapshotIndex = newSnapshotIndex;
     for (const subscriber of this.subscriptions.values()) {
       subscriber.onTimeTravel(newSnapshotIndex);
     }

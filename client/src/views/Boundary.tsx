@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
-import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
+import { AppQuery, AppQueries, AppQueriesResult, AppQueryResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
 
@@ -66,49 +66,38 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
 
     const id = nextQueryLoadId++;
 
-    const partialQueryData: {[k: string]: unknown} = {};
-
-    let completedQueryCount = 0;
-
-    const queryEntries = Object.entries(queries);
-    const queryCount = queryEntries.length;
-
-    for (const [key, query] of queryEntries) {
-      const promise = backendConnection.query(query);
-
-      promise.then(
-        value => {
-          partialQueryData[key] = value;
-          completedQueryCount++;
-          if (completedQueryCount === queryCount) {
-            setQueryState(queryState => {
-              if (queryState.type === "loading" && queryState.id === id) {
-                return {
-                  type: "success",
-                  value: partialQueryData as AppQueriesResult<TQueries>,
-                  queries,
-                };
-              } else {
-                return queryState;
-              }
-            });
+    asyncMapValues<TQueries, AppQueriesResult<TQueries>>(
+      queries,
+      async <K extends keyof TQueries>(query: TQueries[K]) =>
+        (await backendConnection.query(query)) as AppQueryResult<TQueries[K]>,
+    ).then(
+      result => {
+        setQueryState(queryState => {
+          if (queryState.type === "loading" && queryState.id === id) {
+            return {
+              type: "success",
+              value: result,
+              queries,
+            };
+          } else {
+            return queryState;
           }
-        },
-        error => {
-          setQueryState(queryState => {
-            if (queryState.type === "loading" && queryState.id === id) {
-              return {
-                type: "error",
-                error,
-                queries,
-              };
-            } else {
-              return queryState;
-            }
-          });
-        }
-      );
-    }
+        });
+      },
+      error => {
+        setQueryState(queryState => {
+          if (queryState.type === "loading" && queryState.id === id) {
+            return {
+              type: "error",
+              error,
+              queries,
+            };
+          } else {
+            return queryState;
+          }
+        });
+      }
+    );
 
     setQueryState({
       type: "loading",
@@ -132,4 +121,26 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
     case "success":
       return render(queryState.value, backendConnection.sendRequest, backendConnection.query);
   }
+}
+
+async function asyncMapValues<TObj extends object, TResult extends {[key in keyof TObj]: unknown}>(
+  obj: TObj,
+  f: <K extends keyof TObj>(value: TObj[K]) => Promise<TResult[K]>,
+): Promise<TResult> {
+  const partialResult: Partial<TResult> = {};
+
+  const entries = Object.entries(obj) as Array<[keyof TObj, TObj[keyof TObj]]>;
+  const promises: Array<Promise<void>> = [];
+
+  for (const [key, value] of entries) {
+    promises.push(f(value).then(mappedValue => {
+      partialResult[key] = mappedValue;
+    }));
+  }
+
+  for (const promise of promises) {
+    await promise;
+  }
+
+  return partialResult as TResult;
 }

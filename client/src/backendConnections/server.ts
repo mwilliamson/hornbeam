@@ -117,7 +117,7 @@ export function connectServer(uri: string): BackendConnection {
     return [serverQuery, deserialize];
   };
 
-  async function queryMany<TQueries extends AppQueries>(queries: TQueries): Promise<AppQueriesResult<TQueries>> {
+  async function executeQueries<TQueries extends AppQueries>(queries: TQueries): Promise<AppQueriesResult<TQueries>> {
     const serverQueries: Array<ServerQuery> = [];
     const responseDeserializers: Array<[string, (response: unknown) => unknown]> = [];
 
@@ -181,7 +181,7 @@ export function connectServer(uri: string): BackendConnection {
   };
 
   const executeQuery = async <R>(query: AppQuery<R>): Promise<R> => {
-    return (await queryMany({query})).query;
+    return (await executeQueries({query})).query;
   };
 
   const subscriptions = new BackendSubscriptions();
@@ -193,8 +193,8 @@ export function connectServer(uri: string): BackendConnection {
 
   return {
     close: () => {},
-    executeQuery: executeQuery,
-    executeQueries: queryMany,
+    executeQuery,
+    executeQueries,
     sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,

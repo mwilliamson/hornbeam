@@ -5,7 +5,7 @@ import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, cardQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, cardQuery, parentCardQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
 import { CardAddRequest } from "hornbeam-common/lib/app/cards";
@@ -27,7 +27,6 @@ export function createBackendConnectionTestSuite(
           const categoryId = uuidv7();
           await backendConnection.sendRequest(testRequests.categoryAdd({
             id: categoryId,
-            name: "<category name 1>",
           }));
 
           const card1Id = uuidv7();
@@ -47,6 +46,59 @@ export function createBackendConnectionTestSuite(
           const card = await backendConnection.query(cardQuery(card2Id));
 
           assertThat(card, hasProperties({text: "<card text 2>"}));
+        });
+      });
+
+      suite("parentCard", () => {
+        testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
+          const card = await backendConnection.query(parentCardQuery(uuidv7()));
+
+          assertThat(card, equalTo(null));
+        });
+
+        testBackendConnection("card has no parent", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+          }));
+
+          const card1Id = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: card1Id,
+            parentCardId: null,
+          }));
+
+          const card = await backendConnection.query(parentCardQuery(card1Id));
+
+          assertThat(card, equalTo(null));
+        });
+
+        testBackendConnection("card has parent", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+            name: "<category name 1>",
+          }));
+
+          const parentCardId = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: parentCardId,
+            parentCardId: null,
+            text: "<parent card text>",
+          }));
+
+          const card1Id = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: card1Id,
+            parentCardId,
+          }));
+
+          const card = await backendConnection.query(parentCardQuery(card1Id));
+
+          assertThat(card, hasProperties({text: "<parent card text>"}));
         });
       });
 

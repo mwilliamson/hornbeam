@@ -5,6 +5,7 @@ import { useBackendConnection } from "../backendConnections";
 import { AppQuery, AppQueries, AppQueriesResult, AppQueryResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
+import { asyncMapValues } from "hornbeam-common/lib/util/promises";
 
 let nextQueryLoadId = 1;
 
@@ -121,26 +122,4 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
     case "success":
       return render(queryState.value, backendConnection.sendRequest, backendConnection.query);
   }
-}
-
-async function asyncMapValues<TObj extends object, TResult extends {[key in keyof TObj]: unknown}>(
-  obj: TObj,
-  f: <K extends keyof TObj>(value: TObj[K]) => Promise<TResult[K]>,
-): Promise<TResult> {
-  const partialResult: Partial<TResult> = {};
-
-  const entries = Object.entries(obj) as Array<[keyof TObj, TObj[keyof TObj]]>;
-  const promises: Array<Promise<void>> = [];
-
-  for (const [key, value] of entries) {
-    promises.push(f(value).then(mappedValue => {
-      partialResult[key] = mappedValue;
-    }));
-  }
-
-  for (const promise of promises) {
-    await promise;
-  }
-
-  return partialResult as TResult;
 }

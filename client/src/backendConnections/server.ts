@@ -1,7 +1,7 @@
 import { AppQuery } from "hornbeam-common/lib/queries";
 import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
-import { CategorySetInMemory } from "hornbeam-common/lib/app/categories";
+import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
 import { AppRequest, AppUpdate } from "hornbeam-common/lib/app/snapshots";
 import { serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
@@ -48,13 +48,12 @@ export function connectServer(uri: string): BackendConnection {
       }
 
       case "allCategories": {
-        const response = await fetchQuery({
-          type: "allCategories",
-        });
+        return query.proof(await fetchAllCategories());
+      }
 
-        const allCategories = deserializeAllCategoriesResponse(response);
-
-        return query.proof(new CategorySetInMemory(allCategories));
+      case "availableCategories": {
+        const allCategories = await fetchAllCategories();
+        return query.proof(allCategories.availableCategories());
       }
 
       case "allColors": {
@@ -72,6 +71,16 @@ export function connectServer(uri: string): BackendConnection {
         console.error(`missing support for query: ${query.type}`);
         throw new Error("not supported");
     }
+  };
+
+  const fetchAllCategories = async (): Promise<CategorySet> => {
+    const response = await fetchQuery({
+      type: "allCategories",
+    });
+
+    const allCategories = deserializeAllCategoriesResponse(response);
+
+    return new CategorySetInMemory(allCategories);
   };
 
   const fetchQuery = async (query: ServerQuery) => {

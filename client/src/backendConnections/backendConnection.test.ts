@@ -5,7 +5,7 @@ import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, availableCategoriesQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
 
@@ -15,7 +15,7 @@ export function createBackendConnectionTestSuite(
 ): void {
   suite(name, () => {
     suite("queries", () => {
-      testBackendConnection("can fetch all categories", async (backendConnection) => {
+      testBackendConnection("allCategories", async (backendConnection) => {
         await backendConnection.sendRequest(testRequests.categoryAdd({
           name: "<category name 1>",
         }));
@@ -26,6 +26,22 @@ export function createBackendConnectionTestSuite(
         const allCategories = await backendConnection.query(allCategoriesQuery);
 
         assertThat(allCategories.allCategories(), containsExactly(
+          hasProperties({name: "<category name 1>"}),
+          hasProperties({name: "<category name 2>"}),
+        ));
+      });
+
+      testBackendConnection("availableCategories", async (backendConnection) => {
+        await backendConnection.sendRequest(testRequests.categoryAdd({
+          name: "<category name 1>",
+        }));
+        await backendConnection.sendRequest(testRequests.categoryAdd({
+          name: "<category name 2>",
+        }));
+
+        const availableCategories = await backendConnection.query(availableCategoriesQuery);
+
+        assertThat(availableCategories, containsExactly(
           hasProperties({name: "<category name 1>"}),
           hasProperties({name: "<category name 2>"}),
         ));

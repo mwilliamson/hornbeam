@@ -184,9 +184,6 @@ export class BackendSubscriptions {
     for (const subscriber of this.subscriptions.values()) {
       subscriber.onConnectionError();
     }
-    for (const subscriber of this.connectionStatusSubscriptions.values()) {
-      subscriber(this.connectionStatus);
-    }
   };
 
   public onSyncError = () => {

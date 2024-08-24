@@ -2,10 +2,10 @@ import { assertThat, containsExactly, hasProperties } from "@mwilliamson/precise
 import { suite, test } from "mocha";
 import { BackendConnection } from ".";
 import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
-import { presetColorWhite } from "hornbeam-common/lib/app/colors";
+import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery, availableCategoriesQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
 
@@ -44,6 +44,14 @@ export function createBackendConnectionTestSuite(
         assertThat(availableCategories, containsExactly(
           hasProperties({name: "<category name 1>"}),
           hasProperties({name: "<category name 2>"}),
+        ));
+      });
+
+      testBackendConnection("allColors", async (backendConnection) => {
+        const allColors = await backendConnection.query(allColorsQuery);
+
+        assertThat(allColors.allPresetColors(), containsExactly(
+          ...presetColors.map(presetColor => hasProperties({name: presetColor.name}))
         ));
       });
     });

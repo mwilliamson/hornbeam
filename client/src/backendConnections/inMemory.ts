@@ -5,10 +5,22 @@ import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { last, mapValues } from "lodash";
-import { AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
+import { AppQueries, AppQueriesResult, AppQuery } from "hornbeam-common/lib/queries";
 
 export function connectInMemory(initialState: AppState): BackendConnection {
   let appState = initialState;
+
+  const executeQuery = async <R>(query: AppQuery<R>): Promise<R> => {
+    return queryAppState(appState, timeTravelSnapshotIndex, query);
+  };
+
+  const executeQueries = async <TQueries extends AppQueries>(queries: TQueries) => {
+    return mapValues(
+      queries,
+      query => queryAppState(appState, timeTravelSnapshotIndex, query)
+    ) as AppQueriesResult<TQueries>;
+  };
+
   const subscriptions = new BackendSubscriptions();
 
   const generateLastUpdate = () => {
@@ -38,11 +50,8 @@ export function connectInMemory(initialState: AppState): BackendConnection {
 
   return {
     close: () => {},
-    executeQuery: async query => queryAppState(appState, timeTravelSnapshotIndex, query),
-    executeQueries: async <TQueries extends AppQueries>(queries: TQueries) => mapValues(
-      queries,
-      query => queryAppState(appState, timeTravelSnapshotIndex, query),
-    ) as AppQueriesResult<TQueries>,
+    executeQuery,
+    executeQueries,
     sendRequest,
     subscribe: subscriptions.subscribe,
     subscribeStatus: subscriptions.subscribeConnectionStatus,

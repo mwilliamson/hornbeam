@@ -146,7 +146,7 @@ export function connectServer(uri: string): BackendConnection {
   };
 
   const sendRequest = async (request: AppRequest): Promise<void> => {
-    // TODO: also update data (send active queries as part of request?)
+    // TODO: send active queries as part of request?
 
     const updateId = uuidv7();
 
@@ -158,7 +158,7 @@ export function connectServer(uri: string): BackendConnection {
     await fetchJson("update", {update: serializeAppUpdate(update)});
 
     // TODO: get real snapshot index
-    subscriptions.onLastUpdate({
+    await subscriptions.onLastUpdate({
       snapshotIndex: 0,
     });
   };

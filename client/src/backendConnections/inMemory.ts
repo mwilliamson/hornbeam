@@ -36,7 +36,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     };
 
     appState = applyAppUpdate(appState, update);
-    subscriptions.onLastUpdate(generateLastUpdate());
+    await subscriptions.onLastUpdate(generateLastUpdate());
   };
 
   let timeTravelSnapshotIndex: number | null = null;

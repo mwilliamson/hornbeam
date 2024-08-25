@@ -44,7 +44,7 @@ interface AppQueriesSubscriber<TQueries extends AppQueries> {
 }
 
 interface AppQueriesSubscription {
-  execute: () => void;
+  execute: () => Promise<() => void>;
 }
 
 interface TimeTravelSubscriber {
@@ -103,17 +103,20 @@ export class BackendSubscriptions {
 
     let currentLoadId: number | null = null;
 
+    // Explicitly split the execution of the query against the server, and
+    // notifying any subscribers. This allows us to notify subscribers at the
+    // same time so that the UI is in sync with itself.
     const execute = () => {
       const loadId = nextLoadId++;
       currentLoadId = loadId;
 
-      this.executeQueries(queries).then(
-        result => {
+      return this.executeQueries(queries).then(
+        result => () => {
           if (loadId === currentLoadId) {
             subscriber.onSuccess(result);
           }
         },
-        error => {
+        error => () => {
           if (loadId === currentLoadId) {
             subscriber.onError(error);
           }
@@ -122,7 +125,7 @@ export class BackendSubscriptions {
     };
 
     if (this.connectionStatus.type === "connected") {
-      execute();
+      execute().then(notify => notify());
     }
 
     this.queriesSubscriptions.set(subscriptionId, {
@@ -154,19 +157,24 @@ export class BackendSubscriptions {
     };
   };
 
-  public onLastUpdate = (lastUpdate: OnUpdateArgs) => {
+  public onLastUpdate = async (lastUpdate: OnUpdateArgs) => {
     this.lastUpdate = lastUpdate;
 
     if (this.connectionStatus.type !== "connected") {
       this.updateConnectionStatus({type: "connected"});
     }
 
+    const notifyPromises: Array<Promise<() => void>> = [];
     for (const subscriber of this.queriesSubscriptions.values()) {
-      subscriber.execute();
+      notifyPromises.push(subscriber.execute());
     }
 
     for (const subscriber of this.timeTravelSubscriptions.values()) {
       subscriber.onMaxSnapshotIndex(lastUpdate.snapshotIndex);
+    }
+
+    for (const notify of await Promise.all(notifyPromises)) {
+      notify();
     }
   };
 

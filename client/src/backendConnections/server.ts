@@ -1,5 +1,5 @@
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardResponse, deserializeParentCardResponse, desserializeUpdateResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
@@ -155,11 +155,12 @@ export function connectServer(uri: string): BackendConnection {
       updateId,
     };
 
-    await fetchJson("update", {update: serializeAppUpdate(update)});
+    const response = await fetchJson("update", {update: serializeAppUpdate(update)});
 
-    // TODO: get real snapshot index
+    const {snapshotIndex} = desserializeUpdateResponse(response);
+
     await subscriptions.onLastUpdate({
-      snapshotIndex: 0,
+      snapshotIndex,
     });
   };
 

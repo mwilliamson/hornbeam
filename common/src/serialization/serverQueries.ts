@@ -91,6 +91,13 @@ export function serializeServerQuery(query: ServerQuery): SerializedServerQuery 
 
 export const deserializeServerQuery = deserializer(ServerQuery);
 
+const SerializedUpdateResponse = t.readonly(t.type({
+  snapshotIndex: t.number,
+}, "SerializedUpdateResponse"));
+
+export const serializeUpdateResponse = SerializedUpdateResponse.encode;
+export const desserializeUpdateResponse = deserializer(SerializedUpdateResponse);
+
 function deserializer<T>(decoder: t.Decoder<unknown, T>): (value: unknown) => T {
   return value => deserialize(decoder, value);
 }

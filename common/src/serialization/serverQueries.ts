@@ -1,7 +1,7 @@
 import { isLeft } from "fp-ts/lib/Either";
 import * as t from "io-ts";
 import { PathReporter } from "io-ts/PathReporter";
-import { SerializedCard } from "./cards";
+import { SerializedCard, SerializedCardEvent } from "./cards";
 import { SerializedCategory } from "./categories";
 import { SerializedPresetColor } from "./colors";
 import { SerializedCardTree } from "./cardTrees";
@@ -44,6 +44,16 @@ const CardChildCountResponse = t.number;
 export const serializeCardChildCountResponse = CardChildCountResponse.encode;
 export const deserializeCardChildCountResponse = deserializer(CardChildCountResponse);
 
+const CardHistoryServerQuery = t.type({
+  type: t.literal("cardHistory"),
+  cardId: t.string,
+}, "CardHistoryServerQuery");
+
+const CardHistoryResponse = t.readonlyArray(SerializedCardEvent);
+
+export const serializeCardHistoryResponse = CardHistoryResponse.encode;
+export const deserializeCardHistoryResponse = deserializer(CardHistoryResponse);
+
 const BoardCardTreesServerQuery = t.type({
   type: t.literal("boardCardTrees"),
   boardId: SerializedBoardId,
@@ -77,6 +87,7 @@ const ServerQuery = t.union([
   CardServerQuery,
   ParentCardServerQuery,
   CardChildCountServerQuery,
+  CardHistoryServerQuery,
   BoardCardTreesServerQuery,
   AllCategoriesServerQuery,
   AllColorsServerQuery,

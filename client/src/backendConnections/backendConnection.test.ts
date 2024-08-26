@@ -5,7 +5,7 @@ import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardQuery, parentCardQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
 import { CardAddRequest } from "hornbeam-common/lib/app/cards";
@@ -159,6 +159,29 @@ export function createBackendConnectionTestSuite(
           const card = await backendConnection.executeQuery(cardChildCountQuery(parentCardId));
 
           assertThat(card, equalTo(2));
+        });
+      });
+
+      suite("cardHistory", () => {
+        testBackendConnection("card history initially has card creation", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+          }));
+
+          const cardId = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: cardId,
+          }));
+
+          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(cardId));
+
+          assertThat(cardHistory, containsExactly(
+            hasProperties({
+              type: "created",
+            }),
+          ));
         });
       });
 

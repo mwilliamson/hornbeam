@@ -2,9 +2,9 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
 import {applyAppUpdate, initialAppState} from "hornbeam-common/lib/app";
-import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
+import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery} from "hornbeam-common/lib/queries";
 import {deserializeAppUpdate} from "hornbeam-common/lib/serialization/app";
-import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardResponse, serializeParentCardResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentCardResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
 import assertNever from "hornbeam-common/lib/util/assertNever";
 
@@ -48,6 +48,10 @@ export async function startServer({port}: {port: number}): Promise<Server> {
         case "cardChildCount": {
           const result = executeQuery(cardChildCountQuery(serverQuery.cardId));
           return serializeCardChildCountResponse(result);
+        }
+        case "cardHistory": {
+          const result = executeQuery(cardHistoryQuery(serverQuery.cardId));
+          return serializeCardHistoryResponse(result);
         }
         case "boardCardTrees": {
           const result = executeQuery(boardCardTreesQuery({

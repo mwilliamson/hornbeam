@@ -173,6 +173,7 @@ export function createBackendConnectionTestSuite(
           const cardId = uuidv7();
           await backendConnection.sendRequest(testRequests.cardAdd({
             categoryId,
+            createdAt: Instant.ofEpochSecond(1713386548),
             id: cardId,
           }));
 
@@ -181,6 +182,7 @@ export function createBackendConnectionTestSuite(
           assertThat(cardHistory, containsExactly(
             hasProperties({
               type: "created",
+              instant: deepEqualTo(Instant.ofEpochSecond(1713386548)),
             }),
           ));
         });

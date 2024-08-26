@@ -6,7 +6,7 @@ import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQ
 import {deserializeAppUpdate} from "hornbeam-common/lib/serialization/app";
 import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
-import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 
 interface Server {
   close: () => Promise<void>;
@@ -77,7 +77,7 @@ export async function startServer({port}: {port: number}): Promise<Server> {
           return serializeAllColorsResponse(result.allPresetColors());
         }
         default: {
-          assertNeverWithDefault(serverQuery, null);
+          handleNever(serverQuery, null);
         }
       }
     });

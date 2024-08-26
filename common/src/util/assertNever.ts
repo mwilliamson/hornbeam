@@ -1,4 +1,4 @@
-export function assertNeverWithDefault<T>(value: never, defaultValue: T): T {
+export function handleNever<T>(value: never, defaultValue: T): T {
   // TODO: log error
   return defaultValue;
 }

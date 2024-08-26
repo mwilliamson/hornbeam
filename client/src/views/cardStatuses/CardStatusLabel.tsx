@@ -1,5 +1,5 @@
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
-import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 
 interface CardStatusLabelProps {
   showNone?: boolean;
@@ -17,6 +17,6 @@ export default function CardStatusLabel(props: CardStatusLabelProps) {
     case CardStatus.Done:
       return "Done";
     default:
-      return assertNeverWithDefault(value, null);
+      return handleNever(value, null);
   }
 }

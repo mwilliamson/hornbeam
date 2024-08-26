@@ -7,7 +7,7 @@ import { CardTree } from "hornbeam-common/lib/app/cardTrees";
 import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "hornbeam-common/lib/app/cards";
 import { CategorySet } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
-import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import "./CardsView.scss";
 import CardView, { cardHeight } from "./cards/CardView";
 import classNames from "classnames";
@@ -78,7 +78,7 @@ export default function CardsView(props: CardsViewProps) {
         return;
 
       default:
-        assertNeverWithDefault(droppable.type, null);
+        handleNever(droppable.type, null);
         return;
     }
   };

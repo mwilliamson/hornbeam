@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BackendConnection, BackendConnectionProvider, BackendConnectionState } from "../backendConnections";
-import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 
 interface BackendConnectProps {
   connect: () => BackendConnection;
@@ -33,7 +33,7 @@ export default function BackendConnect(props: BackendConnectProps) {
           setConnectionState({type: "sync-error"});
           return;
         default:
-          assertNeverWithDefault(status, null);
+          handleNever(status, null);
           return;
       }
     });

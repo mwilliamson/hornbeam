@@ -8,7 +8,7 @@ import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
 import { BackendConnection, BackendSubscriptions } from ".";
-import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { AppQueries, AppQueriesResult, AppQuery } from "hornbeam-common/lib/queries";
 
 export function connectSimpleSync(
@@ -63,7 +63,7 @@ export function connectSimpleSync(
           return;
         }
         default:
-          assertNeverWithDefault(state, null);
+          handleNever(state, null);
       }
     },
   });

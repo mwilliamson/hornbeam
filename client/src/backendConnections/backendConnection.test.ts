@@ -11,7 +11,7 @@ import { createDeferred } from "hornbeam-common/lib/util/promises";
 import { CardAddRequest, CardEditRequest } from "hornbeam-common/lib/app/cards";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
-import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { CommentAddRequest } from "hornbeam-common/lib/app/comments";
 
 export function createBackendConnectionTestSuite(
@@ -454,7 +454,7 @@ export function createBackendConnectionTestSuite(
               case "unconnected":
                 return;
               default:
-                assertNeverWithDefault(status, null);
+                handleNever(status, null);
             }
           });
 

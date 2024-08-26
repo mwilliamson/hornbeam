@@ -1,5 +1,5 @@
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentCardResponse, desserializeUpdateResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, desserializeUpdateResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
@@ -57,6 +57,19 @@ export function connectServer(uri: string): BackendConnection {
 
         const deserialize = (response: unknown) => {
           return query.proof(deserializeCardHistoryResponse(response));
+        };
+
+        return [serverQuery, deserialize];
+      }
+
+      case "searchCards": {
+        const serverQuery: ServerQuery = {
+          type: "searchCards",
+          searchTerm: query.searchTerm,
+        };
+
+        const deserialize = (response: unknown) => {
+          return query.proof(deserializeSearchCardsResponse(response));
         };
 
         return [serverQuery, deserialize];

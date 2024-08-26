@@ -1,4 +1,4 @@
-import { assertThat, containsExactly, equalTo, hasProperties } from "@mwilliamson/precisely";
+import { assertThat, containsExactly, deepEqualTo, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { BackendConnection } from ".";
 import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
@@ -12,6 +12,7 @@ import { CardAddRequest } from "hornbeam-common/lib/app/cards";
 import { rootBoardId } from "hornbeam-common/lib/app/boards";
 import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
 import assertNever from "hornbeam-common/lib/util/assertNever";
+import { CommentAddRequest } from "hornbeam-common/lib/app/comments";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -183,6 +184,40 @@ export function createBackendConnectionTestSuite(
             }),
           ));
         });
+
+        testBackendConnection("card history includes comments", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+          }));
+
+          const cardId = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: cardId,
+          }));
+
+          await backendConnection.sendRequest(testRequests.commentAdd({
+            cardId,
+            createdAt: Instant.ofEpochSecond(1713386548),
+            text: "<card text>",
+          }));
+
+          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(cardId));
+
+          assertThat(cardHistory, containsExactly(
+            hasProperties({
+              type: "created",
+            }),
+            hasProperties({
+              type: "comment",
+              instant: deepEqualTo(Instant.ofEpochSecond(1713386548)),
+              comment: hasProperties({
+                text: "<card text>",
+              }),
+            }),
+          ));
+        });
       });
 
       suite("boardCardTrees", () => {
@@ -337,6 +372,16 @@ const testRequests = {
       createdAt: defaultCreatedAt,
       id: uuidv7(),
       name: "<default test name>",
+      ...request,
+    });
+  },
+
+  commentAdd: (request: Partial<CommentAddRequest>): AppRequest => {
+    return requests.commentAdd({
+      cardId: uuidv7(),
+      createdAt: defaultCreatedAt,
+      id: uuidv7(),
+      text: "<default test text>",
       ...request,
     });
   },

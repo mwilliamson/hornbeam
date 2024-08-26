@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import assertNever from "../util/assertNever";
+import { assertNeverWithDefault } from "../util/assertNever";
 import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
@@ -81,7 +81,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
         swapWithCard = siblingCards[siblingIndex + 1];
         break;
       default:
-        return assertNever(request.direction, this);
+        return assertNeverWithDefault(request.direction, this);
     }
 
     return new AppSnapshot(
@@ -330,7 +330,7 @@ export function requestCreatedAt(request: AppRequest): Instant {
     case "commentAdd":
       return request.commentAdd.createdAt;
     default:
-      return assertNever(request, Instant.now());
+      return assertNeverWithDefault(request, Instant.now());
   }
 }
 
@@ -353,6 +353,6 @@ export function applySnapshotUpdate(snapshot: AppSnapshot, update: AppUpdate): A
     case "commentAdd":
       return snapshot.commentAdd(update.request.commentAdd);
     default:
-      return assertNever(update.request, snapshot);
+      return assertNeverWithDefault(update.request, snapshot);
   }
 }

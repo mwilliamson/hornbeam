@@ -4,7 +4,7 @@ import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import { Card, CardEditRequest, CardEvent, CardHistory, CardSearcher, validateCardText } from "hornbeam-common/lib/app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
-import assertNever from "hornbeam-common/lib/util/assertNever";
+import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
 import pluralize from "hornbeam-common/lib/util/pluralize";
 import { ValidationError, ValidationResult } from "hornbeam-common/lib/util/validation";
 import CardStatusLabel from "../cardStatuses/CardStatusLabel";
@@ -504,7 +504,7 @@ function CardEventTypeView(props: CardEventTypeViewProps) {
     case "comment":
       return "Comment";
     default:
-      return assertNever(cardEvent, null);
+      return assertNeverWithDefault(cardEvent, null);
   }
 }
 
@@ -523,7 +523,7 @@ function CardEventDescription(props: CardEventDescriptionProps) {
         <PlainTextView value={cardEvent.comment.text} />
       );
     default:
-      return assertNever(cardEvent, null);
+      return assertNeverWithDefault(cardEvent, null);
   }
 }
 

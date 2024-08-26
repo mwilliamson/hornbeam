@@ -5,13 +5,13 @@ import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
-import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
+import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentBoardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
 import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
-import { CardAddRequest } from "hornbeam-common/lib/app/cards";
-import { rootBoardId } from "hornbeam-common/lib/app/boards";
+import { CardAddRequest, CardEditRequest } from "hornbeam-common/lib/app/cards";
+import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
-import assertNever from "hornbeam-common/lib/util/assertNever";
+import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
 import { CommentAddRequest } from "hornbeam-common/lib/app/comments";
 
 export function createBackendConnectionTestSuite(
@@ -298,6 +298,93 @@ export function createBackendConnectionTestSuite(
             }),
           ));
         });
+
+        testBackendConnection("root board", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+            name: "<category name 1>",
+          }));
+
+          const parentCardId = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: parentCardId,
+            parentCardId: null,
+            text: "<parent card text>",
+          }));
+
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: uuidv7(),
+            parentCardId,
+            text: "<child card text>",
+          }));
+
+          const boardCardTrees = await backendConnection.executeQuery(boardCardTreesQuery({
+            boardId: rootBoardId,
+            cardStatuses: new Set(allCardStatuses),
+          }));
+
+          assertThat(boardCardTrees, containsExactly(
+            hasProperties({
+              card: hasProperties({
+                text: "<parent card text>",
+              }),
+              children: containsExactly(
+                hasProperties({
+                  card: hasProperties({
+                    text: "<child card text>",
+                  }),
+                  children: containsExactly(),
+                }),
+              ),
+            }),
+          ));
+        });
+      });
+
+      suite("parentBoard", () => {
+        testBackendConnection("root board parent is itself", async (backendConnection) => {
+          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery(rootBoardId));
+
+          assertThat(parentBoardId, deepEqualTo(rootBoardId));
+        });
+
+        testBackendConnection("can find parent of subboard", async (backendConnection) => {
+          const categoryId = uuidv7();
+          await backendConnection.sendRequest(testRequests.categoryAdd({
+            id: categoryId,
+          }));
+
+          const card1Id = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: card1Id,
+            parentCardId: null,
+          }));
+          await backendConnection.sendRequest(requests.cardEdit({
+            createdAt: defaultCreatedAt,
+            id: card1Id,
+            isSubboardRoot: true,
+          }));
+
+          const card2Id = uuidv7();
+          await backendConnection.sendRequest(testRequests.cardAdd({
+            categoryId,
+            id: card2Id,
+            parentCardId: card1Id,
+          }));
+          await backendConnection.sendRequest(requests.cardEdit({
+            createdAt: defaultCreatedAt,
+            id: card2Id,
+            isSubboardRoot: true,
+          }));
+
+          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery(cardSubboardId(card2Id)));
+
+          assertThat(parentBoardId, deepEqualTo(cardSubboardId(card1Id)));
+        });
       });
 
       testBackendConnection("allCategories", async (backendConnection) => {
@@ -367,7 +454,7 @@ export function createBackendConnectionTestSuite(
               case "unconnected":
                 return;
               default:
-                assertNever(status, null);
+                assertNeverWithDefault(status, null);
             }
           });
 
@@ -396,6 +483,13 @@ const testRequests = {
       id: uuidv7(),
       parentCardId: null,
       text: "<default test text>",
+      ...request,
+    });
+  },
+  cardEdit: (request: Partial<CardEditRequest>): AppRequest => {
+    return requests.cardEdit({
+      createdAt: defaultCreatedAt,
+      id: uuidv7(),
       ...request,
     });
   },

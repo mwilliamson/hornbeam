@@ -75,6 +75,16 @@ const BoardCardTreesResponse = t.readonlyArray(SerializedCardTree);
 export const serializeBoardCardTreesResponse = BoardCardTreesResponse.encode;
 export const deserializeBoardCardTreesResponse = deserializer(BoardCardTreesResponse);
 
+const ParentBoardServerQuery = t.type({
+  type: t.literal("parentBoard"),
+  boardId: SerializedBoardId,
+});
+
+const ParentBoardResponse = SerializedBoardId;
+
+export const serializeParentBoardResponse = ParentBoardResponse.encode;
+export const deserializeParentBoardResponse = deserializer(ParentBoardResponse);
+
 const AllCategoriesServerQuery = t.type({
   type: t.literal("allCategories"),
 }, "AllCategoriesServerQuery");
@@ -100,6 +110,7 @@ const ServerQuery = t.union([
   CardHistoryServerQuery,
   SearchCardsServerQuery,
   BoardCardTreesServerQuery,
+  ParentBoardServerQuery,
   AllCategoriesServerQuery,
   AllColorsServerQuery,
 ], "SerializedAppQuery");

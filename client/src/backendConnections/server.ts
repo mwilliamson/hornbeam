@@ -1,11 +1,12 @@
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, desserializeUpdateResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, desserializeUpdateResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
 import { AppRequest, AppUpdate } from "hornbeam-common/lib/app/snapshots";
 import { serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { uuidv7 } from "uuidv7";
+import { assertNever } from "hornbeam-common/lib/util/assertNever";
 
 export function connectServer(uri: string): BackendConnection {
   const queriesSerialization = <R,>(query: AppQuery<R>): [ServerQuery, (response: unknown) => R] => {
@@ -89,6 +90,19 @@ export function connectServer(uri: string): BackendConnection {
         return [serverQuery, deserialize];
       }
 
+      case "parentBoard": {
+        const serverQuery: ServerQuery = {
+          type: "parentBoard",
+          boardId: query.boardId,
+        };
+
+        const deserialize = (response: unknown) => {
+          return query.proof(deserializeParentBoardResponse(response));
+        };
+
+        return [serverQuery, deserialize];
+      }
+
       case "allCategories": {
         const [serverQuery, deserializeAllCategories] = allCategoriesSerialization();
 
@@ -125,8 +139,7 @@ export function connectServer(uri: string): BackendConnection {
       }
 
       default:
-        console.error(`missing support for query: ${query.type}`);
-        throw new Error("not supported");
+        return assertNever(query);
     }
   };
 

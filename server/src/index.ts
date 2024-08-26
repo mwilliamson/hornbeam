@@ -2,11 +2,11 @@ import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
 import {applyAppUpdate, initialAppState} from "hornbeam-common/lib/app";
-import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery} from "hornbeam-common/lib/queries";
+import {allCategoriesQuery, allColorsQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentBoardQuery, parentCardQuery, searchCardsQuery} from "hornbeam-common/lib/queries";
 import {deserializeAppUpdate} from "hornbeam-common/lib/serialization/app";
-import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import appStateToQueryFunction from "hornbeam-common/lib/appStateToQueryFunction";
-import assertNever from "hornbeam-common/lib/util/assertNever";
+import { assertNeverWithDefault } from "hornbeam-common/lib/util/assertNever";
 
 interface Server {
   close: () => Promise<void>;
@@ -64,6 +64,10 @@ export async function startServer({port}: {port: number}): Promise<Server> {
           }));
           return serializeBoardCardTreesResponse(result);
         }
+        case "parentBoard": {
+          const result = executeQuery(parentBoardQuery(serverQuery.boardId));
+          return serializeParentBoardResponse(result);
+        }
         case "allCategories": {
           const result = executeQuery(allCategoriesQuery);
           return serializeAllCategoriesResponse(result.allCategories());
@@ -73,7 +77,7 @@ export async function startServer({port}: {port: number}): Promise<Server> {
           return serializeAllColorsResponse(result.allPresetColors());
         }
         default: {
-          assertNever(serverQuery, null);
+          assertNeverWithDefault(serverQuery, null);
         }
       }
     });

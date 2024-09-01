@@ -20,27 +20,33 @@ import CardAddFormBoundary from "./cards/CardAddFormBoundary";
 import CardDetailViewBoundary from "./cards/CardDetailViewBoundary";
 import TopBarBoundary from "./TopBarBoundary";
 import { useTimeTravel } from "./useTimeTravel";
+import { handleNever } from "hornbeam-common/lib/util/assertNever";
 
 interface CardFilters {
   cardStatuses: ReadonlySet<CardStatus>;
 }
 
 interface ViewState {
-  addingCard: CardFormInitialState | null,
   cardFilters: CardFilters;
   selectedCardId: string | null;
   selectedBoardId: BoardId;
-  viewSettings: boolean;
+  sidebar: SidebarViewState;
 }
 
+type SidebarViewState =
+  | {type: "selected"}
+  | {type: "settings"}
+  | {type: "addCard", cardFormInitialState: CardFormInitialState};
+
+const defaultSidebarViewState: SidebarViewState = {type: "selected"};
+
 const initialViewState: ViewState = {
-  addingCard: null,
   cardFilters: {
     cardStatuses: new Set(allCardStatuses.filter(cardStatus => cardStatus !== CardStatus.Deleted)),
   },
   selectedCardId: null,
   selectedBoardId: rootBoardId,
-  viewSettings: false,
+  sidebar: defaultSidebarViewState,
 };
 
 interface BoardViewProps {
@@ -55,25 +61,25 @@ export default function BoardView(props: BoardViewProps) {
   const [viewState, setViewState] = useState(initialViewState);
 
   const handleCardAddClick = (cardFormInitialState: CardFormInitialState) => {
-    setViewState({...viewState, addingCard: cardFormInitialState});
+    setViewState({
+      ...viewState,
+      sidebar: {type: "addCard", cardFormInitialState},
+    });
   };
 
   const handleCardAddClose = () => {
-    setViewState({...viewState, addingCard: null});
+    setViewState({...viewState, sidebar: defaultSidebarViewState});
   };
 
   const handleSettingsClick = () => {
     setViewState({
       ...viewState,
-      viewSettings: true,
+      sidebar: {type: "settings"},
     });
   };
 
   const handleSettingsClose = () => {
-    setViewState({
-      ...viewState,
-      viewSettings: false,
-    });
+    setViewState({...viewState, sidebar: defaultSidebarViewState});
   };
 
   // TODO: prevent actions when time travelling
@@ -205,36 +211,44 @@ function Sidebar(props: SidebarProps) {
     viewState,
   } = props;
 
-  if (viewState.viewSettings) {
-    return (
-      <Pane header="Settings">
-        <SettingsView
-          onBack={onSettingsClose}
-        />
-      </Pane>
-    );
-  } else if (viewState.addingCard !== null) {
-    return (
-      <Pane header="Add card">
-        <CardAddFormBoundary
-          initialValue={viewState.addingCard}
-          onClose={onCardAddClose}
-        />
-      </Pane>
-    );
-  } else if (viewState.selectedCardId !== null) {
-    return (
-      <Pane header="Selected card">
-        <CardDetailViewBoundary
-          cardId={viewState.selectedCardId}
-          onCardAddClick={onCardAddClick}
-          onBoardOpen={onBoardOpen}
-          selectedBoardId={viewState.selectedBoardId}
-        />
-      </Pane>
-    );
-  } else {
-    return null;
+  switch (viewState.sidebar.type) {
+    case "addCard":
+      return (
+        <Pane header="Add card">
+          <CardAddFormBoundary
+            initialValue={viewState.sidebar.cardFormInitialState}
+            onClose={onCardAddClose}
+          />
+        </Pane>
+      );
+
+    case "selected":
+      if (viewState.selectedCardId === null) {
+        return null;
+      } else {
+        return (
+          <Pane header="Selected card">
+            <CardDetailViewBoundary
+              cardId={viewState.selectedCardId}
+              onCardAddClick={onCardAddClick}
+              onBoardOpen={onBoardOpen}
+              selectedBoardId={viewState.selectedBoardId}
+            />
+          </Pane>
+        );
+      }
+
+    case "settings":
+      return (
+        <Pane header="Settings">
+          <SettingsView
+            onBack={onSettingsClose}
+          />
+        </Pane>
+      );
+
+    default:
+      return handleNever(viewState.sidebar, null);
   }
 }
 

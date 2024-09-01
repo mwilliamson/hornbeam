@@ -2,7 +2,6 @@ import { Category, CategoryAddRequest } from "hornbeam-common/lib/app/categories
 import { AppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { Kysely } from "kysely";
 import { DB } from "../database/types";
-import { presetColorWhite } from "hornbeam-common/lib/app/colors";
 
 export interface CategoryRepository {
   add: (request: CategoryAddRequest) => Promise<void>;
@@ -38,17 +37,18 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
         createdAt: new Date(request.createdAt.toEpochMilli()),
         id: request.id,
         name: request.name,
+        presetColorId: request.color.presetColorId,
       })
       .execute();
   }
 
   async fetchAll(): Promise<ReadonlyArray<Category>> {
     const categoryRows = await this.database.selectFrom("categories")
-      .select(["id", "name"])
+      .select(["id", "name", "presetColorId"])
       .execute();
 
     return categoryRows.map(categoryRow => ({
-      color: {presetColorId: presetColorWhite.id},
+      color: {presetColorId: categoryRow.presetColorId},
       id: categoryRow.id,
       name: categoryRow.name,
     }));

@@ -11,6 +11,7 @@ export interface Category {
   createdAt: Timestamp;
   id: string;
   name: string;
+  presetColorId: string;
 }
 
 export interface DB {

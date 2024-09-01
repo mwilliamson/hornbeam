@@ -1,8 +1,8 @@
 import { Instant } from "@js-joda/core";
-import { assertThat, containsExactly, hasProperties } from "@mwilliamson/precisely";
+import { assertThat, containsExactly, deepEqualTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { uuidv7 } from "uuidv7";
-import { presetColorWhite } from "hornbeam-common/lib/app/colors";
+import { presetColorGreen, presetColorRed } from "hornbeam-common/lib/app/colors";
 import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMemory } from "./categories";
 import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { withTemporaryDatabase } from "../database/withTemporaryDatabase";
@@ -28,7 +28,7 @@ export function createCategoryRepositoryTestSuite(
       testRepository("multiple categories", async (repository) => {
         const category1Id = uuidv7();
         await repository.add({
-          color: {presetColorId: presetColorWhite.id},
+          color: {presetColorId: presetColorRed.id},
           createdAt: Instant.ofEpochSecond(0),
           id: category1Id,
           name: "<category 1 name>",
@@ -36,7 +36,7 @@ export function createCategoryRepositoryTestSuite(
 
         const category2Id = uuidv7();
         await repository.add({
-          color: {presetColorId: presetColorWhite.id},
+          color: {presetColorId: presetColorGreen.id},
           createdAt: Instant.ofEpochSecond(60),
           id: category2Id,
           name: "<category 2 name>",
@@ -46,10 +46,12 @@ export function createCategoryRepositoryTestSuite(
 
         assertThat(categories, containsExactly(
           hasProperties({
+            color: deepEqualTo({presetColorId: presetColorRed.id}),
             id: category1Id,
             name: "<category 1 name>",
           }),
           hasProperties({
+            color: deepEqualTo({presetColorId: presetColorGreen.id}),
             id: category2Id,
             name: "<category 2 name>",
           }),

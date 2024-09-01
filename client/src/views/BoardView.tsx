@@ -313,9 +313,13 @@ function Pane(props: PaneProps) {
 
   const [isCollapsed, setIsCollapsed] = useState(collapsible);
 
+  const onHeaderClick = collapsible
+    ? () => setIsCollapsed(!isCollapsed)
+    : undefined;
+
   return (
     <section className="BoardView-CollapsiblePane">
-      <h2 className="BoardView-CollapsiblePane-Header" onClick={() => setIsCollapsed(!isCollapsed)}>
+      <h2 className="BoardView-CollapsiblePane-Header" onClick={onHeaderClick}>
         {collapsible && <ExpanderIcon isCollapsed={isCollapsed} />}
         {header}
       </h2>

@@ -5,6 +5,7 @@
     "build-watch": "tsc --watch",
     "check": "npm run check:eslint",
     "check:eslint": "eslint src && echo 'No lint errors' 1>&2",
+    "test": "mocha",
     "start": "node lib/server.js"
   },
   "type": "commonjs",
@@ -20,9 +21,13 @@
     "npm": "10.5.0"
   },
   "devDependencies": {
+    "@mwilliamson/precisely": "^1.2.0",
     "@types/node": "^22.2.0",
     "@types/pg": "^8.11.8",
     "kysely-codegen": "^0.16.3",
     "typescript": "^5.5.4"
+  },
+  "mocha": {
+    "spec": "lib/**/*.test.js"
   }
 }

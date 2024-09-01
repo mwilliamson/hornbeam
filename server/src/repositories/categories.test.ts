@@ -3,12 +3,19 @@ import { assertThat, containsExactly, hasProperties } from "@mwilliamson/precise
 import { suite, test } from "mocha";
 import { uuidv7 } from "uuidv7";
 import { presetColorWhite } from "hornbeam-common/lib/app/colors";
-import { CategoryRepository, CategoryRepositoryInMemory } from "./categories";
+import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMemory } from "./categories";
 import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
+import { withTemporaryDatabase } from "../database/withTemporaryDatabase";
+import { testDatabaseUrl } from "../settings";
+import * as pg from "pg";
+import { CamelCasePlugin, Kysely, PostgresDialect } from "kysely";
+import { DB } from "../database/types";
 
 export function createCategoryRepositoryTestSuite(
   name: string,
-  createRepository: () => Promise<[CategoryRepository, () => Promise<void>]>,
+  withRepository: (
+    f: (repository: CategoryRepository) => Promise<void>
+  ) => Promise<void>,
 ): void {
   suite(name, () => {
     suite("fetchAll()", () => {
@@ -53,21 +60,34 @@ export function createCategoryRepositoryTestSuite(
 
   function testRepository(name: string, f: (categories: CategoryRepository) => Promise<void>) {
     test(name, async () => {
-      const [repository, tearDown] = await createRepository();
-
-      try {
-        await f(repository);
-      } finally {
-        await tearDown();
-      }
+      await withRepository(f);
     });
   }
 }
 
 createCategoryRepositoryTestSuite(
   "repositories/categories/inMemory",
-  async () => [
-    new CategoryRepositoryInMemory(initialAppSnapshot()),
-    () => Promise.resolve(),
-  ]
-)
+  async (f) => f(new CategoryRepositoryInMemory(initialAppSnapshot()))
+);
+
+createCategoryRepositoryTestSuite(
+  "repositories/categories/database",
+  async (f) => {
+    await withTemporaryDatabase(testDatabaseUrl(), async connectionString => {
+      const database = new Kysely<DB>({
+        dialect: new PostgresDialect({
+          pool: new pg.Pool({connectionString})
+        }),
+        plugins: [
+          new CamelCasePlugin(),
+        ],
+      });
+      try {
+        const repository = new CategoryRepositoryDatabase(database);
+        await f(repository);
+      } finally {
+        await database.destroy();
+      }
+    });
+  },
+);

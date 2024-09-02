@@ -1,7 +1,6 @@
 import { assertThat, containsExactly, deepEqualTo, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { BackendConnection } from ".";
-import { requests } from "hornbeam-common/lib/app/snapshots";
 import { presetColors } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
@@ -361,8 +360,7 @@ export function createBackendConnectionTestSuite(
             id: card1Id,
             parentCardId: null,
           }));
-          await backendConnection.sendRequest(requests.cardEdit({
-            createdAt: defaultCreatedAt,
+          await backendConnection.sendRequest(testRequests.cardEdit({
             id: card1Id,
             isSubboardRoot: true,
           }));
@@ -373,8 +371,7 @@ export function createBackendConnectionTestSuite(
             id: card2Id,
             parentCardId: card1Id,
           }));
-          await backendConnection.sendRequest(requests.cardEdit({
-            createdAt: defaultCreatedAt,
+          await backendConnection.sendRequest(testRequests.cardEdit({
             id: card2Id,
             isSubboardRoot: true,
           }));
@@ -470,5 +467,3 @@ export function createBackendConnectionTestSuite(
     });
   }
 }
-
-const defaultCreatedAt = Instant.ofEpochSecond(1724429942);

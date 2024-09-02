@@ -53,16 +53,12 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
 
   async reorder(mutation: CategoryReorderMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
-      // TODO: investigate Kysely batch update support
-      // See: https://github.com/kysely-org/kysely/issues/839
-      let index = 0;
-      for (const id of mutation.ids) {
-        await transaction.updateTable("categories")
-          .set({index})
-          .where("categories.id", "=", id)
-          .execute();
-        index++;
-      }
+      // TODO: handle missing IDs
+      await transaction.updateTable("categories")
+        .set(({fn, ref, val}) => ({
+          index: fn<number>("array_position", [val(mutation.ids), ref("categories.id")])
+        }))
+        .execute();
     });
   }
 

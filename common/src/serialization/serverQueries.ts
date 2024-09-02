@@ -113,7 +113,7 @@ const ServerQuery = t.union([
   ParentBoardServerQuery,
   AllCategoriesServerQuery,
   AllColorsServerQuery,
-], "SerializedAppQuery");
+], "ServerQuery");
 
 export type ServerQuery = t.TypeOf<typeof ServerQuery>;
 export type SerializedServerQuery = t.OutputOf<typeof ServerQuery>;

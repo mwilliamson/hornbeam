@@ -9,42 +9,42 @@ import { CommentAddMutation } from "./comments";
 const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
 
 export const testProjectContentsMutation = {
-  cardAdd: (request: Partial<CardAddMutation>): ProjectContentsMutation => {
+  cardAdd: (mutation: Partial<CardAddMutation>): ProjectContentsMutation => {
     return projectContentsMutations.cardAdd({
       categoryId: uuidv7(),
       createdAt: defaultCreatedAt,
       id: uuidv7(),
       parentCardId: null,
       text: "<default test text>",
-      ...request,
+      ...mutation,
     });
   },
 
-  cardEdit: (request: Partial<CardEditMutation>): ProjectContentsMutation => {
+  cardEdit: (mutation: Partial<CardEditMutation>): ProjectContentsMutation => {
     return projectContentsMutations.cardEdit({
       createdAt: defaultCreatedAt,
       id: uuidv7(),
-      ...request,
+      ...mutation,
     });
   },
 
-  categoryAdd: (request: Partial<CategoryAddMutation>): ProjectContentsMutation => {
+  categoryAdd: (mutation: Partial<CategoryAddMutation>): ProjectContentsMutation => {
     return projectContentsMutations.categoryAdd({
       color: {presetColorId: presetColorWhite.id},
       createdAt: defaultCreatedAt,
       id: uuidv7(),
       name: "<default test name>",
-      ...request,
+      ...mutation,
     });
   },
 
-  commentAdd: (request: Partial<CommentAddMutation>): ProjectContentsMutation => {
+  commentAdd: (mutation: Partial<CommentAddMutation>): ProjectContentsMutation => {
     return projectContentsMutations.commentAdd({
       cardId: uuidv7(),
       createdAt: defaultCreatedAt,
       id: uuidv7(),
       text: "<default test text>",
-      ...request,
+      ...mutation,
     });
   },
 };

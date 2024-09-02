@@ -1,7 +1,6 @@
 import { Category, CategoryAddMutation, CategoryReorderMutation } from "hornbeam-common/lib/app/categories";
 import { AppSnapshot } from "hornbeam-common/lib/app/snapshots";
-import { Kysely } from "kysely";
-import { DB } from "../database/types";
+import { Database } from "../database";
 
 export interface CategoryRepository {
   add: (mutation: CategoryAddMutation) => Promise<void>;
@@ -30,9 +29,9 @@ export class CategoryRepositoryInMemory implements CategoryRepository {
 }
 
 export class CategoryRepositoryDatabase implements CategoryRepository {
-  private readonly database: Kysely<DB>;
+  private readonly database: Database;
 
-  constructor(database: Kysely<DB>) {
+  constructor(database: Database) {
     this.database = database;
   }
 

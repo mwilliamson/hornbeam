@@ -8,6 +8,7 @@ export default async function createDatabase(databaseUrl: string) {
       CREATE TABLE categories (
         created_at timestamptz NOT NULL,
         id uuid PRIMARY KEY,
+        index int NOT NULL,
         name text NOT NULL,
         preset_color_id uuid NOT NULL
       )

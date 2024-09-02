@@ -10,6 +10,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 export interface Category {
   createdAt: Timestamp;
   id: string;
+  index: number;
   name: string;
   presetColorId: string;
 }

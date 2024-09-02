@@ -7,9 +7,7 @@ import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMem
 import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { withTemporaryDatabase } from "../database/withTemporaryDatabase";
 import { testDatabaseUrl } from "../settings";
-import * as pg from "pg";
-import { CamelCasePlugin, Kysely, PostgresDialect } from "kysely";
-import { DB } from "../database/types";
+import { databaseConnect } from "../database";
 
 export function createCategoryRepositoryTestSuite(
   name: string,
@@ -76,14 +74,8 @@ createCategoryRepositoryTestSuite(
   "repositories/categories/database",
   async (f) => {
     await withTemporaryDatabase(testDatabaseUrl(), async connectionString => {
-      const database = new Kysely<DB>({
-        dialect: new PostgresDialect({
-          pool: new pg.Pool({connectionString})
-        }),
-        plugins: [
-          new CamelCasePlugin(),
-        ],
-      });
+      const database = await databaseConnect(connectionString);
+
       try {
         const repository = new CategoryRepositoryDatabase(database);
         await f(repository);

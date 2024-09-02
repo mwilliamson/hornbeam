@@ -7,14 +7,14 @@ export interface Comment {
   text: string;
 }
 
-export interface CommentAddRequest {
+export interface CommentAddMutation {
   cardId: string;
   createdAt: Instant;
   id: string;
   text: string;
 }
 
-export function createComment(request: CommentAddRequest): Comment {
+export function createComment(request: CommentAddMutation): Comment {
   return {
     cardId: request.cardId,
     createdAt: request.createdAt,

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { AppRequest } from "hornbeam-common/lib/app/snapshots";
+import { BoardContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { useBackendConnection } from "../backendConnections";
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
@@ -16,7 +16,7 @@ interface BoundaryProps<TQueries extends AppQueries> {
   queries: TQueries,
   render: (
     queryData: AppQueriesResult<TQueries>,
-    sendRequest: (update: AppRequest) => Promise<void>,
+    mutate: (mutation: BoardContentsMutation) => Promise<void>,
     query: <R>(query: AppQuery<R>) => Promise<R>,
   ) => React.ReactNode;
 }
@@ -63,7 +63,7 @@ export default function Boundary<TQueries extends AppQueries>(props: BoundaryPro
         <p>Query error.</p>
       );
     case "success":
-      return render(queryState.value, backendConnection.sendRequest, backendConnection.executeQuery);
+      return render(queryState.value, backendConnection.mutate, backendConnection.executeQuery);
   }
 }
 

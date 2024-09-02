@@ -3,7 +3,7 @@ import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deseria
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
-import { AppRequest, AppUpdate } from "hornbeam-common/lib/app/snapshots";
+import { AppUpdate, BoardContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { uuidv7 } from "uuidv7";
 import { assertNever } from "hornbeam-common/lib/util/assertNever";
@@ -184,13 +184,13 @@ export function connectServer(uri: string): BackendConnection {
     });
   };
 
-  const sendRequest = async (request: AppRequest): Promise<void> => {
+  const mutate = async (mutation: BoardContentsMutation): Promise<void> => {
     // TODO: send active queries as part of request?
 
     const updateId = uuidv7();
 
     const update: AppUpdate = {
-      request,
+      request: mutation,
       updateId,
     };
 
@@ -233,7 +233,7 @@ export function connectServer(uri: string): BackendConnection {
     close: () => {},
     executeQuery,
     executeQueries,
-    sendRequest,
+    mutate,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
     subscribeTimeTravel: subscriptions.subscribeTimeTravel,

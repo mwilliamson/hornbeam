@@ -3,7 +3,7 @@ import { Instant } from "@js-joda/core";
 import { useId, useState } from "react";
 import { uuidv7 } from "uuidv7";
 
-import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
+import { CategoryAddMutation } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
 import ColorSelect from "../colors/ColorSelect";
 import ControlGroup from "../widgets/ControlGroup";
@@ -20,7 +20,7 @@ interface AddCategoryState {
 
 interface AddCategorySectionProps {
   allColors: ColorSet;
-  onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
+  onCategoryAdd: (mutation: CategoryAddMutation) => Promise<void>;
 }
 
 export default function AddCategorySection(props: AddCategorySectionProps) {
@@ -33,18 +33,18 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
 
   // TODO: extract validation
   // TODO: add validation feedback
-  const validCategoryAddRequest = state !== null && state.name !== "" && state.presetColorId !== null ? {
+  const validCategoryAddMutation = state !== null && state.name !== "" && state.presetColorId !== null ? {
     name: state.name,
     presetColorId: state.presetColorId,
   } : null;
 
   const handleSubmit = async () => {
-    if (validCategoryAddRequest !== null) {
+    if (validCategoryAddMutation !== null) {
       // TODO: handle errors (here and elsewhere)
       await onCategoryAdd({
-        color: {presetColorId: validCategoryAddRequest.presetColorId},
+        color: {presetColorId: validCategoryAddMutation.presetColorId},
         createdAt: Instant.now(),
-        name: validCategoryAddRequest.name,
+        name: validCategoryAddMutation.name,
         id: uuidv7(),
       });
       setState(null);

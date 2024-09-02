@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import { BoardId, cardSubboardId, isCardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
-import { Card, CardEditRequest, CardEvent, CardHistory, CardSearcher, validateCardText } from "hornbeam-common/lib/app/cards";
+import { Card, CardEditMutation, CardEvent, CardHistory, CardSearcher, validateCardText } from "hornbeam-common/lib/app/cards";
 import { CategorySet, categoryBackgroundColorStyle } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
@@ -33,7 +33,7 @@ interface CardDetailViewProps {
   cardHistory: CardHistory,
   cardSearcher: CardSearcher,
   onAddChildClick: () => void;
-  onCardEdit: (request: Omit<CardEditRequest, "createdAt" | "id">) => Promise<void>;
+  onCardEdit: (mutation: Omit<CardEditMutation, "createdAt" | "id">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
   onBoardOpen: (boardId: BoardId) => void;

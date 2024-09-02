@@ -1,7 +1,7 @@
 import { uuidv7 } from "uuidv7";
 
 import { AppState, applyAppUpdate } from "hornbeam-common/lib/app";
-import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
+import { AppUpdate, BoardContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { mapValues } from "lodash";
@@ -29,9 +29,9 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     };
   };
 
-  const sendRequest = async (request: AppRequest) => {
+  const mutate = async (mutation: BoardContentsMutation) => {
     const update: AppUpdate = {
-      request,
+      request: mutation,
       updateId: uuidv7(),
     };
 
@@ -51,7 +51,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     close: () => {},
     executeQuery,
     executeQueries,
-    sendRequest,
+    mutate,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
     subscribeTimeTravel: subscriptions.subscribeTimeTravel,

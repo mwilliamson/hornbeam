@@ -1,4 +1,4 @@
-import { Category, CategoryAddRequest } from "hornbeam-common/lib/app/categories";
+import { Category, CategoryAddMutation } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
 import AddCategorySection from "./AddCategorySection";
 import CategoryListView from "./CategoryListView";
@@ -6,7 +6,7 @@ import CategoryListView from "./CategoryListView";
 interface CategorySectionProps {
   categories: ReadonlyArray<Category>;
   allColors: ColorSet;
-  onCategoryAdd: (request: CategoryAddRequest) => Promise<void>;
+  onCategoryAdd: (mutation: CategoryAddMutation) => Promise<void>;
   onReorder: (categoryIds: ReadonlyArray<string>) => Promise<void>;
 }
 

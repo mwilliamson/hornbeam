@@ -3,7 +3,7 @@ import * as simpleSync from "simple-sync/lib/client";
 import { uuidv7 } from "uuidv7";
 
 import { applyAppUpdate, initialAppState } from "hornbeam-common/lib/app";
-import { AppUpdate, AppRequest } from "hornbeam-common/lib/app/snapshots";
+import { AppUpdate, BoardContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
@@ -78,7 +78,7 @@ export function connectSimpleSync(
     close: () => client.close(),
     executeQuery,
     executeQueries,
-    sendRequest: requestSender.sendRequest,
+    mutate: requestSender.mutate,
     subscribeStatus: subscriptions.subscribeConnectionStatus,
     subscribeQueries: subscriptions.subscribeQueries,
     subscribeTimeTravel: subscriptions.subscribeTimeTravel,
@@ -87,7 +87,7 @@ export function connectSimpleSync(
 }
 
 interface RequestSender {
-  sendRequest: (request: AppRequest) => Promise<void>;
+  mutate: (mutation: BoardContentsMutation) => Promise<void>;
   useSendAppUpdate: (sendAppUpdate: ((update: AppUpdate) => void) | null) => void;
   receiveUpdateIds: (updateIds: ReadonlyArray<string>) => void;
 }
@@ -98,7 +98,7 @@ function createRequestSender(): RequestSender {
   let lastUpdateIndex = -1;
 
   return {
-    sendRequest: async (request: AppRequest) => {
+    mutate: async (mutation: BoardContentsMutation) => {
       if (sendAppUpdate === null) {
         // TODO: better error?
         throw new Error("Not connected");
@@ -107,7 +107,7 @@ function createRequestSender(): RequestSender {
       const updateId = uuidv7();
       sendAppUpdate({
         updateId,
-        request,
+        request: mutation,
       });
 
       const deferred = createDeferred<void>();

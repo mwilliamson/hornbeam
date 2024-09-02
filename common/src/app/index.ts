@@ -1,4 +1,4 @@
-import { AppSnapshot, AppUpdate, applySnapshotUpdate, initialAppSnapshot } from "./snapshots";
+import { AppSnapshot, AppUpdate, applyBoardContentsMutation, initialAppSnapshot } from "./snapshots";
 
 export class AppState {
   public readonly updateIds: ReadonlyArray<string>;
@@ -37,7 +37,7 @@ export function initialAppState(): AppState {
 }
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
-  const newSnapshot = applySnapshotUpdate(state.latestSnapshot(), update);
+  const newSnapshot = applyBoardContentsMutation(state.latestSnapshot(), update.request);
 
   return state.addSnapshot(update.updateId, newSnapshot);
 }

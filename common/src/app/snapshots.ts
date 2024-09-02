@@ -1,9 +1,9 @@
 import { Instant } from "@js-joda/core";
 import { handleNever } from "../util/assertNever";
-import { Card, CardAddRequest, CardEditRequest, CardMoveRequest, CardMoveToAfterRequest, CardMoveToBeforeRequest, CardSet, createCard, updateCard } from "./cards";
-import { Category, CategoryAddRequest, CategoryReorderRequest, CategorySet, CategorySetInMemory } from "./categories";
+import { Card, CardAddMutation, CardEditMutation, CardMoveMutation, CardMoveToAfterMutation, CardMoveToBeforeMutation, CardSet, createCard, updateCard } from "./cards";
+import { Category, CategoryAddMutation, CategoryReorderMutation, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
-import { Comment, CommentAddRequest, CommentSet, createComment } from "./comments";
+import { Comment, CommentAddMutation, CommentSet, createComment } from "./comments";
 
 export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   private readonly cards: ReadonlyArray<Card>;
@@ -26,8 +26,8 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     this.comments = comments;
   }
 
-  public cardAdd(request: CardAddRequest): AppSnapshot {
-    const card = createCard(request, this.nextCardNumber);
+  public cardAdd(mutation: CardAddMutation): AppSnapshot {
+    const card = createCard(mutation, this.nextCardNumber);
     return new AppSnapshot(
       [...this.cards, card],
       this.nextCardNumber + 1,
@@ -37,7 +37,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardEdit(request: CardEditRequest): AppSnapshot {
+  public cardEdit(request: CardEditMutation): AppSnapshot {
     return new AppSnapshot(
       this.cards.map(card => {
         if (card.id !== request.id) {
@@ -53,7 +53,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardMove(request: CardMoveRequest): AppSnapshot {
+  public cardMove(request: CardMoveMutation): AppSnapshot {
     const card = this.findCardById(request.id);
 
     if (card === null) {
@@ -101,7 +101,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardMoveToAfter(request: CardMoveToAfterRequest): AppSnapshot {
+  public cardMoveToAfter(request: CardMoveToAfterMutation): AppSnapshot {
     if (request.afterCardId === request.moveCardId) {
       return this;
     }
@@ -136,7 +136,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardMoveToBefore(request: CardMoveToBeforeRequest): AppSnapshot {
+  public cardMoveToBefore(request: CardMoveToBeforeMutation): AppSnapshot {
     if (request.beforeCardId === request.moveCardId) {
       return this;
     }
@@ -200,7 +200,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }
 
-  public categoryAdd(request: CategoryAddRequest): AppSnapshot {
+  public categoryAdd(request: CategoryAddMutation): AppSnapshot {
     return new AppSnapshot(
       this.cards,
       this.nextCardNumber,
@@ -210,7 +210,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public categoryReorder(request: CategoryReorderRequest): AppSnapshot {
+  public categoryReorder(request: CategoryReorderMutation): AppSnapshot {
     return new AppSnapshot(
       this.cards,
       this.nextCardNumber,
@@ -236,7 +236,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.colors.findPresetColorById(presetColorId);
   }
 
-  public commentAdd(request: CommentAddRequest): AppSnapshot {
+  public commentAdd(request: CommentAddMutation): AppSnapshot {
     const comment = createComment(request);
     return new AppSnapshot(
       this.cards,
@@ -264,95 +264,96 @@ export function initialAppSnapshot(): AppSnapshot {
 
 export interface AppUpdate {
   updateId: string;
-  request: AppRequest;
+  // TODO: rename to mutation or boardContentsMutation
+  request: BoardContentsMutation;
 }
 
-export type AppRequest =
-  | {type: "cardAdd", cardAdd: CardAddRequest}
-  | {type: "cardEdit", cardEdit: CardEditRequest}
-  | {type: "cardMove", cardMove: CardMoveRequest}
-  | {type: "cardMoveToAfter", cardMoveToAfter: CardMoveToAfterRequest}
-  | {type: "cardMoveToBefore", cardMoveToBefore: CardMoveToBeforeRequest}
-  | {type: "categoryAdd", categoryAdd: CategoryAddRequest}
-  | {type: "categoryReorder", categoryReorder: CategoryReorderRequest}
-  | {type: "commentAdd", commentAdd: CommentAddRequest};
+export type BoardContentsMutation =
+  | {type: "cardAdd", cardAdd: CardAddMutation}
+  | {type: "cardEdit", cardEdit: CardEditMutation}
+  | {type: "cardMove", cardMove: CardMoveMutation}
+  | {type: "cardMoveToAfter", cardMoveToAfter: CardMoveToAfterMutation}
+  | {type: "cardMoveToBefore", cardMoveToBefore: CardMoveToBeforeMutation}
+  | {type: "categoryAdd", categoryAdd: CategoryAddMutation}
+  | {type: "categoryReorder", categoryReorder: CategoryReorderMutation}
+  | {type: "commentAdd", commentAdd: CommentAddMutation};
 
-export const requests = {
-  cardAdd(request: CardAddRequest): AppRequest {
-    return {type: "cardAdd", cardAdd: request};
+export const boardContentsMutations = {
+  cardAdd(mutation: CardAddMutation): BoardContentsMutation {
+    return {type: "cardAdd", cardAdd: mutation};
   },
 
-  cardEdit(request: CardEditRequest): AppRequest {
-    return {type: "cardEdit", cardEdit: request};
+  cardEdit(mutation: CardEditMutation): BoardContentsMutation {
+    return {type: "cardEdit", cardEdit: mutation};
   },
 
-  cardMove(request: CardMoveRequest): AppRequest {
-    return {type: "cardMove", cardMove: request};
+  cardMove(mutation: CardMoveMutation): BoardContentsMutation {
+    return {type: "cardMove", cardMove: mutation};
   },
 
-  cardMoveToAfter(request: CardMoveToAfterRequest): AppRequest {
-    return {type: "cardMoveToAfter", cardMoveToAfter: request};
+  cardMoveToAfter(mutation: CardMoveToAfterMutation): BoardContentsMutation {
+    return {type: "cardMoveToAfter", cardMoveToAfter: mutation};
   },
 
-  cardMoveToBefore(request: CardMoveToBeforeRequest): AppRequest {
-    return {type: "cardMoveToBefore", cardMoveToBefore: request};
+  cardMoveToBefore(mutation: CardMoveToBeforeMutation): BoardContentsMutation {
+    return {type: "cardMoveToBefore", cardMoveToBefore: mutation};
   },
 
-  categoryAdd(request: CategoryAddRequest): AppRequest {
-    return {type: "categoryAdd", categoryAdd: request};
+  categoryAdd(mutation: CategoryAddMutation): BoardContentsMutation {
+    return {type: "categoryAdd", categoryAdd: mutation};
   },
 
-  categoryReorder(request: CategoryReorderRequest): AppRequest {
-    return {type: "categoryReorder", categoryReorder: request};
+  categoryReorder(mutation: CategoryReorderMutation): BoardContentsMutation {
+    return {type: "categoryReorder", categoryReorder: mutation};
   },
 
-  commentAdd(request: CommentAddRequest): AppRequest {
-    return {type: "commentAdd", commentAdd: request};
+  commentAdd(mutation: CommentAddMutation): BoardContentsMutation {
+    return {type: "commentAdd", commentAdd: mutation};
   },
 };
 
-export function requestCreatedAt(request: AppRequest): Instant {
-  switch (request.type) {
+export function boardContentsMutationCreatedAt(mutation: BoardContentsMutation): Instant {
+  switch (mutation.type) {
     case "cardAdd":
-      return request.cardAdd.createdAt;
+      return mutation.cardAdd.createdAt;
     case "cardEdit":
-      return request.cardEdit.createdAt;
+      return mutation.cardEdit.createdAt;
     case "cardMove":
-      return request.cardMove.createdAt;
+      return mutation.cardMove.createdAt;
     case "cardMoveToAfter":
-      return request.cardMoveToAfter.createdAt;
+      return mutation.cardMoveToAfter.createdAt;
     case "cardMoveToBefore":
-      return request.cardMoveToBefore.createdAt;
+      return mutation.cardMoveToBefore.createdAt;
     case "categoryAdd":
-      return request.categoryAdd.createdAt;
+      return mutation.categoryAdd.createdAt;
     case "categoryReorder":
-      return request.categoryReorder.createdAt;
+      return mutation.categoryReorder.createdAt;
     case "commentAdd":
-      return request.commentAdd.createdAt;
+      return mutation.commentAdd.createdAt;
     default:
-      return handleNever(request, Instant.now());
+      return handleNever(mutation, Instant.now());
   }
 }
 
-export function applySnapshotUpdate(snapshot: AppSnapshot, update: AppUpdate): AppSnapshot {
-  switch (update.request.type) {
+export function applyBoardContentsMutation(snapshot: AppSnapshot, mutation: BoardContentsMutation): AppSnapshot {
+  switch (mutation.type) {
     case "cardAdd":
-      return snapshot.cardAdd(update.request.cardAdd);
+      return snapshot.cardAdd(mutation.cardAdd);
     case "cardEdit":
-      return snapshot.cardEdit(update.request.cardEdit);
+      return snapshot.cardEdit(mutation.cardEdit);
     case "cardMove":
-      return snapshot.cardMove(update.request.cardMove);
+      return snapshot.cardMove(mutation.cardMove);
     case "cardMoveToAfter":
-      return snapshot.cardMoveToAfter(update.request.cardMoveToAfter);
+      return snapshot.cardMoveToAfter(mutation.cardMoveToAfter);
     case "cardMoveToBefore":
-      return snapshot.cardMoveToBefore(update.request.cardMoveToBefore);
+      return snapshot.cardMoveToBefore(mutation.cardMoveToBefore);
     case "categoryAdd":
-      return snapshot.categoryAdd(update.request.categoryAdd);
+      return snapshot.categoryAdd(mutation.categoryAdd);
     case "categoryReorder":
-      return snapshot.categoryReorder(update.request.categoryReorder);
+      return snapshot.categoryReorder(mutation.categoryReorder);
     case "commentAdd":
-      return snapshot.commentAdd(update.request.commentAdd);
+      return snapshot.commentAdd(mutation.commentAdd);
     default:
-      return handleNever(update.request, snapshot);
+      return handleNever(mutation, snapshot);
   }
 }

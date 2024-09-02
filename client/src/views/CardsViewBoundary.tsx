@@ -2,7 +2,7 @@ import { Instant } from "@js-joda/core";
 import { BoardId } from "hornbeam-common/lib/app/boards";
 import { Card } from "hornbeam-common/lib/app/cards";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
-import { requests } from "hornbeam-common/lib/app/snapshots";
+import { boardContentsMutations } from "hornbeam-common/lib/app/snapshots";
 import { allCategoriesQuery, allColorsQuery, boardCardTreesQuery } from "hornbeam-common/lib/queries";
 import Boundary from "./Boundary";
 import CardsView from "./CardsView";
@@ -36,21 +36,21 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
           boardId: selectedBoardId,
         }),
       }}
-      render={({allCategories, allColors, boardCardTrees: boardCards}, sendRequest) => (
+      render={({allCategories, allColors, boardCardTrees: boardCards}, mutate) => (
         <CardsView
           allCategories={allCategories}
           allColors={allColors}
           cardTrees={boardCards}
           cardSelectedId={cardSelectedId}
-          onCardMoveToAfter={async (request) => {
-            await sendRequest(requests.cardMoveToAfter({
-              ...request,
+          onCardMoveToAfter={async (mutation) => {
+            await mutate(boardContentsMutations.cardMoveToAfter({
+              ...mutation,
               createdAt: Instant.now(),
             }));
           }}
-          onCardMoveToBefore={async (request) => {
-            await sendRequest(requests.cardMoveToBefore({
-              ...request,
+          onCardMoveToBefore={async (mutation) => {
+            await mutate(boardContentsMutations.cardMoveToBefore({
+              ...mutation,
               createdAt: Instant.now(),
             }));
           }}

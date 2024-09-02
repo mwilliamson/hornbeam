@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { AppRequest } from "hornbeam-common/lib/app/snapshots";
+import { BoardContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 
 export type BackendConnectionState =
@@ -214,7 +214,7 @@ export type ExecuteQueries = <TQueries extends AppQueries>(
 
 export interface BackendConnection {
   close: () => void;
-  sendRequest: SendRequest;
+  mutate: Mutate;
   executeQuery: <R>(query: AppQuery<R>) => Promise<R>;
   executeQueries: ExecuteQueries;
   subscribeStatus: (subscriber: BackendConnectionStatusSubscriber) => BackendSubscription;
@@ -226,7 +226,7 @@ export interface BackendConnection {
   setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;
 }
 
-export type SendRequest = (update: AppRequest) => Promise<void>;
+export type Mutate = (mutation: BoardContentsMutation) => Promise<void>;
 
 const BackendConnectionContext = React.createContext<BackendConnection | null>(null);
 
@@ -240,10 +240,4 @@ export function useBackendConnection(): BackendConnection {
   }
 
   return backendConnection;
-}
-
-export function useSendRequest(): SendRequest {
-  const backendConnection = useBackendConnection();
-
-  return backendConnection.sendRequest;
 }

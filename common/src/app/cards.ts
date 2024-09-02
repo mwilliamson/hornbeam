@@ -34,7 +34,7 @@ export function generateCardHistory(card: Card, appSnapshot: CommentSet): CardHi
   ];
 }
 
-export interface CardAddRequest {
+export interface CardAddMutation {
   categoryId: string;
   createdAt: Instant;
   id: string;
@@ -42,7 +42,7 @@ export interface CardAddRequest {
   text: string;
 }
 
-export function createCard(request: CardAddRequest, cardNumber: number): Card {
+export function createCard(request: CardAddMutation, cardNumber: number): Card {
   return {
     categoryId: request.categoryId,
     createdAt: request.createdAt,
@@ -55,7 +55,7 @@ export function createCard(request: CardAddRequest, cardNumber: number): Card {
   };
 }
 
-export interface CardEditRequest {
+export interface CardEditMutation {
   categoryId?: string;
   createdAt: Instant;
   id: string;
@@ -65,7 +65,7 @@ export interface CardEditRequest {
   text?: string;
 }
 
-export function updateCard(card: Card, request: Omit<CardEditRequest, "createdAt" | "id">): Card {
+export function updateCard(card: Card, request: Omit<CardEditMutation, "createdAt" | "id">): Card {
   return {
     categoryId: request.categoryId === undefined ? card.categoryId : request.categoryId,
     createdAt: card.createdAt,
@@ -78,20 +78,20 @@ export function updateCard(card: Card, request: Omit<CardEditRequest, "createdAt
   };
 }
 
-export interface CardMoveRequest {
+export interface CardMoveMutation {
   createdAt: Instant;
   direction: "up" | "down";
   id: string;
 }
 
-export interface CardMoveToBeforeRequest {
+export interface CardMoveToBeforeMutation {
   beforeCardId: string;
   createdAt: Instant;
   moveCardId: string;
   parentCardId: string | null;
 }
 
-export interface CardMoveToAfterRequest {
+export interface CardMoveToAfterMutation {
   afterCardId: string;
   createdAt: Instant;
   moveCardId: string;

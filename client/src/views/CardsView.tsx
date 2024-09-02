@@ -4,7 +4,7 @@ import React from "react";
 
 import { BoardId, cardSubboardId } from "hornbeam-common/lib/app/boards";
 import { CardTree } from "hornbeam-common/lib/app/cardTrees";
-import { Card, CardMoveToAfterRequest, CardMoveToBeforeRequest } from "hornbeam-common/lib/app/cards";
+import { Card, CardMoveToAfterMutation, CardMoveToBeforeMutation } from "hornbeam-common/lib/app/cards";
 import { CategorySet } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
@@ -17,8 +17,8 @@ interface CardsViewProps {
   allColors: ColorSet;
   cardTrees: ReadonlyArray<CardTree>;
   cardSelectedId: string | null;
-  onCardMoveToAfter: (request: Omit<CardMoveToAfterRequest, "createdAt">) => void;
-  onCardMoveToBefore: (request: Omit<CardMoveToBeforeRequest, "createdAt">) => void;
+  onCardMoveToAfter: (mutation: Omit<CardMoveToAfterMutation, "createdAt">) => void;
+  onCardMoveToBefore: (mutation: Omit<CardMoveToBeforeMutation, "createdAt">) => void;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
   onBoardOpen: (boardId: BoardId) => void;

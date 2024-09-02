@@ -8,15 +8,15 @@ import * as t2 from "../util/io-ts";
 import { SerializedCardStatus } from "./cardStatuses";
 import { SerializedColorRef } from "./colors";
 
-const SerializedCardAddRequest = t.type({
+const SerializedCardAddMutation = t.type({
   categoryId: t.string,
   createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
   id: t.string,
   parentCardId: t.union([t.string, t.null]),
   text: t.string,
-}, "SerializedCardAddRequest");
+}, "SerializedCardAddMutation");
 
-const SerializedCardEditRequest = t.intersection([
+const SerializedCardEditMutation = t.intersection([
   t.type({
     createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
     id: t.string,
@@ -28,61 +28,61 @@ const SerializedCardEditRequest = t.intersection([
     status: SerializedCardStatus,
     text: t.string,
   }),
-], "SerializedCardEditRequest");
+], "SerializedCardEditMutation");
 
-const SerializedCardMoveRequest = t.type({
+const SerializedCardMoveMutation = t.type({
   createdAt: t2.instant,
   direction: t.keyof({"down": null, "up": null}),
   id: t.string,
-}, "SerializedCardMoveRequest");
+}, "SerializedCardMoveMutation");
 
-const SerializedCardMoveToAfterRequest = t.type({
+const SerializedCardMoveToAfterMutation = t.type({
   createdAt: t2.instant,
   afterCardId: t.string,
   moveCardId: t.string,
   parentCardId: t.union([t.string, t.null]),
-}, "SerializedCardMoveToAfterRequest");
+}, "SerializedCardMoveToAfterMutation");
 
-const SerializedCardMoveToBeforeRequest = t.type({
+const SerializedCardMoveToBeforeMutation = t.type({
   createdAt: t2.instant,
   beforeCardId: t.string,
   moveCardId: t.string,
   parentCardId: t.union([t.string, t.null]),
-}, "SerializedCardMoveToBeforeRequest");
+}, "SerializedCardMoveToBeforeMutation");
 
-const SerializedCategoryAddRequest = t.type({
+const SerializedCategoryAddMutation = t.type({
   createdAt: t2.instant,
   color: SerializedColorRef,
   id: t.string,
   name: t.string,
-}, "SerializedCategoryAddRequest");
+}, "SerializedCategoryAddMutation");
 
-const SerializedCategoryReorderRequest = t.type({
+const SerializedCategoryReorderMutation = t.type({
   createdAt: t2.instant,
   ids: t.readonlyArray(t.string),
-}, "SerializedCategoryReorderRequest");
+}, "SerializedCategoryReorderMutation");
 
-const SerializedCommentAddRequest = t.type({
+const SerializedCommentAddMutation = t.type({
   cardId: t.string,
   createdAt: t2.instant,
   id: t.string,
   text: t.string,
-}, "SerializedCommentAddRequest");
+}, "SerializedCommentAddMutation");
 
-const SerializedRequest = t.union([
-  t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddRequest}),
-  t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditRequest}),
-  t.type({type: t.literal("cardMove"), cardMove: SerializedCardMoveRequest}),
-  t.type({type: t.literal("cardMoveToAfter"), cardMoveToAfter: SerializedCardMoveToAfterRequest}),
-  t.type({type: t.literal("cardMoveToBefore"), cardMoveToBefore: SerializedCardMoveToBeforeRequest}),
-  t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddRequest}),
-  t.type({type: t.literal("categoryReorder"), categoryReorder: SerializedCategoryReorderRequest}),
-  t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddRequest}),
+const SerializedBoardContentsMutation = t.union([
+  t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddMutation}),
+  t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditMutation}),
+  t.type({type: t.literal("cardMove"), cardMove: SerializedCardMoveMutation}),
+  t.type({type: t.literal("cardMoveToAfter"), cardMoveToAfter: SerializedCardMoveToAfterMutation}),
+  t.type({type: t.literal("cardMoveToBefore"), cardMoveToBefore: SerializedCardMoveToBeforeMutation}),
+  t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddMutation}),
+  t.type({type: t.literal("categoryReorder"), categoryReorder: SerializedCategoryReorderMutation}),
+  t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddMutation}),
 ]);
 
 const SerializedAppUpdate = t.type({
   updateId: t.string,
-  request: SerializedRequest,
+  request: SerializedBoardContentsMutation,
 }, "SerializedAppUpdate");
 
 export function serializeAppUpdate(update: AppUpdate): t.OutputOf<typeof SerializedAppUpdate> {

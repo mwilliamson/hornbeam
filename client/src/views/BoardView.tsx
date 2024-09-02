@@ -3,7 +3,7 @@ import { useEffect, useId, useState } from "react";
 
 import { BoardId, isRootBoardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { CardStatus, allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
-import { requests } from "hornbeam-common/lib/app/snapshots";
+import { boardContentsMutations } from "hornbeam-common/lib/app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import "./BoardView.scss";
@@ -55,7 +55,7 @@ interface BoardViewProps {
 
 export default function BoardView(props: BoardViewProps) {
   const {backendConnection} = props;
-  const {sendRequest} = backendConnection;
+  const {mutate} = backendConnection;
   const timeTravel = useTimeTravel();
 
   const [viewState, setViewState] = useState(initialViewState);
@@ -113,7 +113,7 @@ export default function BoardView(props: BoardViewProps) {
         // TODO: prevent during time travel
         if (viewState.selectedCardId !== null) {
           // TODO: wait
-          sendRequest(requests.cardEdit({
+          mutate(boardContentsMutations.cardEdit({
             createdAt: Instant.now(),
             id: viewState.selectedCardId,
             status: CardStatus.Deleted,
@@ -127,7 +127,7 @@ export default function BoardView(props: BoardViewProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [viewState.selectedCardId, sendRequest]);
+  }, [viewState.selectedCardId, mutate]);
 
   const handleBoardUp = isRootBoardId(viewState.selectedBoardId)
     ? undefined

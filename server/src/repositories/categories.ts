@@ -1,11 +1,11 @@
-import { Category, CategoryAddRequest, CategoryReorderRequest } from "hornbeam-common/lib/app/categories";
+import { Category, CategoryAddMutation, CategoryReorderMutation } from "hornbeam-common/lib/app/categories";
 import { AppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { Kysely } from "kysely";
 import { DB } from "../database/types";
 
 export interface CategoryRepository {
-  add: (request: CategoryAddRequest) => Promise<void>;
-  reorder: (request: CategoryReorderRequest) => Promise<void>;
+  add: (mutation: CategoryAddMutation) => Promise<void>;
+  reorder: (mutation: CategoryReorderMutation) => Promise<void>;
   fetchAll: () => Promise<ReadonlyArray<Category>>;
 }
 
@@ -16,12 +16,12 @@ export class CategoryRepositoryInMemory implements CategoryRepository {
     this.snapshot = initialSnapshot;
   }
 
-  async add(request: CategoryAddRequest): Promise<void> {
-    this.snapshot = this.snapshot.categoryAdd(request);
+  async add(mutation: CategoryAddMutation): Promise<void> {
+    this.snapshot = this.snapshot.categoryAdd(mutation);
   }
 
-  async reorder(request: CategoryReorderRequest): Promise<void> {
-    this.snapshot = this.snapshot.categoryReorder(request);
+  async reorder(mutation: CategoryReorderMutation): Promise<void> {
+    this.snapshot = this.snapshot.categoryReorder(mutation);
   }
 
   async fetchAll(): Promise<ReadonlyArray<Category>> {
@@ -36,27 +36,27 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
     this.database = database;
   }
 
-  async add(request: CategoryAddRequest): Promise<void> {
+  async add(mutation: CategoryAddMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
       await transaction.insertInto("categories")
         .values(({fn, selectFrom, lit}) => ({
-          createdAt: new Date(request.createdAt.toEpochMilli()),
-          id: request.id,
+          createdAt: new Date(mutation.createdAt.toEpochMilli()),
+          id: mutation.id,
           index: selectFrom("categories")
             .select(fn.coalesce(fn.max("categories.index"), lit(0)).as("index")),
-          name: request.name,
-          presetColorId: request.color.presetColorId,
+          name: mutation.name,
+          presetColorId: mutation.color.presetColorId,
         }))
         .execute();
     });
   }
 
-  async reorder(request: CategoryReorderRequest): Promise<void> {
+  async reorder(mutation: CategoryReorderMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
       // TODO: investigate Kysely batch update support
       // See: https://github.com/kysely-org/kysely/issues/839
       let index = 0;
-      for (const id of request.ids) {
+      for (const id of mutation.ids) {
         await transaction.updateTable("categories")
           .set({index})
           .where("categories.id", "=", id)

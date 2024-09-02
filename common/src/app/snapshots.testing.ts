@@ -3,8 +3,8 @@ import { uuidv7 } from "uuidv7";
 import { CardAddMutation, CardEditMutation } from "./cards";
 import { ProjectContentsMutation, projectContentsMutations } from "./snapshots";
 import { CategoryAddMutation } from "./categories";
-import { presetColorWhite } from "./colors";
 import { CommentAddMutation } from "./comments";
+import { testCategoryAddMutation } from "./categories.testing";
 
 const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
 
@@ -29,13 +29,7 @@ export const testProjectContentsMutation = {
   },
 
   categoryAdd: (mutation: Partial<CategoryAddMutation>): ProjectContentsMutation => {
-    return projectContentsMutations.categoryAdd({
-      color: {presetColorId: presetColorWhite.id},
-      createdAt: defaultCreatedAt,
-      id: uuidv7(),
-      name: "<default test name>",
-      ...mutation,
-    });
+    return projectContentsMutations.categoryAdd(testCategoryAddMutation(mutation));
   },
 
   commentAdd: (mutation: Partial<CommentAddMutation>): ProjectContentsMutation => {

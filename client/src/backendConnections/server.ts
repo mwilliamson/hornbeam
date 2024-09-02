@@ -190,7 +190,7 @@ export function connectServer(uri: string): BackendConnection {
     const updateId = uuidv7();
 
     const update: AppUpdate = {
-      request: mutation,
+      mutation,
       updateId,
     };
 

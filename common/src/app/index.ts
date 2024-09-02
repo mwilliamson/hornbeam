@@ -37,7 +37,7 @@ export function initialAppState(): AppState {
 }
 
 export function applyAppUpdate(state: AppState, update: AppUpdate): AppState {
-  const newSnapshot = applyBoardContentsMutation(state.latestSnapshot(), update.request);
+  const newSnapshot = applyBoardContentsMutation(state.latestSnapshot(), update.mutation);
 
   return state.addSnapshot(update.updateId, newSnapshot);
 }

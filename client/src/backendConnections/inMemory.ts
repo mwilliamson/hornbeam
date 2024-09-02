@@ -31,7 +31,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
 
   const mutate = async (mutation: BoardContentsMutation) => {
     const update: AppUpdate = {
-      request: mutation,
+      mutation,
       updateId: uuidv7(),
     };
 

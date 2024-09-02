@@ -82,7 +82,7 @@ const SerializedBoardContentsMutation = t.union([
 
 const SerializedAppUpdate = t.type({
   updateId: t.string,
-  request: SerializedBoardContentsMutation,
+  mutation: SerializedBoardContentsMutation,
 }, "SerializedAppUpdate");
 
 export function serializeAppUpdate(update: AppUpdate): t.OutputOf<typeof SerializedAppUpdate> {

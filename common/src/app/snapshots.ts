@@ -264,8 +264,7 @@ export function initialAppSnapshot(): AppSnapshot {
 
 export interface AppUpdate {
   updateId: string;
-  // TODO: rename to mutation or boardContentsMutation
-  request: BoardContentsMutation;
+  mutation: BoardContentsMutation;
 }
 
 export type BoardContentsMutation =

@@ -107,7 +107,7 @@ function createRequestSender(): RequestSender {
       const updateId = uuidv7();
       sendAppUpdate({
         updateId,
-        request: mutation,
+        mutation,
       });
 
       const deferred = createDeferred<void>();

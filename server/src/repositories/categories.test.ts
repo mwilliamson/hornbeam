@@ -1,4 +1,3 @@
-import { Instant } from "@js-joda/core";
 import { assertThat, containsExactly, deepEqualTo, hasProperties, isSequence } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { uuidv7 } from "uuidv7";
@@ -97,7 +96,6 @@ export function createCategoryRepositoryTestSuite(
 
         await repository.reorder(categoriesTesting.testCategoryReorderMutation({
           ids: [category2Id, category1Id, category3Id],
-          createdAt: Instant.ofEpochSecond(180),
         }));
 
         const categories = await repository.fetchAll();

@@ -1,18 +1,16 @@
 import { assertThat, containsExactly, deepEqualTo, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { BackendConnection } from ".";
-import { AppRequest, requests } from "hornbeam-common/lib/app/snapshots";
-import { presetColors, presetColorWhite } from "hornbeam-common/lib/app/colors";
+import { requests } from "hornbeam-common/lib/app/snapshots";
+import { presetColors } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
 import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentBoardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
-import { CategoryAddRequest } from "hornbeam-common/lib/app/categories";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
-import { CardAddRequest, CardEditRequest } from "hornbeam-common/lib/app/cards";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
-import { CommentAddRequest } from "hornbeam-common/lib/app/comments";
+import { testRequests } from "hornbeam-common/lib/app/snapshots.testing";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -474,43 +472,3 @@ export function createBackendConnectionTestSuite(
 }
 
 const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
-
-const testRequests = {
-  cardAdd: (request: Partial<CardAddRequest>): AppRequest => {
-    return requests.cardAdd({
-      categoryId: uuidv7(),
-      createdAt: defaultCreatedAt,
-      id: uuidv7(),
-      parentCardId: null,
-      text: "<default test text>",
-      ...request,
-    });
-  },
-  cardEdit: (request: Partial<CardEditRequest>): AppRequest => {
-    return requests.cardEdit({
-      createdAt: defaultCreatedAt,
-      id: uuidv7(),
-      ...request,
-    });
-  },
-
-  categoryAdd: (request: Partial<CategoryAddRequest>): AppRequest => {
-    return requests.categoryAdd({
-      color: {presetColorId: presetColorWhite.id},
-      createdAt: defaultCreatedAt,
-      id: uuidv7(),
-      name: "<default test name>",
-      ...request,
-    });
-  },
-
-  commentAdd: (request: Partial<CommentAddRequest>): AppRequest => {
-    return requests.commentAdd({
-      cardId: uuidv7(),
-      createdAt: defaultCreatedAt,
-      id: uuidv7(),
-      text: "<default test text>",
-      ...request,
-    });
-  },
-};

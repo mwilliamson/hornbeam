@@ -264,10 +264,10 @@ export function initialAppSnapshot(): AppSnapshot {
 
 export interface AppUpdate {
   updateId: string;
-  mutation: BoardContentsMutation;
+  mutation: ProjectContentsMutation;
 }
 
-export type BoardContentsMutation =
+export type ProjectContentsMutation =
   | {type: "cardAdd", cardAdd: CardAddMutation}
   | {type: "cardEdit", cardEdit: CardEditMutation}
   | {type: "cardMove", cardMove: CardMoveMutation}
@@ -277,41 +277,41 @@ export type BoardContentsMutation =
   | {type: "categoryReorder", categoryReorder: CategoryReorderMutation}
   | {type: "commentAdd", commentAdd: CommentAddMutation};
 
-export const boardContentsMutations = {
-  cardAdd(mutation: CardAddMutation): BoardContentsMutation {
+export const projectContentsMutations = {
+  cardAdd(mutation: CardAddMutation): ProjectContentsMutation {
     return {type: "cardAdd", cardAdd: mutation};
   },
 
-  cardEdit(mutation: CardEditMutation): BoardContentsMutation {
+  cardEdit(mutation: CardEditMutation): ProjectContentsMutation {
     return {type: "cardEdit", cardEdit: mutation};
   },
 
-  cardMove(mutation: CardMoveMutation): BoardContentsMutation {
+  cardMove(mutation: CardMoveMutation): ProjectContentsMutation {
     return {type: "cardMove", cardMove: mutation};
   },
 
-  cardMoveToAfter(mutation: CardMoveToAfterMutation): BoardContentsMutation {
+  cardMoveToAfter(mutation: CardMoveToAfterMutation): ProjectContentsMutation {
     return {type: "cardMoveToAfter", cardMoveToAfter: mutation};
   },
 
-  cardMoveToBefore(mutation: CardMoveToBeforeMutation): BoardContentsMutation {
+  cardMoveToBefore(mutation: CardMoveToBeforeMutation): ProjectContentsMutation {
     return {type: "cardMoveToBefore", cardMoveToBefore: mutation};
   },
 
-  categoryAdd(mutation: CategoryAddMutation): BoardContentsMutation {
+  categoryAdd(mutation: CategoryAddMutation): ProjectContentsMutation {
     return {type: "categoryAdd", categoryAdd: mutation};
   },
 
-  categoryReorder(mutation: CategoryReorderMutation): BoardContentsMutation {
+  categoryReorder(mutation: CategoryReorderMutation): ProjectContentsMutation {
     return {type: "categoryReorder", categoryReorder: mutation};
   },
 
-  commentAdd(mutation: CommentAddMutation): BoardContentsMutation {
+  commentAdd(mutation: CommentAddMutation): ProjectContentsMutation {
     return {type: "commentAdd", commentAdd: mutation};
   },
 };
 
-export function boardContentsMutationCreatedAt(mutation: BoardContentsMutation): Instant {
+export function projectContentsMutationCreatedAt(mutation: ProjectContentsMutation): Instant {
   switch (mutation.type) {
     case "cardAdd":
       return mutation.cardAdd.createdAt;
@@ -334,7 +334,7 @@ export function boardContentsMutationCreatedAt(mutation: BoardContentsMutation):
   }
 }
 
-export function applyBoardContentsMutation(snapshot: AppSnapshot, mutation: BoardContentsMutation): AppSnapshot {
+export function applyProjectContentsMutation(snapshot: AppSnapshot, mutation: ProjectContentsMutation): AppSnapshot {
   switch (mutation.type) {
     case "cardAdd":
       return snapshot.cardAdd(mutation.cardAdd);

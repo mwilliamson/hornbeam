@@ -3,7 +3,7 @@ import { useEffect, useId, useState } from "react";
 
 import { BoardId, isRootBoardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { CardStatus, allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
-import { boardContentsMutations } from "hornbeam-common/lib/app/snapshots";
+import { projectContentsMutations } from "hornbeam-common/lib/app/snapshots";
 import "../scss/style.scss";
 import isInputEvent from "../util/isInputEvent";
 import "./BoardView.scss";
@@ -113,7 +113,7 @@ export default function BoardView(props: BoardViewProps) {
         // TODO: prevent during time travel
         if (viewState.selectedCardId !== null) {
           // TODO: wait
-          mutate(boardContentsMutations.cardEdit({
+          mutate(projectContentsMutations.cardEdit({
             createdAt: Instant.now(),
             id: viewState.selectedCardId,
             status: CardStatus.Deleted,

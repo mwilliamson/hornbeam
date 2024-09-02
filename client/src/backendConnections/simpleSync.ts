@@ -3,7 +3,7 @@ import * as simpleSync from "simple-sync/lib/client";
 import { uuidv7 } from "uuidv7";
 
 import { applyAppUpdate, initialAppState } from "hornbeam-common/lib/app";
-import { AppUpdate, BoardContentsMutation } from "hornbeam-common/lib/app/snapshots";
+import { AppUpdate, ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
@@ -87,7 +87,7 @@ export function connectSimpleSync(
 }
 
 interface RequestSender {
-  mutate: (mutation: BoardContentsMutation) => Promise<void>;
+  mutate: (mutation: ProjectContentsMutation) => Promise<void>;
   useSendAppUpdate: (sendAppUpdate: ((update: AppUpdate) => void) | null) => void;
   receiveUpdateIds: (updateIds: ReadonlyArray<string>) => void;
 }
@@ -98,7 +98,7 @@ function createRequestSender(): RequestSender {
   let lastUpdateIndex = -1;
 
   return {
-    mutate: async (mutation: BoardContentsMutation) => {
+    mutate: async (mutation: ProjectContentsMutation) => {
       if (sendAppUpdate === null) {
         // TODO: better error?
         throw new Error("Not connected");

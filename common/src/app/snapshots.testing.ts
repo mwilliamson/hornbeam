@@ -1,16 +1,16 @@
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
 import { CardAddMutation, CardEditMutation } from "./cards";
-import { BoardContentsMutation, boardContentsMutations } from "./snapshots";
+import { ProjectContentsMutation, projectContentsMutations } from "./snapshots";
 import { CategoryAddMutation } from "./categories";
 import { presetColorWhite } from "./colors";
 import { CommentAddMutation } from "./comments";
 
 const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
 
-export const testBoardContentsMutation = {
-  cardAdd: (request: Partial<CardAddMutation>): BoardContentsMutation => {
-    return boardContentsMutations.cardAdd({
+export const testProjectContentsMutation = {
+  cardAdd: (request: Partial<CardAddMutation>): ProjectContentsMutation => {
+    return projectContentsMutations.cardAdd({
       categoryId: uuidv7(),
       createdAt: defaultCreatedAt,
       id: uuidv7(),
@@ -20,16 +20,16 @@ export const testBoardContentsMutation = {
     });
   },
 
-  cardEdit: (request: Partial<CardEditMutation>): BoardContentsMutation => {
-    return boardContentsMutations.cardEdit({
+  cardEdit: (request: Partial<CardEditMutation>): ProjectContentsMutation => {
+    return projectContentsMutations.cardEdit({
       createdAt: defaultCreatedAt,
       id: uuidv7(),
       ...request,
     });
   },
 
-  categoryAdd: (request: Partial<CategoryAddMutation>): BoardContentsMutation => {
-    return boardContentsMutations.categoryAdd({
+  categoryAdd: (request: Partial<CategoryAddMutation>): ProjectContentsMutation => {
+    return projectContentsMutations.categoryAdd({
       color: {presetColorId: presetColorWhite.id},
       createdAt: defaultCreatedAt,
       id: uuidv7(),
@@ -38,8 +38,8 @@ export const testBoardContentsMutation = {
     });
   },
 
-  commentAdd: (request: Partial<CommentAddMutation>): BoardContentsMutation => {
-    return boardContentsMutations.commentAdd({
+  commentAdd: (request: Partial<CommentAddMutation>): ProjectContentsMutation => {
+    return projectContentsMutations.commentAdd({
       cardId: uuidv7(),
       createdAt: defaultCreatedAt,
       id: uuidv7(),

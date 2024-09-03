@@ -2,18 +2,13 @@ import { assertThat, containsExactly, deepEqualTo, hasProperties, isSequence } f
 import { suite, test } from "mocha";
 import { uuidv7 } from "uuidv7";
 import { presetColorGreen, presetColorRed } from "hornbeam-common/lib/app/colors";
-import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMemory } from "./categories";
+import { CategoryRepository } from "./categories";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
-import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
-import { withTemporaryDatabase } from "../database/temporaryDatabases";
-import { testDatabaseUrl } from "../settings";
-import { databaseConnect } from "../database";
 import { fileSuite } from "../testing";
+import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 
 export function createCategoryRepositoryTests(
-  withRepository: (
-    f: (repository: CategoryRepository) => Promise<void>
-  ) => Promise<void>,
+  createFixtures: () => RepositoryFixtures,
 ): void {
   suite("fetchAll()", () => {
     testRepository("no categories", async (repository) => {
@@ -109,32 +104,18 @@ export function createCategoryRepositoryTests(
 
   function testRepository(name: string, f: (categories: CategoryRepository) => Promise<void>) {
     test(name, async () => {
-      await withRepository(f);
+      await using fixtures = await createFixtures();
+      await f(await fixtures.categoryRepository());
     });
   }
 }
 
 fileSuite(__filename, () => {
   suite("inMemory", () => {
-    createCategoryRepositoryTests(
-      async (f) => f(new CategoryRepositoryInMemory(initialAppSnapshot()))
-    );
+    createCategoryRepositoryTests(repositoryFixturesInMemory);
   });
 
   suite("database", () => {
-    createCategoryRepositoryTests(
-      async (f) => {
-        await withTemporaryDatabase(testDatabaseUrl(), async connectionString => {
-          const database = await databaseConnect(connectionString);
-
-          try {
-            const repository = new CategoryRepositoryDatabase(database);
-            await f(repository);
-          } finally {
-            await database.destroy();
-          }
-        });
-      },
-    );
+    createCategoryRepositoryTests(repositoryFixturesDatabase);
   });
 });

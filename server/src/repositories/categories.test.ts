@@ -5,7 +5,7 @@ import { presetColorGreen, presetColorRed } from "hornbeam-common/lib/app/colors
 import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMemory } from "./categories";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
-import { withTemporaryDatabase } from "../database/withTemporaryDatabase";
+import { withTemporaryDatabase } from "../database/temporaryDatabases";
 import { testDatabaseUrl } from "../settings";
 import { databaseConnect } from "../database";
 import { fileSuite } from "../testing";

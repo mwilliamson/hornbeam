@@ -1,7 +1,7 @@
 
 import childProcess from "node:child_process";
 import util from "node:util";
-import { withTemporaryDatabase } from "./withTemporaryDatabase";
+import { withTemporaryDatabase } from "./temporaryDatabases";
 import { testDatabaseUrl } from "../settings";
 
 const exec = util.promisify(childProcess.exec);

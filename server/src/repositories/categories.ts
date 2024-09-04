@@ -1,6 +1,6 @@
 import { Category, CategoryAddMutation, CategoryReorderMutation } from "hornbeam-common/lib/app/categories";
-import { AppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { Database } from "../database";
+import { AppSnapshotRef } from "./snapshotRef";
 
 export interface CategoryRepository {
   add: (mutation: CategoryAddMutation) => Promise<void>;
@@ -9,22 +9,22 @@ export interface CategoryRepository {
 }
 
 export class CategoryRepositoryInMemory implements CategoryRepository {
-  private snapshot: AppSnapshot;
+  private readonly snapshot: AppSnapshotRef;
 
-  constructor(initialSnapshot: AppSnapshot) {
-    this.snapshot = initialSnapshot;
+  constructor(snapshot: AppSnapshotRef) {
+    this.snapshot = snapshot;
   }
 
   async add(mutation: CategoryAddMutation): Promise<void> {
-    this.snapshot = this.snapshot.categoryAdd(mutation);
+    this.snapshot.update(snapshot => snapshot.categoryAdd(mutation));
   }
 
   async reorder(mutation: CategoryReorderMutation): Promise<void> {
-    this.snapshot = this.snapshot.categoryReorder(mutation);
+    this.snapshot.update(snapshot => snapshot.categoryReorder(mutation));
   }
 
   async fetchAll(): Promise<ReadonlyArray<Category>> {
-    return this.snapshot.allCategories();
+    return this.snapshot.value.allCategories();
   }
 }
 

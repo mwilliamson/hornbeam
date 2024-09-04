@@ -11,7 +11,15 @@ export default async function createDatabase(databaseUrl: string) {
         index int NOT NULL,
         name text NOT NULL,
         preset_color_id uuid NOT NULL
-      )
+      );
+
+      CREATE TABLE cards (
+        category_id uuid NOT NULL REFERENCES categories(id),
+        created_at timestamptz NOT NULL,
+        id uuid PRIMARY KEY,
+        index int NOT NULL,
+        text text NOT NULL
+      );
     `);
   } finally {
     await client.end();

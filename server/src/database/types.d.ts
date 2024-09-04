@@ -7,6 +7,14 @@ import type { ColumnType } from "kysely";
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface Card {
+  categoryId: string;
+  createdAt: Timestamp;
+  id: string;
+  index: number;
+  text: string;
+}
+
 export interface Category {
   createdAt: Timestamp;
   id: string;
@@ -16,5 +24,6 @@ export interface Category {
 }
 
 export interface DB {
+  cards: Card;
   categories: Category;
 }

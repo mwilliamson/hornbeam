@@ -4,15 +4,21 @@ import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMem
 import { Database, databaseConnect } from "../database";
 import { createTemporaryDatabase } from "../database/temporaryDatabases";
 import { testDatabaseUrl } from "../settings";
+import { AppSnapshotRef } from "./snapshotRef";
+import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "./cards";
 
 export interface RepositoryFixtures extends AsyncDisposable {
+  cardRepository: () => Promise<CardRepository>;
   categoryRepository: () => Promise<CategoryRepository>;
 }
 
 export function repositoryFixturesInMemory(): RepositoryFixtures {
-  const snapshot = initialAppSnapshot();
+  const snapshot = new AppSnapshotRef(initialAppSnapshot());
 
   return {
+    cardRepository: async () => {
+      return new CardRepositoryInMemory(snapshot);
+    },
     categoryRepository: async () => {
       return new CategoryRepositoryInMemory(snapshot);
     },
@@ -57,9 +63,14 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
   }
 
   return {
+    cardRepository: async () => {
+      return new CardRepositoryDatabase(await getDatabase());
+    },
+
     categoryRepository: async () => {
       return new CategoryRepositoryDatabase(await getDatabase());
     },
+
     [Symbol.asyncDispose]: async () => {
       disposed = true;
       await disposableStack.disposeAsync();

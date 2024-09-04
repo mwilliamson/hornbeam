@@ -1,11 +1,14 @@
 import { assertThat, containsExactly, deepEqualTo, hasProperties, isSequence } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
-import { uuidv7 } from "uuidv7";
 import { presetColorGreen, presetColorRed } from "hornbeam-common/lib/app/colors";
 import { CategoryRepository } from "./categories";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
+
+const CATEGORY_1_ID = "0191be9e-f6df-7507-9e6b-000000000001";
+const CATEGORY_2_ID = "0191be9e-f6df-7507-9e6b-000000000002";
+const CATEGORY_3_ID = "0191be9e-f6df-7507-9e6b-000000000003";
 
 export function createCategoryRepositoryTests(
   createFixtures: () => RepositoryFixtures,
@@ -18,17 +21,15 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("can fetch categories after they're added", async (repository) => {
-      const category1Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
         color: {presetColorId: presetColorRed.id},
-        id: category1Id,
+        id: CATEGORY_1_ID,
         name: "<category 1 name>",
       }));
 
-      const category2Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
         color: {presetColorId: presetColorGreen.id},
-        id: category2Id,
+        id: CATEGORY_2_ID,
         name: "<category 2 name>",
       }));
 
@@ -37,27 +38,25 @@ export function createCategoryRepositoryTests(
       assertThat(categories, containsExactly(
         hasProperties({
           color: deepEqualTo({presetColorId: presetColorRed.id}),
-          id: category1Id,
+          id: CATEGORY_1_ID,
           name: "<category 1 name>",
         }),
         hasProperties({
           color: deepEqualTo({presetColorId: presetColorGreen.id}),
-          id: category2Id,
+          id: CATEGORY_2_ID,
           name: "<category 2 name>",
         }),
       ));
     });
 
     testRepository("categories are fetched in order they're added", async (repository) => {
-      const category1Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
-        id: category1Id,
+        id: CATEGORY_1_ID,
         name: "<category 1 name>",
       }));
 
-      const category2Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
-        id: category2Id,
+        id: CATEGORY_2_ID,
         name: "<category 2 name>",
       }));
 
@@ -70,26 +69,23 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("categories can be reordered", async (repository) => {
-      const category1Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
-        id: category1Id,
+        id: CATEGORY_1_ID,
         name: "<category 1 name>",
       }));
 
-      const category2Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
-        id: category2Id,
+        id: CATEGORY_2_ID,
         name: "<category 2 name>",
       }));
 
-      const category3Id = uuidv7();
       await repository.add(categoriesTesting.testCategoryAddMutation({
-        id: category3Id,
+        id: CATEGORY_3_ID,
         name: "<category 3 name>",
       }));
 
       await repository.reorder(categoriesTesting.testCategoryReorderMutation({
-        ids: [category2Id, category1Id, category3Id],
+        ids: [CATEGORY_2_ID, CATEGORY_1_ID, CATEGORY_3_ID],
       }));
 
       const categories = await repository.fetchAll();

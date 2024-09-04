@@ -3,13 +3,17 @@ import { suite, test } from "mocha";
 import { BackendConnection } from ".";
 import { presetColors } from "hornbeam-common/lib/app/colors";
 import { Instant } from "@js-joda/core";
-import { uuidv7 } from "uuidv7";
 import { allCategoriesQuery, allColorsQuery, availableCategoriesQuery, boardCardTreesQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentBoardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
 import { createDeferred } from "hornbeam-common/lib/util/promises";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { allCardStatuses } from "hornbeam-common/lib/app/cardStatuses";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { testProjectContentsMutation } from "hornbeam-common/lib/app/snapshots.testing";
+
+const CARD_1_ID = "0191beaa-0000-7507-9e6b-000000000001";
+const CARD_2_ID = "0191beaa-0000-7507-9e6b-000000000002";
+const CARD_3_ID = "0191beaa-0000-7507-9e6b-000000000003";
+const CATEGORY_1_ID = "0191beaa-0001-7507-9e6b-000000000001";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -19,32 +23,29 @@ export function createBackendConnectionTestSuite(
     suite("queries", () => {
       suite("card", () => {
         testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
-          const card = await backendConnection.executeQuery(cardQuery(uuidv7()));
+          const card = await backendConnection.executeQuery(cardQuery(CARD_1_ID));
 
           assertThat(card, equalTo(null));
         });
 
         testBackendConnection("can find card by ID", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
           }));
 
-          const card1Id = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card1Id,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_1_ID,
             text: "<card text 1>",
           }));
 
-          const card2Id = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card2Id,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_2_ID,
             text: "<card text 2>",
           }));
 
-          const card = await backendConnection.executeQuery(cardQuery(card2Id));
+          const card = await backendConnection.executeQuery(cardQuery(CARD_2_ID));
 
           assertThat(card, hasProperties({text: "<card text 2>"}));
         });
@@ -52,52 +53,49 @@ export function createBackendConnectionTestSuite(
 
       suite("parentCard", () => {
         testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
-          const card = await backendConnection.executeQuery(parentCardQuery(uuidv7()));
+          const card = await backendConnection.executeQuery(parentCardQuery(CARD_1_ID));
 
           assertThat(card, equalTo(null));
         });
 
         testBackendConnection("card has no parent", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
           }));
 
-          const card1Id = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card1Id,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_1_ID,
             parentCardId: null,
           }));
 
-          const card = await backendConnection.executeQuery(parentCardQuery(card1Id));
+          const card = await backendConnection.executeQuery(parentCardQuery(CARD_1_ID));
 
           assertThat(card, equalTo(null));
         });
 
         testBackendConnection("card has parent", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
             name: "<category name 1>",
           }));
 
-          const parentCardId = uuidv7();
+          const parentCardId = CARD_1_ID;
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
+            categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
             text: "<parent card text>",
           }));
 
-          const card1Id = uuidv7();
+          const childCardId = CARD_2_ID;
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card1Id,
+            categoryId: CATEGORY_1_ID,
+            id: childCardId,
             parentCardId,
           }));
 
-          const card = await backendConnection.executeQuery(parentCardQuery(card1Id));
+          const card = await backendConnection.executeQuery(parentCardQuery(childCardId));
 
           assertThat(card, hasProperties({text: "<parent card text>"}));
         });
@@ -105,52 +103,49 @@ export function createBackendConnectionTestSuite(
 
       suite("cardChildCount", () => {
         testBackendConnection("unrecognised ID returns 0", async (backendConnection) => {
-          const card = await backendConnection.executeQuery(cardChildCountQuery(uuidv7()));
+          const card = await backendConnection.executeQuery(cardChildCountQuery(CARD_1_ID));
 
           assertThat(card, equalTo(0));
         });
 
         testBackendConnection("card with no children", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
           }));
 
-          const card1Id = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card1Id,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_1_ID,
             parentCardId: null,
           }));
 
-          const card = await backendConnection.executeQuery(cardChildCountQuery(card1Id));
+          const card = await backendConnection.executeQuery(cardChildCountQuery(CARD_1_ID));
 
           assertThat(card, equalTo(0));
         });
 
         testBackendConnection("card with children", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
             name: "<category name 1>",
           }));
 
-          const parentCardId = uuidv7();
+          const parentCardId = CARD_1_ID;
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
+            categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
             text: "<parent card text>",
           }));
 
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: uuidv7(),
+            categoryId: CATEGORY_1_ID,
+            id: CARD_2_ID,
             parentCardId,
           }));
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: uuidv7(),
+            categoryId: CATEGORY_1_ID,
+            id: CARD_3_ID,
             parentCardId,
           }));
 
@@ -162,19 +157,17 @@ export function createBackendConnectionTestSuite(
 
       suite("cardHistory", () => {
         testBackendConnection("card history initially has card creation", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
           }));
 
-          const cardId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
+            categoryId: CATEGORY_1_ID,
             createdAt: Instant.ofEpochSecond(1713386548),
-            id: cardId,
+            id: CARD_1_ID,
           }));
 
-          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(cardId));
+          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(CARD_1_ID));
 
           assertThat(cardHistory, containsExactly(
             hasProperties({
@@ -185,24 +178,22 @@ export function createBackendConnectionTestSuite(
         });
 
         testBackendConnection("card history includes comments", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
           }));
 
-          const cardId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: cardId,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_1_ID,
           }));
 
           await backendConnection.mutate(testProjectContentsMutation.commentAdd({
-            cardId,
+            cardId: CARD_1_ID,
             createdAt: Instant.ofEpochSecond(1713386548),
             text: "<card text>",
           }));
 
-          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(cardId));
+          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(CARD_1_ID));
 
           assertThat(cardHistory, containsExactly(
             hasProperties({
@@ -220,26 +211,25 @@ export function createBackendConnectionTestSuite(
       });
 
       testBackendConnection("searchCards", async (backendConnection) => {
-        const categoryId = uuidv7();
         await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-          id: categoryId,
+          id: CATEGORY_1_ID,
         }));
 
         await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-          categoryId,
-          id: uuidv7(),
+          categoryId: CATEGORY_1_ID,
+          id: CARD_1_ID,
           text: "ab",
         }));
 
         await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-          categoryId,
-          id: uuidv7(),
+          categoryId: CATEGORY_1_ID,
+          id: CARD_2_ID,
           text: "ac",
         }));
 
         await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-          categoryId,
-          id: uuidv7(),
+          categoryId: CATEGORY_1_ID,
+          id: CARD_3_ID,
           text: "dd",
         }));
 
@@ -253,23 +243,22 @@ export function createBackendConnectionTestSuite(
 
       suite("boardCardTrees", () => {
         testBackendConnection("root board", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
             name: "<category name 1>",
           }));
 
-          const parentCardId = uuidv7();
+          const parentCardId = CARD_1_ID;
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
+            categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
             text: "<parent card text>",
           }));
 
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: uuidv7(),
+            categoryId: CATEGORY_1_ID,
+            id: CARD_2_ID,
             parentCardId,
             text: "<child card text>",
           }));
@@ -297,23 +286,22 @@ export function createBackendConnectionTestSuite(
         });
 
         testBackendConnection("root board", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
             name: "<category name 1>",
           }));
 
-          const parentCardId = uuidv7();
+          const parentCardId = CARD_1_ID;
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
+            categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
             text: "<parent card text>",
           }));
 
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: uuidv7(),
+            categoryId: CATEGORY_1_ID,
+            id: CARD_2_ID,
             parentCardId,
             text: "<child card text>",
           }));
@@ -349,36 +337,33 @@ export function createBackendConnectionTestSuite(
         });
 
         testBackendConnection("can find parent of subboard", async (backendConnection) => {
-          const categoryId = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.categoryAdd({
-            id: categoryId,
+            id: CATEGORY_1_ID,
           }));
 
-          const card1Id = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card1Id,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_1_ID,
             parentCardId: null,
           }));
           await backendConnection.mutate(testProjectContentsMutation.cardEdit({
-            id: card1Id,
+            id: CARD_1_ID,
             isSubboardRoot: true,
           }));
 
-          const card2Id = uuidv7();
           await backendConnection.mutate(testProjectContentsMutation.cardAdd({
-            categoryId,
-            id: card2Id,
-            parentCardId: card1Id,
+            categoryId: CATEGORY_1_ID,
+            id: CARD_2_ID,
+            parentCardId: CARD_1_ID,
           }));
           await backendConnection.mutate(testProjectContentsMutation.cardEdit({
-            id: card2Id,
+            id: CARD_2_ID,
             isSubboardRoot: true,
           }));
 
-          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery(cardSubboardId(card2Id)));
+          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery(cardSubboardId(CARD_2_ID)));
 
-          assertThat(parentBoardId, deepEqualTo(cardSubboardId(card1Id)));
+          assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_1_ID)));
         });
       });
 

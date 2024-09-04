@@ -23,17 +23,34 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
 
 export function repositoryFixturesDatabase(): RepositoryFixtures {
   const disposableStack = new AsyncDisposableStack();
-  let database: Database | null = null;
+  let database: Promise<Database> | null = null;
+  let disposed = false;
+
+  async function setUpDatabase(): Promise<Database> {
+    const temporaryDatabase = await createTemporaryDatabase(testDatabaseUrl());
+    if (disposed) {
+      throw new Error("Cannot use after disposal");
+    }
+    disposableStack.use(temporaryDatabase);
+
+    const connectedDatabase = await databaseConnect(temporaryDatabase.connectionString);
+    if (disposed) {
+      throw new Error("Cannot use after disposal");
+    }
+    disposableStack.defer(() => {
+      connectedDatabase.destroy();
+    });
+
+    return connectedDatabase;
+  }
 
   async function getDatabase(): Promise<Database> {
-    // TODO: deal with concurrency
+    if (disposed) {
+      throw new Error("Cannot use after disposal");
+    }
+
     if (database === null) {
-      const temporaryDatabase = disposableStack.use(await createTemporaryDatabase(testDatabaseUrl()));
-      const connectedDatabase = await databaseConnect(temporaryDatabase.connectionString);
-      disposableStack.defer(() => {
-        connectedDatabase.destroy();
-      });
-      database = connectedDatabase;
+      database = setUpDatabase();
     }
 
     return database;
@@ -44,6 +61,7 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
       return new CategoryRepositoryDatabase(await getDatabase());
     },
     [Symbol.asyncDispose]: async () => {
+      disposed = true;
       await disposableStack.disposeAsync();
     },
   };

@@ -21,13 +21,13 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("can fetch categories after they're added", async (repository) => {
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         color: {presetColorId: presetColorRed.id},
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
       }));
 
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         color: {presetColorId: presetColorGreen.id},
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
@@ -50,12 +50,12 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("categories are fetched in order they're added", async (repository) => {
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
       }));
 
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
       }));
@@ -69,22 +69,22 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("categories can be reordered", async (repository) => {
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
       }));
 
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
       }));
 
-      await repository.add(categoriesTesting.testCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_3_ID,
         name: "<category 3 name>",
       }));
 
-      await repository.reorder(categoriesTesting.testCategoryReorderMutation({
+      await repository.reorder(categoriesTesting.testingCategoryReorderMutation({
         ids: [CATEGORY_2_ID, CATEGORY_1_ID, CATEGORY_3_ID],
       }));
 

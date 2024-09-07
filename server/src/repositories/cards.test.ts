@@ -3,8 +3,8 @@ import { suite, test } from "mocha";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { CardRepository } from "./cards";
-import { testCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
-import { testCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
+import { testingCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
+import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
 import { CardAddMutation } from "hornbeam-common/lib/app/cards";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
@@ -43,7 +43,7 @@ export function createCardsRepositoryTests(
   });
 
   function cardAddMutation(mutation: Partial<CardAddMutation>): CardAddMutation {
-    return testCardAddMutation({
+    return testingCardAddMutation({
       categoryId: CATEGORY_1_ID,
       ...mutation,
     });
@@ -54,7 +54,7 @@ export function createCardsRepositoryTests(
       await using fixtures = await createFixtures();
 
       const categoryRepository = await fixtures.categoryRepository();
-      await categoryRepository.add(testCategoryAddMutation({
+      await categoryRepository.add(testingCategoryAddMutation({
         id: CATEGORY_1_ID,
       }));
 

@@ -5,7 +5,7 @@ import { presetColorWhite } from "./colors";
 const defaultCategoryAddId = "0191bea4-0000-7e56-a31e-999999999999";
 const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
 
-export function testCategoryAddMutation(mutation: Partial<CategoryAddMutation>): CategoryAddMutation {
+export function testingCategoryAddMutation(mutation: Partial<CategoryAddMutation>): CategoryAddMutation {
   return {
     color: {presetColorId: presetColorWhite.id},
     createdAt: defaultCreatedAt,
@@ -15,7 +15,7 @@ export function testCategoryAddMutation(mutation: Partial<CategoryAddMutation>):
   };
 }
 
-export function testCategoryReorderMutation(mutation: Partial<CategoryReorderMutation>): CategoryReorderMutation {
+export function testingCategoryReorderMutation(mutation: Partial<CategoryReorderMutation>): CategoryReorderMutation {
   return {
     createdAt: defaultCreatedAt,
     ids: [],

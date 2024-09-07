@@ -5,6 +5,7 @@ import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMem
 import { CardRepository } from "./cards";
 import { testCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
 import { testCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
+import { CardAddMutation } from "hornbeam-common/lib/app/cards";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -22,18 +23,15 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when there are cards then fetchById() returns card with matching ID", async (repository) => {
-      await repository.add(testCardAddMutation({
-        categoryId: CATEGORY_1_ID,
+      await repository.add(cardAddMutation({
         id: CARD_1_ID,
         text: "<card 1 text>",
       }));
-      await repository.add(testCardAddMutation({
-        categoryId: CATEGORY_1_ID,
+      await repository.add(cardAddMutation({
         id: CARD_2_ID,
         text: "<card 2 text>",
       }));
-      await repository.add(testCardAddMutation({
-        categoryId: CATEGORY_1_ID,
+      await repository.add(cardAddMutation({
         id: CARD_3_ID,
         text: "<card 3 text>",
       }));
@@ -43,6 +41,13 @@ export function createCardsRepositoryTests(
       assertThat(card, hasProperties({text: "<card 2 text>"}));
     });
   });
+
+  function cardAddMutation(mutation: Partial<CardAddMutation>): CardAddMutation {
+    return testCardAddMutation({
+      categoryId: CATEGORY_1_ID,
+      ...mutation,
+    });
+  }
 
   function testRepository(name: string, f: (repository: CardRepository) => Promise<void>) {
     test(name, async () => {

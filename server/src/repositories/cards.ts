@@ -3,9 +3,12 @@ import { Card, CardAddMutation } from "hornbeam-common/lib/app/cards";
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
+import { DB } from "../database/types";
+import { SelectQueryBuilder } from "kysely";
 
 export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
+  fetchAll: () => Promise<ReadonlyArray<Card>>;
   fetchById: (id: string) => Promise<Card | null>;
 }
 
@@ -18,6 +21,10 @@ export class CardRepositoryInMemory implements CardRepository {
 
   async add(mutation: CardAddMutation): Promise<void> {
     return this.snapshot.update(snapshot => snapshot.cardAdd(mutation));
+  }
+
+  async fetchAll(): Promise<ReadonlyArray<Card>> {
+    return this.snapshot.value.allCards();
   }
 
   async fetchById(id: string): Promise<Card | null> {
@@ -47,25 +54,45 @@ export class CardRepositoryDatabase implements CardRepository {
     });
   }
 
+  async fetchAll(): Promise<ReadonlyArray<Card>> {
+    const cardsQuery = this.selectColumns(this.database.selectFrom("cards"));
+
+    const cardRows = await cardsQuery.execute();
+
+    return cardRows.map(cardRow => this.rowToCard(cardRow));
+  }
+
   async fetchById(id: string): Promise<Card | null> {
-    const cardRow = await this.database.selectFrom("cards")
-      .select(["categoryId", "createdAt", "id", "text"])
-      .where("id", "=", id)
-      .executeTakeFirst();
+    const cardQuery = this.selectColumns(
+      this.database.selectFrom("cards")
+        .where("id", "=", id)
+    );
+
+    const cardRow = await cardQuery.executeTakeFirst();
 
     if (cardRow === undefined) {
       return null;
     } else {
-      return {
-        categoryId: cardRow.categoryId,
-        createdAt: Instant.ofEpochMilli(cardRow.createdAt.getTime()),
-        id: cardRow.id,
-        isSubboardRoot: false,
-        number: 0,
-        parentCardId: null,
-        status: CardStatus.None,
-        text: cardRow.text,
-      };
+      return this.rowToCard(cardRow);
     }
   }
+
+  selectColumns(query: SelectQueryBuilder<DB, "cards", unknown>) {
+    return query.select(["categoryId", "createdAt", "id", "text"]);
+  }
+
+  rowToCard(cardRow: QueryOutput<ReturnType<typeof this.selectColumns>>): Card {
+    return {
+      categoryId: cardRow.categoryId,
+      createdAt: Instant.ofEpochMilli(cardRow.createdAt.getTime()),
+      id: cardRow.id,
+      isSubboardRoot: false,
+      number: 0,
+      parentCardId: null,
+      status: CardStatus.None,
+      text: cardRow.text,
+    };
+  }
 }
+
+type QueryOutput<TQuery> = TQuery extends SelectQueryBuilder<DB, infer _T, infer O> ? O : never;

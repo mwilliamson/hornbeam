@@ -1,4 +1,4 @@
-import { assertThat, equalTo, hasProperties } from "@mwilliamson/precisely";
+import { assertThat, containsExactly, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
@@ -39,6 +39,31 @@ export function createCardsRepositoryTests(
       const card = await repository.fetchById(CARD_2_ID);
 
       assertThat(card, hasProperties({text: "<card 2 text>"}));
+    });
+  });
+
+  suite("field persistence", () => {
+    testRepository("text", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1 text>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2 text>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        text: "<card 3 text>",
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({id: CARD_1_ID, text: "<card 1 text>"}),
+        hasProperties({id: CARD_2_ID, text: "<card 2 text>"}),
+        hasProperties({id: CARD_3_ID, text: "<card 3 text>"}),
+      ));
     });
   });
 

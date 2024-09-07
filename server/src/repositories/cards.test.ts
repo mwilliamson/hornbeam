@@ -13,6 +13,7 @@ const CARD_3_ID = "0191beb5-0000-79e7-8207-000000001003";
 const CARD_4_ID = "0191beb5-0000-79e7-8207-000000001004";
 const CARD_5_ID = "0191beb5-0000-79e7-8207-000000001005";
 const CATEGORY_1_ID = "0191beb5-0000-79e7-8207-000000000001";
+const CATEGORY_2_ID = "0191beb5-0000-79e7-8207-000000000002";
 
 export function createCardsRepositoryTests(
   createFixtures: () => RepositoryFixtures,
@@ -65,6 +66,32 @@ export function createCardsRepositoryTests(
         hasProperties({id: CARD_1_ID, text: "<card 1 text>"}),
         hasProperties({id: CARD_2_ID, text: "<card 2 text>"}),
         hasProperties({id: CARD_3_ID, text: "<card 3 text>"}),
+      ));
+    });
+
+    testRepository("category", async (repository) => {
+      await repository.add(cardAddMutation({
+        categoryId: CATEGORY_1_ID,
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        categoryId: CATEGORY_1_ID,
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+      await repository.add(cardAddMutation({
+        categoryId: CATEGORY_2_ID,
+        id: CARD_3_ID,
+        text: "<card 3>",
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({categoryId: CATEGORY_1_ID, text: "<card 1>"}),
+        hasProperties({categoryId: CATEGORY_1_ID, text: "<card 2>"}),
+        hasProperties({categoryId: CATEGORY_2_ID, text: "<card 3>"}),
       ));
     });
 
@@ -128,6 +155,9 @@ export function createCardsRepositoryTests(
       const categoryRepository = await fixtures.categoryRepository();
       await categoryRepository.add(testingCategoryAddMutation({
         id: CATEGORY_1_ID,
+      }));
+      await categoryRepository.add(testingCategoryAddMutation({
+        id: CATEGORY_2_ID,
       }));
 
       await f(await fixtures.cardRepository());

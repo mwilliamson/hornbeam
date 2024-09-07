@@ -48,6 +48,7 @@ export class CardRepositoryDatabase implements CardRepository {
           id: mutation.id,
           index: selectFrom("cards")
             .select(fn.coalesce(fn.max("cards.index"), lit(0)).as("index")),
+          parentCardId: mutation.parentCardId,
           text: mutation.text,
         }))
         .execute();
@@ -78,7 +79,13 @@ export class CardRepositoryDatabase implements CardRepository {
   }
 
   selectColumns(query: SelectQueryBuilder<DB, "cards", unknown>) {
-    return query.select(["categoryId", "createdAt", "id", "text"]);
+    return query.select([
+      "categoryId",
+      "createdAt",
+      "id",
+      "parentCardId",
+      "text",
+    ]);
   }
 
   rowToCard(cardRow: QueryOutput<ReturnType<typeof this.selectColumns>>): Card {
@@ -88,7 +95,7 @@ export class CardRepositoryDatabase implements CardRepository {
       id: cardRow.id,
       isSubboardRoot: false,
       number: 0,
-      parentCardId: null,
+      parentCardId: cardRow.parentCardId,
       status: CardStatus.None,
       text: cardRow.text,
     };

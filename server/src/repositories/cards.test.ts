@@ -10,6 +10,8 @@ import { CardAddMutation } from "hornbeam-common/lib/app/cards";
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
 const CARD_3_ID = "0191beb5-0000-79e7-8207-000000001003";
+const CARD_4_ID = "0191beb5-0000-79e7-8207-000000001004";
+const CARD_5_ID = "0191beb5-0000-79e7-8207-000000001005";
 const CATEGORY_1_ID = "0191beb5-0000-79e7-8207-000000000001";
 
 export function createCardsRepositoryTests(
@@ -63,6 +65,51 @@ export function createCardsRepositoryTests(
         hasProperties({id: CARD_1_ID, text: "<card 1 text>"}),
         hasProperties({id: CARD_2_ID, text: "<card 2 text>"}),
         hasProperties({id: CARD_3_ID, text: "<card 3 text>"}),
+      ));
+    });
+
+    testRepository("parent card", async (repository) => {
+      const parentCard1Id = CARD_1_ID;
+      await repository.add(cardAddMutation({
+        id: parentCard1Id,
+        parentCardId: null,
+        text: "<parent card 1>",
+      }));
+
+      const parentCard2Id = CARD_2_ID;
+      await repository.add(cardAddMutation({
+        id: parentCard2Id,
+        parentCardId: null,
+        text: "<parent card 2>",
+      }));
+
+      const childCard1Id = CARD_3_ID;
+      await repository.add(cardAddMutation({
+        id: childCard1Id,
+        parentCardId: parentCard1Id,
+        text: "<child card 1>",
+      }));
+      const childCard2Id = CARD_4_ID;
+      await repository.add(cardAddMutation({
+        id: childCard2Id,
+        parentCardId: parentCard1Id,
+        text: "<child card 2>",
+      }));
+      const childCard3Id = CARD_5_ID;
+      await repository.add(cardAddMutation({
+        id: childCard3Id,
+        parentCardId: parentCard2Id,
+        text: "<child card 3>",
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({parentCardId: null, text: "<parent card 1>"}),
+        hasProperties({parentCardId: null, text: "<parent card 2>"}),
+        hasProperties({parentCardId: parentCard1Id, text: "<child card 1>"}),
+        hasProperties({parentCardId: parentCard1Id, text: "<child card 2>"}),
+        hasProperties({parentCardId: parentCard2Id, text: "<child card 3>"}),
       ));
     });
   });

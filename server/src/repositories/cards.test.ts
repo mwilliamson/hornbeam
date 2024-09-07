@@ -1,4 +1,5 @@
-import { assertThat, containsExactly, equalTo, hasProperties } from "@mwilliamson/precisely";
+import { Instant } from "@js-joda/core";
+import { assertThat, containsExactly, deepEqualTo, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
@@ -92,6 +93,32 @@ export function createCardsRepositoryTests(
         hasProperties({categoryId: CATEGORY_1_ID, text: "<card 1>"}),
         hasProperties({categoryId: CATEGORY_1_ID, text: "<card 2>"}),
         hasProperties({categoryId: CATEGORY_2_ID, text: "<card 3>"}),
+      ));
+    });
+
+    testRepository("created at", async (repository) => {
+      await repository.add(cardAddMutation({
+        createdAt: Instant.ofEpochSecond(1000),
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        createdAt: Instant.ofEpochSecond(2000),
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+      await repository.add(cardAddMutation({
+        createdAt: Instant.ofEpochSecond(3000),
+        id: CARD_3_ID,
+        text: "<card 3>",
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({createdAt: deepEqualTo(Instant.ofEpochSecond(1000)), text: "<card 1>"}),
+        hasProperties({createdAt: deepEqualTo(Instant.ofEpochSecond(2000)), text: "<card 2>"}),
+        hasProperties({createdAt: deepEqualTo(Instant.ofEpochSecond(3000)), text: "<card 3>"}),
       ));
     });
 

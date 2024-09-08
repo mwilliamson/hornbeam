@@ -10,6 +10,7 @@ export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
   fetchAll: () => Promise<ReadonlyArray<Card>>;
   fetchById: (id: string) => Promise<Card | null>;
+  fetchParentByChildId: (childId: string) => Promise<Card | null>;
 }
 
 export class CardRepositoryInMemory implements CardRepository {
@@ -29,6 +30,14 @@ export class CardRepositoryInMemory implements CardRepository {
 
   async fetchById(id: string): Promise<Card | null> {
     return this.snapshot.value.findCardById(id);
+  }
+
+  async fetchParentByChildId(childId: string): Promise<Card | null> {
+    const childCard = this.snapshot.value.findCardById(childId);
+    if (childCard === null || childCard.parentCardId === null) {
+      return null;
+    }
+    return this.snapshot.value.findCardById(childCard.parentCardId);
   }
 }
 
@@ -78,13 +87,29 @@ export class CardRepositoryDatabase implements CardRepository {
     }
   }
 
+  async fetchParentByChildId(childId: string): Promise<Card | null> {
+    const cardQuery = this.selectColumns(
+      this.database.selectFrom("cards")
+        .innerJoin("cards as child_cards", "cards.id", "child_cards.parentCardId")
+        .where("child_cards.id", "=", childId)
+    );
+
+    const cardRow = await cardQuery.executeTakeFirst();
+
+    if (cardRow === undefined) {
+      return null;
+    } else {
+      return this.rowToCard(cardRow);
+    }
+  }
+
   selectColumns(query: SelectQueryBuilder<DB, "cards", unknown>) {
     return query.select([
-      "categoryId",
-      "createdAt",
-      "id",
-      "parentCardId",
-      "text",
+      "cards.categoryId",
+      "cards.createdAt",
+      "cards.id",
+      "cards.parentCardId",
+      "cards.text",
     ]);
   }
 

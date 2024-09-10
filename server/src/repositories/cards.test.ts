@@ -94,6 +94,43 @@ export function createCardsRepositoryTests(
     });
   });
 
+  suite("fetchChildCountByParentId()", () => {
+    testRepository("when parent ID is not recognised then count is 0", async (repository) => {
+      const card = await repository.fetchChildCountByParentId(CARD_1_ID);
+
+      assertThat(card, equalTo(0));
+    });
+
+    testRepository("can count children of parent", async (repository) => {
+      const parent1Id = CARD_1_ID;
+      await repository.add(cardAddMutation({
+        id: parent1Id,
+      }));
+      const parent2Id = CARD_2_ID;
+      await repository.add(cardAddMutation({
+        id: parent2Id,
+      }));
+      const child1Id = CARD_3_ID;
+      await repository.add(cardAddMutation({
+        id: child1Id,
+        parentCardId: parent1Id,
+      }));
+      const child2Id = CARD_4_ID;
+      await repository.add(cardAddMutation({
+        id: child2Id,
+        parentCardId: parent2Id,
+      }));
+      const child3Id = CARD_5_ID;
+      await repository.add(cardAddMutation({
+        id: child3Id,
+        parentCardId: parent2Id,
+      }));
+      const card = await repository.fetchChildCountByParentId(parent2Id);
+
+      assertThat(card, equalTo(2));
+    });
+  });
+
   suite("field persistence", () => {
     testRepository("text", async (repository) => {
       await repository.add(cardAddMutation({

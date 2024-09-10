@@ -11,6 +11,7 @@ export interface CardRepository {
   fetchAll: () => Promise<ReadonlyArray<Card>>;
   fetchById: (id: string) => Promise<Card | null>;
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
+  fetchChildCountByParentId: (parentId: string) => Promise<number>;
 }
 
 export class CardRepositoryInMemory implements CardRepository {
@@ -38,6 +39,10 @@ export class CardRepositoryInMemory implements CardRepository {
       return null;
     }
     return this.snapshot.value.findCardById(childCard.parentCardId);
+  }
+
+  async fetchChildCountByParentId(parentId: string): Promise<number> {
+    return this.snapshot.value.countCardChildren(parentId);
   }
 }
 
@@ -101,6 +106,17 @@ export class CardRepositoryDatabase implements CardRepository {
     } else {
       return this.rowToCard(cardRow);
     }
+  }
+
+  async fetchChildCountByParentId(parentId: string): Promise<number> {
+    return await this.database.transaction().execute(async transaction => {
+      const row = await transaction.selectFrom("cards")
+        .select(({fn, lit}) => [fn.count<string>(lit(0)).as("count")])
+        .where("cards.parentCardId", "=", parentId)
+        .executeTakeFirst();
+
+      return row === undefined ? 0 : parseInt(row.count, 10);
+    });
   }
 
   selectColumns(query: SelectQueryBuilder<DB, "cards", unknown>) {

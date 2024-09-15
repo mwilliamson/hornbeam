@@ -12,6 +12,7 @@ export interface Card {
   createdAt: Timestamp;
   id: string;
   index: number;
+  number: number;
   parentCardId: string | null;
   text: string;
 }

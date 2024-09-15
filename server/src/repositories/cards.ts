@@ -63,12 +63,18 @@ export class CardRepositoryDatabase implements CardRepository {
   async add(mutation: CardAddMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
       await transaction.insertInto("cards")
-        .values(({fn, selectFrom, lit}) => ({
+        .values((eb) => ({
           categoryId: mutation.categoryId,
           createdAt: new Date(mutation.createdAt.toEpochMilli()),
           id: mutation.id,
-          index: selectFrom("cards")
-            .select(fn.coalesce(fn.max("cards.index"), lit(0)).as("index")),
+          index: eb.selectFrom("cards")
+            .select(eb.fn.coalesce(eb.fn.max("cards.index"), eb.lit(0)).as("index")),
+          number: eb.selectFrom("cards")
+            .select(
+              eb.fn.coalesce(
+                eb(eb.fn.max("cards.number"), "+", 1),
+                eb.lit(1),
+              ).as("number")),
           parentCardId: mutation.parentCardId,
           text: mutation.text,
         }))
@@ -146,6 +152,7 @@ export class CardRepositoryDatabase implements CardRepository {
       "cards.categoryId",
       "cards.createdAt",
       "cards.id",
+      "cards.number",
       "cards.parentCardId",
       "cards.text",
     ]);
@@ -157,7 +164,7 @@ export class CardRepositoryDatabase implements CardRepository {
       createdAt: Instant.ofEpochMilli(cardRow.createdAt.getTime()),
       id: cardRow.id,
       isSubboardRoot: false,
-      number: 0,
+      number: cardRow.number,
       parentCardId: cardRow.parentCardId,
       status: CardStatus.None,
       text: cardRow.text,

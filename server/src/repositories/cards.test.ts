@@ -170,6 +170,31 @@ export function createCardsRepositoryTests(
     });
   });
 
+  suite("numbers", () => {
+    testRepository("cards are numbered sequentially", async(repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1 text>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2 text>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        text: "<card 3 text>",
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({number: 1, text: "<card 1 text>"}),
+        hasProperties({number: 2, text: "<card 2 text>"}),
+        hasProperties({number: 3, text: "<card 3 text>"}),
+      ));
+    });
+  });
+
   suite("field persistence", () => {
     testRepository("text", async (repository) => {
       await repository.add(cardAddMutation({

@@ -18,6 +18,7 @@ export default async function createDatabase(databaseUrl: string) {
         created_at timestamptz NOT NULL,
         id uuid PRIMARY KEY,
         index int NOT NULL,
+        number int NOT NULL,
         parent_card_id uuid NULL REFERENCES cards(id),
         text text NOT NULL
       );

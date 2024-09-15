@@ -13,6 +13,8 @@ export default async function createDatabase(databaseUrl: string) {
         preset_color_id uuid NOT NULL
       );
 
+      CREATE UNIQUE INDEX uq__categories__index ON categories(index);
+
       CREATE TABLE cards (
         category_id uuid NOT NULL REFERENCES categories(id),
         created_at timestamptz NOT NULL,

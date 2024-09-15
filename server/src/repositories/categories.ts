@@ -38,11 +38,16 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
   async add(mutation: CategoryAddMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
       await transaction.insertInto("categories")
-        .values(({fn, selectFrom, lit}) => ({
+        .values((eb) => ({
           createdAt: new Date(mutation.createdAt.toEpochMilli()),
           id: mutation.id,
-          index: selectFrom("categories")
-            .select(fn.coalesce(fn.max("categories.index"), lit(0)).as("index")),
+          index: eb.selectFrom("categories")
+            .select(
+              eb.fn.coalesce(
+                eb(eb.fn.max("categories.index"), "+", 1),
+                eb.lit(0)
+              ).as("index")
+            ),
           name: mutation.name,
           presetColorId: mutation.color.presetColorId,
         }))
@@ -53,9 +58,18 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
   async reorder(mutation: CategoryReorderMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
       // TODO: handle missing IDs
+
+      // Renumber the indexes to negative values to avoid violating the unique
+      // constraint on indexes.
       await transaction.updateTable("categories")
-        .set(({fn, ref, val}) => ({
-          index: fn<number>("array_position", [val(mutation.ids), ref("categories.id")])
+        .set((eb) => ({
+          index: eb.neg(eb.ref("categories.index"))
+        }))
+        .execute();
+
+      await transaction.updateTable("categories")
+        .set((eb) => ({
+          index: eb.fn<number>("array_position", [eb.val(mutation.ids), eb.ref("categories.id")])
         }))
         .execute();
     });

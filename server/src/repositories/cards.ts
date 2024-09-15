@@ -12,6 +12,7 @@ export interface CardRepository {
   fetchById: (id: string) => Promise<Card | null>;
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
   fetchChildCountByParentId: (parentId: string) => Promise<number>;
+  search: (searchTerm: string) => Promise<ReadonlyArray<Card>>;
 }
 
 export class CardRepositoryInMemory implements CardRepository {
@@ -44,7 +45,13 @@ export class CardRepositoryInMemory implements CardRepository {
   async fetchChildCountByParentId(parentId: string): Promise<number> {
     return this.snapshot.value.countCardChildren(parentId);
   }
+
+  async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
+    return this.snapshot.value.searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
+  }
 }
+
+const MAX_SEARCH_RESULTS = 20;
 
 export class CardRepositoryDatabase implements CardRepository {
   private readonly database: Database;
@@ -116,6 +123,21 @@ export class CardRepositoryDatabase implements CardRepository {
         .executeTakeFirst();
 
       return row === undefined ? 0 : parseInt(row.count, 10);
+    });
+  }
+
+  async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
+    return await this.database.transaction().execute(async transaction => {
+      const cardsQuery = this.selectColumns(
+        transaction.selectFrom("cards")
+          .where(({fn, val}) => fn("strpos", ["cards.text", val(searchTerm)]), ">", 0)
+          .orderBy("cards.index")
+          .limit(20)
+      );
+
+      const cardRows = await cardsQuery.execute();
+
+      return cardRows.map(cardRow => this.rowToCard(cardRow));
     });
   }
 

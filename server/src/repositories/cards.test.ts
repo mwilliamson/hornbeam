@@ -1,6 +1,7 @@
 import { Instant } from "@js-joda/core";
 import { assertThat, containsExactly, deepEqualTo, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
+import { uuidv7 } from "uuidv7";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { CardRepository } from "./cards";
@@ -128,6 +129,44 @@ export function createCardsRepositoryTests(
       const card = await repository.fetchChildCountByParentId(parent2Id);
 
       assertThat(card, equalTo(2));
+    });
+  });
+
+  suite("search", () => {
+    testRepository("search finds cards that contain search term in text", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "abcd",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "bc",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        text: "cd",
+      }));
+
+      const cards = await repository.search("bc");
+
+      assertThat(cards, containsExactly(
+        hasProperties({text: "abcd"}),
+        hasProperties({text: "bc"}),
+      ));
+    });
+
+    testRepository("results are limited to 20 cards", async (repository) => {
+      for (let i = 0; i< 30; i++) {
+        const id = uuidv7();
+        await repository.add(cardAddMutation({
+          id,
+          text: "abcd",
+        }));
+      }
+
+      const cards = await repository.search("bc");
+
+      assertThat(cards.length, equalTo(20));
     });
   });
 

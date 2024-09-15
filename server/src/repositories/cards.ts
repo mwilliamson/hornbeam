@@ -68,7 +68,12 @@ export class CardRepositoryDatabase implements CardRepository {
           createdAt: new Date(mutation.createdAt.toEpochMilli()),
           id: mutation.id,
           index: eb.selectFrom("cards")
-            .select(eb.fn.coalesce(eb.fn.max("cards.index"), eb.lit(0)).as("index")),
+            .select(
+              eb.fn.coalesce(
+                eb(eb.fn.max("cards.index"), "+", 1),
+                eb.lit(0),
+              ).as("index")
+            ),
           number: eb.selectFrom("cards")
             .select(
               eb.fn.coalesce(

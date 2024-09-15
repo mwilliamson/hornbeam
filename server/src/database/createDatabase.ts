@@ -22,6 +22,9 @@ export default async function createDatabase(databaseUrl: string) {
         parent_card_id uuid NULL REFERENCES cards(id),
         text text NOT NULL
       );
+
+      CREATE UNIQUE INDEX uq__cards__index ON cards(index);
+      CREATE UNIQUE INDEX uq__cards__number ON cards(number);
     `);
   } finally {
     await client.end();

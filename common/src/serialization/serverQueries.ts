@@ -1,12 +1,11 @@
-import { isLeft } from "fp-ts/lib/Either";
 import * as t from "io-ts";
-import { PathReporter } from "io-ts/PathReporter";
 import { SerializedCard, SerializedCardEvent } from "./cards";
 import { SerializedCategory } from "./categories";
 import { SerializedPresetColor } from "./colors";
 import { SerializedCardTree } from "./cardTrees";
 import { SerializedBoardId } from "./boards";
 import { SerializedCardStatus } from "./cardStatuses";
+import { deserializer } from "./deserialize";
 
 const CardServerQuery = t.type({
   type: t.literal("card"),
@@ -130,18 +129,3 @@ const SerializedUpdateResponse = t.readonly(t.type({
 
 export const serializeUpdateResponse = SerializedUpdateResponse.encode;
 export const desserializeUpdateResponse = deserializer(SerializedUpdateResponse);
-
-function deserializer<T>(decoder: t.Decoder<unknown, T>): (value: unknown) => T {
-  return value => deserialize(decoder, value);
-}
-
-function deserialize<T>(decoder: t.Decoder<unknown, T>, value: unknown): T {
-  const result = decoder.decode(value);
-  if (isLeft(result)) {
-    throw Error(
-      `Failed to deserialize: ${PathReporter.report(result).join("\n")}`
-    );
-  } else {
-    return result.right;
-  }
-}

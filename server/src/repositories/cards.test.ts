@@ -319,6 +319,28 @@ export function createCardsRepositoryTests(
   });
 
   suite("field updates", () => {
+    testRepository("nothing", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({id: CARD_1_ID, text: "<card 1>"}),
+        hasProperties({id: CARD_2_ID, text: "<card 2>"}),
+      ));
+    });
+
     testRepository("category", async (repository) => {
       await repository.add(cardAddMutation({
         categoryId: CATEGORY_1_ID,

@@ -8,6 +8,7 @@ import { CardRepository } from "./cards";
 import { testingCardAddMutation, testingCardEditMutation } from "hornbeam-common/lib/app/cards.testing";
 import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
 import { CardAddMutation } from "hornbeam-common/lib/app/cards";
+import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -417,6 +418,30 @@ export function createCardsRepositoryTests(
         hasProperties({parentCardId: CARD_3_ID, text: "<card 1>"}),
         hasProperties({parentCardId: null, text: "<card 2>"}),
         hasProperties({parentCardId: null, text: "<card 3>"}),
+      ));
+    });
+
+    testRepository("status", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: null,
+        text: "<card 2>",
+      }));
+
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        status: CardStatus.Done,
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({status: CardStatus.Done, text: "<card 1>"}),
+        hasProperties({status: CardStatus.None, text: "<card 2>"}),
       ));
     });
 

@@ -3,6 +3,8 @@ import { Card, CardAddMutation, CardEditMutation } from "hornbeam-common/lib/app
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
+import { SerializedCardStatus } from "hornbeam-common/lib/serialization/cardStatuses";
+import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 
@@ -87,6 +89,7 @@ export class CardRepositoryDatabase implements CardRepository {
                 eb.lit(1),
               ).as("number")),
           parentCardId: mutation.parentCardId,
+          status: SerializedCardStatus.encode(CardStatus.None),
           text: mutation.text,
         }))
         .execute();
@@ -111,6 +114,11 @@ export class CardRepositoryDatabase implements CardRepository {
 
       if (mutation.parentCardId !== undefined) {
         query = query.set({parentCardId: mutation.parentCardId});
+        queryRequired = true;
+      }
+
+      if (mutation.status !== undefined) {
+        query = query.set({status: SerializedCardStatus.encode(mutation.status)});
         queryRequired = true;
       }
 
@@ -198,6 +206,7 @@ export class CardRepositoryDatabase implements CardRepository {
       "cards.isSubboardRoot",
       "cards.number",
       "cards.parentCardId",
+      "cards.status",
       "cards.text",
     ]);
   }
@@ -210,7 +219,7 @@ export class CardRepositoryDatabase implements CardRepository {
       isSubboardRoot: cardRow.isSubboardRoot,
       number: cardRow.number,
       parentCardId: cardRow.parentCardId,
-      status: CardStatus.None,
+      status: deserialize(SerializedCardStatus, cardRow.status),
       text: cardRow.text,
     };
   }

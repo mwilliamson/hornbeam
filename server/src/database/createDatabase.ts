@@ -4,6 +4,8 @@ export default async function createDatabase(databaseUrl: string) {
   const client = new Client(databaseUrl);
   await client.connect();
   try {
+    // TODO: use an enum for the card status?
+
     await client.query(`
       CREATE TABLE categories (
         created_at timestamptz NOT NULL,
@@ -20,9 +22,10 @@ export default async function createDatabase(databaseUrl: string) {
         created_at timestamptz NOT NULL,
         id uuid PRIMARY KEY,
         index int NOT NULL,
-        is_subboard_root BOOL NOT NULL,
+        is_subboard_root bool NOT NULL,
         number int NOT NULL,
         parent_card_id uuid NULL REFERENCES cards(id),
+        status text NOT NULL,
         text text NOT NULL
       );
 

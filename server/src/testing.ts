@@ -13,10 +13,6 @@ export function use(disposable: AsyncDisposable): void {
   disposables.use(disposable);
 }
 
-export function defer(f: () => Promise<void>): void {
-  disposables.defer(f);
-}
-
 export const mochaHooks = {
   async afterAll() {
     await disposables.disposeAsync();

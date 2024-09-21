@@ -1,13 +1,12 @@
 import "disposablestack/auto";
 import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMemory } from "./categories";
-import { Database, databaseConnect } from "../database";
-import { createTemporaryDatabase, TemporaryDatabase } from "../database/temporaryDatabases";
+import { Database } from "../database";
+import { createReusableTemporaryDatabase } from "../database/temporaryDatabases";
 import { testDatabaseUrl } from "../settings";
 import * as testing from "../testing";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "./cards";
-import { sql } from "kysely";
 
 export interface RepositoryFixtures extends AsyncDisposable {
   cardRepository: () => Promise<CardRepository>;
@@ -29,45 +28,12 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
   };
 }
 
-let temporaryDatabase: TemporaryDatabase | null = null;
-let connectedDatabase: Database | null = null;
+const temporaryDatabase = createReusableTemporaryDatabase(testDatabaseUrl());
+testing.use(temporaryDatabase);
 
 export function repositoryFixturesDatabase(): RepositoryFixtures {
-  const disposableStack = new AsyncDisposableStack();
   let database: Promise<Database> | null = null;
   let disposed = false;
-
-  async function setUpDatabase(): Promise<Database> {
-    if (temporaryDatabase === null) {
-      temporaryDatabase = await createTemporaryDatabase(testDatabaseUrl());
-      testing.use(temporaryDatabase);
-    }
-    if (disposed) {
-      throw new Error("Cannot use after disposal");
-    }
-
-    if (connectedDatabase === null) {
-      const newConnectedDatabase = await databaseConnect(temporaryDatabase.connectionString);
-      testing.defer(async () => {
-        newConnectedDatabase.destroy();
-      });
-      connectedDatabase = newConnectedDatabase;
-      if (disposed) {
-        throw new Error("Cannot use after disposal");
-      }
-    }
-
-    disposableStack.defer(async () => {
-      if (connectedDatabase !== null) {
-        await sql`
-          DELETE FROM cards;
-          DELETE FROM categories;
-        `.execute(connectedDatabase);
-      }
-    });
-
-    return connectedDatabase;
-  }
 
   async function getDatabase(): Promise<Database> {
     if (disposed) {
@@ -75,7 +41,7 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
     }
 
     if (database === null) {
-      database = setUpDatabase();
+      database = temporaryDatabase.getDatabase();
     }
 
     return database;
@@ -92,7 +58,7 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
 
     [Symbol.asyncDispose]: async () => {
       disposed = true;
-      await disposableStack.disposeAsync();
+      await temporaryDatabase.reset();
     },
   };
 }

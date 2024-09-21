@@ -49,7 +49,8 @@
         "typescript": "^5.4.3"
     },
     "mocha": {
-        "spec": "lib/**/*.test.js"
+        "spec": "lib/**/*.test.js",
+        "require": ["lib/testing"]
     },
     "volta": {
         "node": "20.12.0",

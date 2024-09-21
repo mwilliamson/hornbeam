@@ -52,6 +52,7 @@ export async function withTemporaryDatabase(
 }
 
 interface ReusableTemporaryDatabase extends AsyncDisposable {
+  getDatabaseUrl: () => Promise<string>;
   getDatabase: () => Promise<Database>;
   reset: () => Promise<void>;
 }
@@ -64,7 +65,7 @@ export function createReusableTemporaryDatabase(databaseUrl: string): ReusableTe
 
   let disposed = false;
 
-  async function getDatabase(): Promise<Database> {
+  async function setUpDatabase(): Promise<[string, Database]> {
     if (temporaryDatabase === null) {
       temporaryDatabase = await createTemporaryDatabase(databaseUrl);
       sessionDisposableStack.use(temporaryDatabase);
@@ -84,7 +85,17 @@ export function createReusableTemporaryDatabase(databaseUrl: string): ReusableTe
       }
     }
 
-    return connectedDatabase;
+    return [temporaryDatabase.connectionString, connectedDatabase];
+  }
+
+  async function getDatabase(): Promise<Database> {
+    const [_, database] = await setUpDatabase();
+    return database;
+  }
+
+  async function getDatabaseUrl(): Promise<string> {
+    const [databaseUrl] = await setUpDatabase();
+    return databaseUrl;
   }
 
   const reset = async (): Promise<void> => {
@@ -97,6 +108,7 @@ export function createReusableTemporaryDatabase(databaseUrl: string): ReusableTe
   };
 
   return {
+    getDatabaseUrl,
     getDatabase,
     reset,
     [Symbol.asyncDispose]: async () => {

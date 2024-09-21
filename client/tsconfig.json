@@ -1,6 +1,7 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
+      "lib": ["dom", "esnext.disposable"],
       /* Visit https://aka.ms/tsconfig to read more about this file */
 
       /* Projects */

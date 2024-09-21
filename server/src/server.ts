@@ -1,8 +1,9 @@
 import { startServer } from "./";
+import * as settings from "./settings";
 
 async function run() {
   try {
-    startServer({port: 3000});
+    startServer({databaseUrl: settings.databaseUrl(), port: 3000});
   } catch (err) {
     process.exit(1);
   }

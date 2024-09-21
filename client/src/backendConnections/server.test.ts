@@ -1,11 +1,23 @@
+import "disposablestack/auto";
 import { startServer } from "hornbeam-server/lib";
+import * as settings from "hornbeam-server/lib/settings";
+import { createTemporaryDatabase } from "hornbeam-server/lib/database/temporaryDatabases";
 import { createBackendConnectionTestSuite } from "./backendConnection.test";
 import { connectServer } from "./server";
 
 createBackendConnectionTestSuite(
   "backendConnections/server",
   async () => {
-    const httpServer = await startServer({port: 0});
+    // TODO: reuse database (reuse code from server fixtures?)
+    const disposableStack = new AsyncDisposableStack();
+
+    const temporaryDatabase = await createTemporaryDatabase(settings.testDatabaseUrl());
+    disposableStack.use(temporaryDatabase);
+
+    const httpServer = await startServer({databaseUrl: temporaryDatabase.connectionString, port: 0});
+    disposableStack.defer(async () => {
+      await httpServer.close();
+    });
 
     const port = httpServer.port();
     if (port === null) {
@@ -15,7 +27,7 @@ createBackendConnectionTestSuite(
     const backendConnection = connectServer(`http://localhost:${port}/`);
 
     const tearDown = async () => {
-      await httpServer.close();
+      await disposableStack.disposeAsync();
     };
 
     return [backendConnection, tearDown];

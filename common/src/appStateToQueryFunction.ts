@@ -2,6 +2,7 @@ import { AppState } from "./app";
 import { cardSubboardId, rootBoardId } from "./app/boards";
 import { generateCardHistory } from "./app/cards";
 import { cardsToTrees } from "./app/cardTrees";
+import { AppSnapshot } from "./app/snapshots";
 import { AppQuery } from "./queries";
 
 export default function appStateToQueryFunction(appState: AppState, timeTravelSnapshotIndex: number | null) {
@@ -18,6 +19,13 @@ export function queryAppState<R>(
     ? appState.latestSnapshot()
     : appState.snapshot(timeTravelSnapshotIndex);
 
+  return queryAppSnapshot(snapshot, query);
+}
+
+export function queryAppSnapshot<R>(
+  snapshot: AppSnapshot,
+  query: AppQuery<R>,
+): R {
   switch (query.type) {
     case "card": {
       return query.proof(snapshot.findCardById(query.cardId));

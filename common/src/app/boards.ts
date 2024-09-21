@@ -1,5 +1,5 @@
 export interface BoardId {
-  boardRootId: string | null;
+  readonly boardRootId: string | null;
 }
 
 export const rootBoardId: BoardId = {boardRootId: null};

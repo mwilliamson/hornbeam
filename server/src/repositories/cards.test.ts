@@ -9,6 +9,7 @@ import { testingCardAddMutation, testingCardEditMutation } from "hornbeam-common
 import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
 import { CardAddMutation } from "hornbeam-common/lib/app/cards";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
+import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -194,6 +195,107 @@ export function createCardsRepositoryTests(
         hasProperties({number: 2, text: "<card 2 text>"}),
         hasProperties({number: 3, text: "<card 3 text>"}),
       ));
+    });
+  });
+
+  suite("parent board", () => {
+    testRepository("parent of root board is root board", async (repository) => {
+      const parentBoardId = await repository.fetchParentBoard(rootBoardId);
+
+      assertThat(parentBoardId, deepEqualTo(rootBoardId));
+    });
+
+    testRepository("when card has no parent then parent of subboard is root board", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+      }));
+
+      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_1_ID));
+
+      assertThat(parentBoardId, deepEqualTo(rootBoardId));
+    });
+
+    testRepository("when card has parent that is not subboard then parent of subboard is root board", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+      }));
+
+      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_2_ID));
+
+      assertThat(parentBoardId, deepEqualTo(rootBoardId));
+    });
+
+    testRepository("when card has parent that is subboard then parent of subboard is parent card board", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+      }));
+
+      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_2_ID));
+
+      assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_1_ID)));
+    });
+
+    testRepository("when card has ancestor that is subboard then ancestor of subboard is parent card board", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        parentCardId: CARD_2_ID,
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+      }));
+
+      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_3_ID));
+
+      assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_1_ID)));
+    });
+
+    testRepository("when card has multiple ancestors that are subboards then closest ancestor is parent board", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        parentCardId: CARD_2_ID,
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_2_ID,
+        isSubboardRoot: true,
+      }));
+
+      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_3_ID));
+
+      assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_2_ID)));
     });
   });
 

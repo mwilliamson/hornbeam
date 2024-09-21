@@ -7,6 +7,9 @@ import { SerializedCardStatus } from "hornbeam-common/lib/serialization/cardStat
 import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
+import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
+import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
+import { parentBoardQuery } from "hornbeam-common/lib/queries";
 
 export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
@@ -16,6 +19,7 @@ export interface CardRepository {
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
   fetchChildCountByParentId: (parentId: string) => Promise<number>;
   search: (searchTerm: string) => Promise<ReadonlyArray<Card>>;
+  fetchParentBoard: (boardId: BoardId) => Promise<BoardId>;
 }
 
 export class CardRepositoryInMemory implements CardRepository {
@@ -55,6 +59,10 @@ export class CardRepositoryInMemory implements CardRepository {
 
   async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
     return this.snapshot.value.searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
+  }
+
+  async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
+    return queryAppSnapshot(this.snapshot.value, parentBoardQuery(boardId));
   }
 }
 
@@ -195,6 +203,37 @@ export class CardRepositoryDatabase implements CardRepository {
       const cardRows = await cardsQuery.execute();
 
       return cardRows.map(cardRow => this.rowToCard(cardRow));
+    });
+  }
+
+  async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
+    if (boardId.boardRootId === null) {
+      return rootBoardId;
+    }
+
+    let cardId = boardId.boardRootId;
+    return await this.database.transaction().execute(async transaction => {
+      while (true) {
+        const row = await transaction
+          .selectFrom("cards")
+          .select(["isSubboardRoot", "parentCardId"])
+          .where("id", "=", cardId)
+          .executeTakeFirst();
+
+        if (row === undefined) {
+          return rootBoardId;
+        }
+
+        if (row.isSubboardRoot && cardId !== boardId.boardRootId) {
+          return cardSubboardId(cardId);
+        }
+
+        if (row.parentCardId === null) {
+          return rootBoardId;
+        }
+
+        cardId = row.parentCardId;
+      }
     });
   }
 

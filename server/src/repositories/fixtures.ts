@@ -2,10 +2,12 @@ import "disposablestack/auto";
 import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { CategoryRepository, CategoryRepositoryDatabase, CategoryRepositoryInMemory } from "./categories";
 import { Database, databaseConnect } from "../database";
-import { createTemporaryDatabase } from "../database/temporaryDatabases";
+import { createTemporaryDatabase, TemporaryDatabase } from "../database/temporaryDatabases";
 import { testDatabaseUrl } from "../settings";
+import * as testing from "../testing";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "./cards";
+import { sql } from "kysely";
 
 export interface RepositoryFixtures extends AsyncDisposable {
   cardRepository: () => Promise<CardRepository>;
@@ -27,23 +29,31 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
   };
 }
 
+let temporaryDatabase: TemporaryDatabase | null = null;
+
 export function repositoryFixturesDatabase(): RepositoryFixtures {
   const disposableStack = new AsyncDisposableStack();
   let database: Promise<Database> | null = null;
   let disposed = false;
 
   async function setUpDatabase(): Promise<Database> {
-    const temporaryDatabase = await createTemporaryDatabase(testDatabaseUrl());
+    if (temporaryDatabase === null) {
+      temporaryDatabase = await createTemporaryDatabase(testDatabaseUrl());
+      testing.use(temporaryDatabase);
+    }
     if (disposed) {
       throw new Error("Cannot use after disposal");
     }
-    disposableStack.use(temporaryDatabase);
 
     const connectedDatabase = await databaseConnect(temporaryDatabase.connectionString);
     if (disposed) {
       throw new Error("Cannot use after disposal");
     }
-    disposableStack.defer(() => {
+    disposableStack.defer(async () => {
+      await sql`
+        DELETE FROM cards;
+        DELETE FROM categories;
+      `.execute(connectedDatabase);
       connectedDatabase.destroy();
     });
 

@@ -30,6 +30,7 @@
     "typescript": "^5.5.4"
   },
   "mocha": {
-    "spec": "lib/**/*.test.js"
+    "spec": "lib/**/*.test.js",
+    "require": ["lib/testing"]
   }
 }

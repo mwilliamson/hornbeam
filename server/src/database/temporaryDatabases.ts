@@ -16,6 +16,9 @@ export async function createTemporaryDatabase(databaseUrl: string): Promise<Temp
   });
 
   await databaseManagementClient.query(`
+    DROP DATABASE IF EXISTS hornbeam_tmp;
+  `);
+  await databaseManagementClient.query(`
     CREATE DATABASE hornbeam_tmp;
   `);
   disposableStack.defer(async () => {

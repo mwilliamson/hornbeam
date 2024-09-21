@@ -1,3 +1,4 @@
+import "disposablestack/auto";
 import path from "node:path";
 import { suite } from "mocha";
 
@@ -5,3 +6,15 @@ export function fileSuite(filename: string, callback: () => (Promise<void> | voi
   const projectRoot = path.normalize(path.join(__dirname, "../.."));
   suite(path.relative(projectRoot, filename), callback);
 }
+
+const disposables = new AsyncDisposableStack();
+
+export function use(disposable: AsyncDisposable) {
+  disposables.use(disposable);
+}
+
+export const mochaHooks = {
+  async afterAll() {
+    await disposables.disposeAsync();
+  }
+};

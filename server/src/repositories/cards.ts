@@ -9,7 +9,8 @@ import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
-import { parentBoardQuery } from "hornbeam-common/lib/queries";
+import { boardCardTreesQuery, parentBoardQuery } from "hornbeam-common/lib/queries";
+import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 
 export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
@@ -19,6 +20,10 @@ export interface CardRepository {
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
   fetchChildCountByParentId: (parentId: string) => Promise<number>;
   search: (searchTerm: string) => Promise<ReadonlyArray<Card>>;
+  fetchBoardCardTrees: (
+    boardId: BoardId,
+    cardStatuses: ReadonlySet<CardStatus>,
+  ) => Promise<ReadonlyArray<CardTree>>;
   fetchParentBoard: (boardId: BoardId) => Promise<BoardId>;
 }
 
@@ -59,6 +64,13 @@ export class CardRepositoryInMemory implements CardRepository {
 
   async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
     return this.snapshot.value.searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
+  }
+
+  async fetchBoardCardTrees(
+    boardId: BoardId,
+    cardStatuses: ReadonlySet<CardStatus>,
+  ): Promise<ReadonlyArray<CardTree>> {
+    return queryAppSnapshot(this.snapshot.value, boardCardTreesQuery({boardId, cardStatuses}));
   }
 
   async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
@@ -203,6 +215,26 @@ export class CardRepositoryDatabase implements CardRepository {
       const cardRows = await cardsQuery.execute();
 
       return cardRows.map(cardRow => this.rowToCard(cardRow));
+    });
+  }
+
+  async fetchBoardCardTrees(
+    boardId: BoardId,
+    cardStatuses: ReadonlySet<CardStatus>,
+  ): Promise<ReadonlyArray<CardTree>> {
+    return await this.database.transaction().execute(async transaction => {
+      // TODO: filter to board
+      const cardsQuery = this.selectColumns(
+        transaction
+          .selectFrom("cards")
+          .where("cards.status", "in", Array.from(cardStatuses))
+      );
+
+      const cardRows = await cardsQuery.execute();
+
+      const cards = cardRows.map(cardRow => this.rowToCard(cardRow));
+
+      return cardsToTrees(cards, boardId);
     });
   }
 

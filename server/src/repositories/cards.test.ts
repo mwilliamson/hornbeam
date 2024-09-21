@@ -8,7 +8,7 @@ import { CardRepository } from "./cards";
 import { testingCardAddMutation, testingCardEditMutation } from "hornbeam-common/lib/app/cards.testing";
 import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
 import { CardAddMutation } from "hornbeam-common/lib/app/cards";
-import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
+import { allCardStatuses, CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
@@ -194,6 +194,198 @@ export function createCardsRepositoryTests(
         hasProperties({number: 1, text: "<card 1 text>"}),
         hasProperties({number: 2, text: "<card 2 text>"}),
         hasProperties({number: 3, text: "<card 3 text>"}),
+      ));
+    });
+  });
+
+  suite("board card trees", () => {
+    testRepository("root board includes cards without parents", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+
+      const cardTrees = await repository.fetchBoardCardTrees(rootBoardId, new Set(allCardStatuses));
+
+      assertThat(cardTrees, containsExactly(
+        hasProperties({
+          card: hasProperties({text: "<card 1>"}),
+          children: containsExactly(),
+        }),
+        hasProperties({
+          card: hasProperties({text: "<card 2>"}),
+          children: containsExactly(),
+        }),
+      ));
+    });
+
+    testRepository("children are attached to their parent", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        parentCardId: CARD_1_ID,
+        text: "<card 3>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_4_ID,
+        parentCardId: CARD_1_ID,
+        text: "<card 4>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_5_ID,
+        parentCardId: CARD_2_ID,
+        text: "<card 5>",
+      }));
+
+      const cardTrees = await repository.fetchBoardCardTrees(rootBoardId, new Set(allCardStatuses));
+
+      assertThat(cardTrees, containsExactly(
+        hasProperties({
+          card: hasProperties({text: "<card 1>"}),
+          children: containsExactly(
+            hasProperties({
+              card: hasProperties({text: "<card 3>"}),
+              children: containsExactly(),
+            }),
+            hasProperties({
+              card: hasProperties({text: "<card 4>"}),
+              children: containsExactly(),
+            }),
+          ),
+        }),
+        hasProperties({
+          card: hasProperties({text: "<card 2>"}),
+          children: containsExactly(
+            hasProperties({
+              card: hasProperties({text: "<card 5>"}),
+              children: containsExactly(),
+            }),
+          ),
+        }),
+      ));
+    });
+
+    testRepository("children of subboard roots are ignored", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+        text: "<card 2>",
+      }));
+
+      const cardTrees = await repository.fetchBoardCardTrees(rootBoardId, new Set(allCardStatuses));
+
+      assertThat(cardTrees, containsExactly(
+        hasProperties({
+          card: hasProperties({text: "<card 1>"}),
+          children: containsExactly(),
+        }),
+      ));
+    });
+
+    testRepository("card subboard uses card as root", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        parentCardId: CARD_1_ID,
+        text: "<card 3>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_4_ID,
+        parentCardId: CARD_3_ID,
+        text: "<card 4>",
+      }));
+
+      const cardTrees = await repository.fetchBoardCardTrees(
+        cardSubboardId(CARD_1_ID),
+        new Set(allCardStatuses),
+      );
+
+      assertThat(cardTrees, containsExactly(
+        hasProperties({
+          card: hasProperties({text: "<card 1>"}),
+          children: containsExactly(
+            hasProperties({
+              card: hasProperties({text: "<card 3>"}),
+              children: containsExactly(
+                hasProperties({
+                  card: hasProperties({text: "<card 4>"}),
+                  children: containsExactly(),
+                }),
+              ),
+            }),
+          ),
+        }),
+      ));
+    });
+
+    testRepository("cards are filtered by card statuses", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        status: CardStatus.None,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_2_ID,
+        status: CardStatus.Deleted,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        text: "<card 3>",
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_3_ID,
+        status: CardStatus.Done,
+      }));
+
+      const cardTrees = await repository.fetchBoardCardTrees(
+        rootBoardId,
+        new Set([CardStatus.None, CardStatus.Done]),
+      );
+
+      assertThat(cardTrees, containsExactly(
+        hasProperties({
+          card: hasProperties({text: "<card 1>"}),
+        }),
+        hasProperties({
+          card: hasProperties({text: "<card 3>"}),
+        }),
       ));
     });
   });

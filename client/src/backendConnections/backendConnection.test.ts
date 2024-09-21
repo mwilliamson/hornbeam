@@ -14,6 +14,7 @@ const CARD_1_ID = "0191beaa-0000-7507-9e6b-000000000001";
 const CARD_2_ID = "0191beaa-0000-7507-9e6b-000000000002";
 const CARD_3_ID = "0191beaa-0000-7507-9e6b-000000000003";
 const CATEGORY_1_ID = "0191beaa-0001-7507-9e6b-000000000001";
+const CATEGORY_2_ID = "0191beaa-0001-7507-9e6b-000000000002";
 
 export function createBackendConnectionTestSuite(
   name: string,
@@ -369,9 +370,11 @@ export function createBackendConnectionTestSuite(
 
       testBackendConnection("allCategories", async (backendConnection) => {
         await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
+          id: CATEGORY_1_ID,
           name: "<category name 1>",
         }));
         await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
+          id: CATEGORY_2_ID,
           name: "<category name 2>",
         }));
 
@@ -385,9 +388,11 @@ export function createBackendConnectionTestSuite(
 
       testBackendConnection("availableCategories", async (backendConnection) => {
         await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
+          id: CATEGORY_1_ID,
           name: "<category name 1>",
         }));
         await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
+          id: CATEGORY_2_ID,
           name: "<category name 2>",
         }));
 

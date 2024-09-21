@@ -161,19 +161,28 @@ export function connectServer(uri: string): BackendConnection {
     const responseDeserializers: Array<[string, (response: unknown) => unknown]> = [];
 
     for (const [key, query] of Object.entries(queries)) {
-      const [serverQuery, deserializeResponse] = queriesSerialization(query);
+      if (query !== null) {
+        const [serverQuery, deserializeResponse] = queriesSerialization(query);
 
-      serverQueries.push(serverQuery);
-      responseDeserializers.push([key, deserializeResponse]);
+        serverQueries.push(serverQuery);
+        responseDeserializers.push([key, deserializeResponse]);
+      }
     }
 
     const response: ReadonlyArray<unknown> = await fetchQueries(serverQueries);
     const queriesResult: {[k: string]: unknown} = {};
 
-    response.forEach((queryResponse, queryIndex) => {
-      const [key, deserializeResponse] = responseDeserializers[queryIndex];
-      queriesResult[key] = deserializeResponse(queryResponse);
-    });
+    let serverQueryIndex = 0;
+    for (const[key, query] of Object.entries(queries)) {
+      if (query === null) {
+        queriesResult[key] = null;
+      } else {
+        const queryResponse = response[serverQueryIndex];
+        const [key, deserializeResponse] = responseDeserializers[serverQueryIndex];
+        queriesResult[key] = deserializeResponse(queryResponse);
+        serverQueryIndex++;
+      }
+    }
 
     return queriesResult as AppQueriesResult<TQueries>;
   }

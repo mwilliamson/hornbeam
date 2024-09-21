@@ -407,6 +407,38 @@ export function createBackendConnectionTestSuite(
         ));
       });
     });
+
+    testBackendConnection("null query returns null", async (backendConnection) => {
+      await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
+        id: CATEGORY_1_ID,
+      }));
+
+      await backendConnection.mutate(testingProjectContentsMutation.cardAdd({
+        categoryId: CATEGORY_1_ID,
+        id: CARD_1_ID,
+        text: "<card text 1>",
+      }));
+
+      await backendConnection.mutate(testingProjectContentsMutation.cardAdd({
+        categoryId: CATEGORY_1_ID,
+        id: CARD_2_ID,
+        text: "<card text 2>",
+      }));
+
+      const result = await backendConnection.executeQueries({
+        a: null,
+        b: cardQuery(CARD_1_ID),
+        c: null,
+        d: cardQuery(CARD_2_ID),
+      });
+
+      assertThat(result, hasProperties({
+        a: equalTo(null),
+        b: hasProperties({text: "<card text 1>"}),
+        c: equalTo(null),
+        d: hasProperties({text: "<card text 2>"}),
+      }));
+    });
   });
 
   function testBackendConnection(

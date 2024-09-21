@@ -23,7 +23,7 @@ export function connectSimpleSync(
   const executeQueries = async <TQueries extends AppQueries>(queries: TQueries) => {
     return mapValues(
       queries,
-      query => queryAppState(appState, timeTravelSnapshotIndex, query),
+      query => query === null ? null : queryAppState(appState, timeTravelSnapshotIndex, query),
     ) as AppQueriesResult<TQueries>;
   };
 

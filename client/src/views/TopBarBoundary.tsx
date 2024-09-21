@@ -24,8 +24,7 @@ export default function TopBarBoundary(props: TopBarBoundaryProps) {
   return (
     <Boundary
       queries={{
-        // TODO: remove this terrible hack
-        boardRoot: cardQuery(boardId.boardRootId ?? "")
+        boardRoot: boardId.boardRootId === null ? null : cardQuery(boardId.boardRootId)
       }}
       render={({boardRoot}) => (
         <TopBar

@@ -223,10 +223,29 @@ export class CardRepositoryDatabase implements CardRepository {
     cardStatuses: ReadonlySet<CardStatus>,
   ): Promise<ReadonlyArray<CardTree>> {
     return await this.database.transaction().execute(async transaction => {
-      // TODO: filter to board
       const cardsQuery = this.selectColumns(
         transaction
+          .withRecursive(
+            "boardCards(id, childrenAllowed)",
+            db => {
+              let rootCards = db.selectFrom("cards")
+                .select(eb => ["id", eb.lit<boolean>(true).as("childrenAllowed")]);
+              if (boardId.boardRootId === null) {
+                rootCards = rootCards.where("cards.parentCardId", "is", null);
+              } else {
+                rootCards = rootCards.where("cards.id", "=", boardId.boardRootId);
+              }
+
+              return rootCards.union(
+                db.selectFrom("cards")
+                  .select(eb => ["cards.id", eb.not(eb.ref("isSubboardRoot")).as("childrenAllowed")])
+                  .innerJoin("boardCards", "boardCards.id", "cards.parentCardId")
+                  .where("boardCards.childrenAllowed", "=", true)
+              );
+            }
+          )
           .selectFrom("cards")
+          .innerJoin("boardCards", "boardCards.id", "cards.id")
           .where("cards.status", "in", Array.from(cardStatuses))
       );
 

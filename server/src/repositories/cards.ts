@@ -94,11 +94,22 @@ export class CardRepositoryDatabase implements CardRepository {
 
   async update(mutation: CardEditMutation): Promise<void> {
     await this.database.transaction().execute(async transaction => {
+      let query = transaction.updateTable("cards")
+        .where("id", "=", mutation.id);
+      let queryRequired = false;
+
       if (mutation.categoryId !== undefined) {
-        await transaction.updateTable("cards")
-          .set({categoryId: mutation.categoryId})
-          .where("id", "=", mutation.id)
-          .execute();
+        query = query.set({categoryId: mutation.categoryId});
+        queryRequired = true;
+      }
+
+      if (mutation.text !== undefined) {
+        query = query.set({text: mutation.text});
+        queryRequired = true;
+      }
+
+      if (queryRequired) {
+        await query.execute();
       }
     });
   }

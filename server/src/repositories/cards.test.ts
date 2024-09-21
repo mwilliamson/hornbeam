@@ -343,6 +343,29 @@ export function createCardsRepositoryTests(
         hasProperties({categoryId: CATEGORY_2_ID, text: "<card 2>"}),
       ));
     });
+
+    testRepository("text", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        text: "<updated text>",
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({id: CARD_1_ID, text: "<updated text>"}),
+        hasProperties({id: CARD_2_ID, text: "<card 2>"}),
+      ));
+    });
   });
 
   function cardAddMutation(mutation: Partial<CardAddMutation>): CardAddMutation {

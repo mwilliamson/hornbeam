@@ -12,6 +12,7 @@ export interface Card {
   createdAt: Timestamp;
   id: string;
   index: number;
+  isSubboardRoot: boolean;
   number: number;
   parentCardId: string | null;
   text: string;

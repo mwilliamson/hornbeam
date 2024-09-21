@@ -79,6 +79,7 @@ export class CardRepositoryDatabase implements CardRepository {
                 eb.lit(0),
               ).as("index")
             ),
+          isSubboardRoot: false,
           number: eb.selectFrom("cards")
             .select(
               eb.fn.coalesce(
@@ -100,6 +101,11 @@ export class CardRepositoryDatabase implements CardRepository {
 
       if (mutation.categoryId !== undefined) {
         query = query.set({categoryId: mutation.categoryId});
+        queryRequired = true;
+      }
+
+      if (mutation.isSubboardRoot !== undefined) {
+        query = query.set({isSubboardRoot: mutation.isSubboardRoot});
         queryRequired = true;
       }
 
@@ -184,6 +190,7 @@ export class CardRepositoryDatabase implements CardRepository {
       "cards.categoryId",
       "cards.createdAt",
       "cards.id",
+      "cards.isSubboardRoot",
       "cards.number",
       "cards.parentCardId",
       "cards.text",
@@ -195,7 +202,7 @@ export class CardRepositoryDatabase implements CardRepository {
       categoryId: cardRow.categoryId,
       createdAt: Instant.ofEpochMilli(cardRow.createdAt.getTime()),
       id: cardRow.id,
-      isSubboardRoot: false,
+      isSubboardRoot: cardRow.isSubboardRoot,
       number: cardRow.number,
       parentCardId: cardRow.parentCardId,
       status: CardStatus.None,

@@ -366,6 +366,29 @@ export function createCardsRepositoryTests(
       ));
     });
 
+    testRepository("is subboard root", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({isSubboardRoot: true, text: "<card 1>"}),
+        hasProperties({isSubboardRoot: false, id: CARD_2_ID, text: "<card 2>"}),
+      ));
+    });
+
     testRepository("text", async (repository) => {
       await repository.add(cardAddMutation({
         id: CARD_1_ID,

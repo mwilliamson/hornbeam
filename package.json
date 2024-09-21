@@ -5,6 +5,9 @@
     "common",
     "server"
   ],
+  "scripts": {
+    "test": "cd client && npm test && cd ../server && npm test"
+  },
   "dependencies": {
     "@types/mocha": "^10.0.7"
   }

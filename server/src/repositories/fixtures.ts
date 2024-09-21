@@ -30,6 +30,7 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
 }
 
 let temporaryDatabase: TemporaryDatabase | null = null;
+let connectedDatabase: Database | null = null;
 
 export function repositoryFixturesDatabase(): RepositoryFixtures {
   const disposableStack = new AsyncDisposableStack();
@@ -45,16 +46,24 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
       throw new Error("Cannot use after disposal");
     }
 
-    const connectedDatabase = await databaseConnect(temporaryDatabase.connectionString);
-    if (disposed) {
-      throw new Error("Cannot use after disposal");
+    if (connectedDatabase === null) {
+      const newConnectedDatabase = await databaseConnect(temporaryDatabase.connectionString);
+      testing.defer(async () => {
+        newConnectedDatabase.destroy();
+      });
+      connectedDatabase = newConnectedDatabase;
+      if (disposed) {
+        throw new Error("Cannot use after disposal");
+      }
     }
+
     disposableStack.defer(async () => {
-      await sql`
-        DELETE FROM cards;
-        DELETE FROM categories;
-      `.execute(connectedDatabase);
-      connectedDatabase.destroy();
+      if (connectedDatabase !== null) {
+        await sql`
+          DELETE FROM cards;
+          DELETE FROM categories;
+        `.execute(connectedDatabase);
+      }
     });
 
     return connectedDatabase;

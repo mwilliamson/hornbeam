@@ -9,8 +9,12 @@ export function fileSuite(filename: string, callback: () => (Promise<void> | voi
 
 const disposables = new AsyncDisposableStack();
 
-export function use(disposable: AsyncDisposable) {
+export function use(disposable: AsyncDisposable): void {
   disposables.use(disposable);
+}
+
+export function defer(f: () => Promise<void>): void {
+  disposables.defer(f);
 }
 
 export const mochaHooks = {

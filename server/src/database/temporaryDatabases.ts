@@ -10,7 +10,7 @@ export async function createTemporaryDatabase(databaseUrl: string): Promise<Temp
   await using disposableStack = new AsyncDisposableStack();
 
   const databaseManagementClient = new Client(databaseUrl);
-  databaseManagementClient.connect();
+  await databaseManagementClient.connect();
   disposableStack.defer(async () => {
     await databaseManagementClient.end();
   });

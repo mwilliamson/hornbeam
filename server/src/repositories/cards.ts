@@ -211,28 +211,30 @@ export class CardRepositoryDatabase implements CardRepository {
       return rootBoardId;
     }
 
-    let cardId = boardId.boardRootId;
     return await this.database.transaction().execute(async transaction => {
-      while (true) {
-        const row = await transaction
-          .selectFrom("cards")
-          .select(["isSubboardRoot", "parentCardId"])
-          .where("id", "=", cardId)
-          .executeTakeFirst();
+      const row = await transaction
+        .withRecursive(
+          "ancestors(id, parentId, isParentBoard)",
+          db =>
+            db.selectFrom("cards")
+              .select(eb => ["id as id", "parentCardId as parentId", eb.lit<boolean>(false).as("isParentBoard")])
+              .where("id", "=", boardId.boardRootId)
+              .union(
+                db.selectFrom("cards")
+                  .select(["cards.id as id", "cards.parentCardId as parentId", "cards.isSubboardRoot as isParentBoard"])
+                  .innerJoin("ancestors", "ancestors.parentId", "cards.id")
+                  .where("ancestors.isParentBoard", "=", false)
+              )
+        )
+        .selectFrom("ancestors")
+        .select(["id"])
+        .where("isParentBoard", "=", true)
+        .executeTakeFirst();
 
-        if (row === undefined) {
-          return rootBoardId;
-        }
-
-        if (row.isSubboardRoot && cardId !== boardId.boardRootId) {
-          return cardSubboardId(cardId);
-        }
-
-        if (row.parentCardId === null) {
-          return rootBoardId;
-        }
-
-        cardId = row.parentCardId;
+      if (row === undefined) {
+        return rootBoardId;
+      } else {
+        return cardSubboardId(row.id);
       }
     });
   }

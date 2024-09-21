@@ -389,6 +389,37 @@ export function createCardsRepositoryTests(
       ));
     });
 
+    testRepository("parent", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        parentCardId: null,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: null,
+        text: "<card 2>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        parentCardId: null,
+        text: "<card 3>",
+      }));
+
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        parentCardId: CARD_3_ID,
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({parentCardId: CARD_3_ID, text: "<card 1>"}),
+        hasProperties({parentCardId: null, text: "<card 2>"}),
+        hasProperties({parentCardId: null, text: "<card 3>"}),
+      ));
+    });
+
     testRepository("text", async (repository) => {
       await repository.add(cardAddMutation({
         id: CARD_1_ID,

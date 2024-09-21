@@ -109,6 +109,11 @@ export class CardRepositoryDatabase implements CardRepository {
         queryRequired = true;
       }
 
+      if (mutation.parentCardId !== undefined) {
+        query = query.set({parentCardId: mutation.parentCardId});
+        queryRequired = true;
+      }
+
       if (mutation.text !== undefined) {
         query = query.set({text: mutation.text});
         queryRequired = true;

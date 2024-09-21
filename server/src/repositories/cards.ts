@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import { Card, CardAddMutation } from "hornbeam-common/lib/app/cards";
+import { Card, CardAddMutation, CardEditMutation } from "hornbeam-common/lib/app/cards";
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
@@ -8,6 +8,7 @@ import { SelectQueryBuilder } from "kysely";
 
 export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
+  update: (mutation: CardEditMutation) => Promise<void>;
   fetchAll: () => Promise<ReadonlyArray<Card>>;
   fetchById: (id: string) => Promise<Card | null>;
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
@@ -24,6 +25,10 @@ export class CardRepositoryInMemory implements CardRepository {
 
   async add(mutation: CardAddMutation): Promise<void> {
     return this.snapshot.update(snapshot => snapshot.cardAdd(mutation));
+  }
+
+  async update(mutation: CardEditMutation): Promise<void> {
+    return this.snapshot.update(snapshot => snapshot.cardEdit(mutation));
   }
 
   async fetchAll(): Promise<ReadonlyArray<Card>> {
@@ -84,6 +89,17 @@ export class CardRepositoryDatabase implements CardRepository {
           text: mutation.text,
         }))
         .execute();
+    });
+  }
+
+  async update(mutation: CardEditMutation): Promise<void> {
+    await this.database.transaction().execute(async transaction => {
+      if (mutation.categoryId !== undefined) {
+        await transaction.updateTable("cards")
+          .set({categoryId: mutation.categoryId})
+          .where("id", "=", mutation.id)
+          .execute();
+      }
     });
   }
 

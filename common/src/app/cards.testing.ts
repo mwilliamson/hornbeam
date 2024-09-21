@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import { CardAddMutation } from "./cards";
+import { CardAddMutation, CardEditMutation } from "./cards";
 
 const defaultCardAddId = "0191beb2-0000-7ccf-a72c-999999999999";
 const defaultCardAddCategoryId = "0191beb2-0001-7ccf-a72c-999999999999";
@@ -12,6 +12,14 @@ export function testingCardAddMutation(mutation: Partial<CardAddMutation>): Card
     id: defaultCardAddId,
     parentCardId: null,
     text: "<default test text>",
+    ...mutation,
+  };
+}
+
+export function testingCardEditMutation(mutation: Partial<CardEditMutation>): CardEditMutation {
+  return {
+    createdAt: defaultCreatedAt,
+    id: defaultCardAddId,
     ...mutation,
   };
 }

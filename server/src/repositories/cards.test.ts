@@ -5,7 +5,7 @@ import { uuidv7 } from "uuidv7";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { CardRepository } from "./cards";
-import { testingCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
+import { testingCardAddMutation, testingCardEditMutation } from "hornbeam-common/lib/app/cards.testing";
 import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
 import { CardAddMutation } from "hornbeam-common/lib/app/cards";
 
@@ -16,6 +16,7 @@ const CARD_4_ID = "0191beb5-0000-79e7-8207-000000001004";
 const CARD_5_ID = "0191beb5-0000-79e7-8207-000000001005";
 const CATEGORY_1_ID = "0191beb5-0000-79e7-8207-000000000001";
 const CATEGORY_2_ID = "0191beb5-0000-79e7-8207-000000000002";
+const CATEGORY_3_ID = "0191beb5-0000-79e7-8207-000000000003";
 
 export function createCardsRepositoryTests(
   createFixtures: () => RepositoryFixtures,
@@ -317,6 +318,33 @@ export function createCardsRepositoryTests(
     });
   });
 
+  suite("field updates", () => {
+    testRepository("category", async (repository) => {
+      await repository.add(cardAddMutation({
+        categoryId: CATEGORY_1_ID,
+        id: CARD_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        categoryId: CATEGORY_2_ID,
+        id: CARD_2_ID,
+        text: "<card 2>",
+      }));
+
+      await repository.update(testingCardEditMutation({
+        categoryId: CATEGORY_3_ID,
+        id: CARD_1_ID,
+      }));
+
+      const card = await repository.fetchAll();
+
+      assertThat(card, containsExactly(
+        hasProperties({categoryId: CATEGORY_3_ID, text: "<card 1>"}),
+        hasProperties({categoryId: CATEGORY_2_ID, text: "<card 2>"}),
+      ));
+    });
+  });
+
   function cardAddMutation(mutation: Partial<CardAddMutation>): CardAddMutation {
     return testingCardAddMutation({
       categoryId: CATEGORY_1_ID,
@@ -334,6 +362,9 @@ export function createCardsRepositoryTests(
       }));
       await categoryRepository.add(testingCategoryAddMutation({
         id: CATEGORY_2_ID,
+      }));
+      await categoryRepository.add(testingCategoryAddMutation({
+        id: CATEGORY_3_ID,
       }));
 
       await f(await fixtures.cardRepository());

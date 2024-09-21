@@ -7,7 +7,8 @@
     "check:eslint": "eslint src && echo 'No lint errors' 1>&2",
     "test": "mocha",
     "start": "node lib/server.js",
-    "generate-database-types": "node lib/database/generateTypes.js"
+    "generate-database-types": "node lib/database/generateTypes.js",
+    "create-database": "node lib/cli.js create-database"
   },
   "type": "commonjs",
   "dependencies": {

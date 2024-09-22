@@ -132,23 +132,25 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
 
     const update = bodyResult.right.update;
 
-    await database.transaction().execute(async transaction => {
-      await mutate(transaction, update.mutation);
+    const index = await database.transaction().execute(async transaction => {
+      return await mutate(transaction, update.mutation);
     });
 
     return UpdateResponseBody.encode({
-      // TODO: proper snapshot index
-      snapshotIndex: 0,
+      snapshotIndex: index,
     });
   });
 
   async function mutate(
     transaction: Transaction<DB>,
     mutation: ProjectContentsMutation,
-  ): Promise<void> {
+  ): Promise<number> {
     const mutationLogRepository = new MutationLogRepositoryDatabase(transaction);
-    await mutationLogRepository.add(uuidv7(), mutation);
+    const index = await mutationLogRepository.add(uuidv7(), mutation);
+
     await applyMutation(transaction, mutation);
+
+    return index;
   }
 
   async function applyMutation(

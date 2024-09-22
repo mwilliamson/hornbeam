@@ -55,72 +55,79 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
 
     const serverQueries = bodyResult.right.queries;
 
-    const queryResults = await executeQueries(serverQueries);
+    const {latestIndex, queryResults} = await database.transaction().execute(async transaction => {
+      const mutationLogRepository = new MutationLogRepositoryDatabase(transaction);
+      const latestIndex = await mutationLogRepository.fetchLatestIndex();
+      return {
+        latestIndex,
+        queryResults: await executeQueries(transaction, serverQueries),
+      };
+    });
 
     return QueryResponseBody.encode({
-      // TODO: set snapshot index
-      snapshotIndex: 0,
+      snapshotIndex: latestIndex,
       results: queryResults,
     });
   });
 
-  const executeQueries = async (serverQueries: ReadonlyArray<ServerQuery>) => {
-    return await database.transaction().execute(async transaction => {
-      return await mapSeries(serverQueries, async serverQuery => {
-        switch (serverQuery.type) {
-          case "card": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const result = await cardRepository.fetchById(serverQuery.cardId);
-            return serializeCardResponse(result);
-          }
-          case "parentCard": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const result = await cardRepository.fetchParentByChildId(serverQuery.cardId);
-            return serializeParentCardResponse(result);
-          }
-          case "cardChildCount": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const result = await cardRepository.fetchChildCountByParentId(serverQuery.cardId);
-            return serializeCardChildCountResponse(result);
-          }
-          case "cardHistory": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const commentRepository = new CommentRepositoryDatabase(transaction);
-            const cardHistoryFetcher = new CardHistoryFetcher(cardRepository, commentRepository);
-            const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(serverQuery.cardId);
-            return serializeCardHistoryResponse(cardHistory);
-          }
-          case "searchCards": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const result = await cardRepository.search(serverQuery.searchTerm);
-            return serializeSearchCardsResponse(result);
-          }
-          case "boardCardTrees": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const result = await cardRepository.fetchBoardCardTrees(
-              serverQuery.boardId,
-              new Set(serverQuery.cardStatuses),
-            );
-            return serializeBoardCardTreesResponse(result);
-          }
-          case "parentBoard": {
-            const cardRepository = new CardRepositoryDatabase(transaction);
-            const result = await cardRepository.fetchParentBoard(serverQuery.boardId);
-            return serializeParentBoardResponse(result);
-          }
-          case "allCategories": {
-            const categoryRepository = new CategoryRepositoryDatabase(transaction);
-            const result = await categoryRepository.fetchAll();
-            return serializeAllCategoriesResponse(result);
-          }
-          case "allColors": {
-            return serializeAllColorsResponse(colorSetPresetsOnly.allPresetColors());
-          }
-          default: {
-            handleNever(serverQuery, null);
-          }
+  const executeQueries = async (
+    transaction: Transaction<DB>,
+    serverQueries: ReadonlyArray<ServerQuery>
+  ) => {
+    return await mapSeries(serverQueries, async serverQuery => {
+      switch (serverQuery.type) {
+        case "card": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const result = await cardRepository.fetchById(serverQuery.cardId);
+          return serializeCardResponse(result);
         }
-      });
+        case "parentCard": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const result = await cardRepository.fetchParentByChildId(serverQuery.cardId);
+          return serializeParentCardResponse(result);
+        }
+        case "cardChildCount": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const result = await cardRepository.fetchChildCountByParentId(serverQuery.cardId);
+          return serializeCardChildCountResponse(result);
+        }
+        case "cardHistory": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const commentRepository = new CommentRepositoryDatabase(transaction);
+          const cardHistoryFetcher = new CardHistoryFetcher(cardRepository, commentRepository);
+          const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(serverQuery.cardId);
+          return serializeCardHistoryResponse(cardHistory);
+        }
+        case "searchCards": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const result = await cardRepository.search(serverQuery.searchTerm);
+          return serializeSearchCardsResponse(result);
+        }
+        case "boardCardTrees": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const result = await cardRepository.fetchBoardCardTrees(
+            serverQuery.boardId,
+            new Set(serverQuery.cardStatuses),
+          );
+          return serializeBoardCardTreesResponse(result);
+        }
+        case "parentBoard": {
+          const cardRepository = new CardRepositoryDatabase(transaction);
+          const result = await cardRepository.fetchParentBoard(serverQuery.boardId);
+          return serializeParentBoardResponse(result);
+        }
+        case "allCategories": {
+          const categoryRepository = new CategoryRepositoryDatabase(transaction);
+          const result = await categoryRepository.fetchAll();
+          return serializeAllCategoriesResponse(result);
+        }
+        case "allColors": {
+          return serializeAllColorsResponse(colorSetPresetsOnly.allPresetColors());
+        }
+        default: {
+          handleNever(serverQuery, null);
+        }
+      }
     });
   };
 

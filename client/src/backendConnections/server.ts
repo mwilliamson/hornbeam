@@ -1,10 +1,10 @@
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, desserializeUpdateResponse, serializeServerQuery, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, desserializeUpdateResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
 import { AppUpdate, ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
-import { serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
+import { QueryRequestBody, UpdateRequestBody } from "hornbeam-common/lib/serialization/serverApi";
 import { uuidv7 } from "uuidv7";
 import { assertNever } from "hornbeam-common/lib/util/assertNever";
 
@@ -188,9 +188,9 @@ export function connectServer(uri: string): BackendConnection {
   }
 
   const fetchQueries = async (queries: Array<ServerQuery>) => {
-    return fetchJson("query", {
-      queries: queries.map(query => serializeServerQuery(query)),
-    });
+    return fetchJson("query", QueryRequestBody.encode({
+      queries,
+    }));
   };
 
   const mutate = async (mutation: ProjectContentsMutation): Promise<void> => {
@@ -203,7 +203,7 @@ export function connectServer(uri: string): BackendConnection {
       updateId,
     };
 
-    const response = await fetchJson("update", {update: serializeAppUpdate(update)});
+    const response = await fetchJson("update", UpdateRequestBody.encode({update}));
 
     const {snapshotIndex} = desserializeUpdateResponse(response);
 

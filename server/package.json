@@ -13,10 +13,12 @@
   "type": "commonjs",
   "dependencies": {
     "@fastify/static": "^7.0.4",
+    "async": "^3.2.6",
     "disposablestack": "^1.1.6",
     "dotenv": "^16.4.5",
     "fastify": "^4.28.1",
     "kysely": "^0.27.4",
+    "p-map-series": "^2.1.0",
     "pg": "^8.12.0"
   },
   "volta": {
@@ -25,6 +27,7 @@
   },
   "devDependencies": {
     "@mwilliamson/precisely": "^1.2.0",
+    "@types/async": "^3.2.24",
     "@types/node": "^22.2.0",
     "@types/pg": "^8.11.8",
     "kysely-codegen": "^0.16.3",
@@ -32,6 +35,8 @@
   },
   "mocha": {
     "spec": "lib/**/*.test.js",
-    "require": ["lib/testing"]
+    "require": [
+      "lib/testing"
+    ]
   }
 }

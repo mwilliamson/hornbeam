@@ -1,4 +1,5 @@
 import "disposablestack/auto";
+import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
@@ -47,8 +48,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
       serializedServerQuery => deserializeServerQuery(serializedServerQuery),
     );
 
-    // TODO: serialize queries?
-    return Promise.all(serverQueries.map(async serverQuery => {
+    return mapSeries(serverQueries, async serverQuery => {
       switch (serverQuery.type) {
         case "card": {
           const cardRepository = new CardRepositoryDatabase(database);
@@ -99,7 +99,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
           handleNever(serverQuery, null);
         }
       }
-    }));
+    });
   });
 
   fastify.post("/update", async (request) => {

@@ -21,8 +21,29 @@ export function createMutationLogRepositoryTests(
     });
     const index2 = await repository.add(MUTATION_2_ID, mutation2);
 
-    assertThat(index1, equalTo(0));
-    assertThat(index2, equalTo(1));
+    assertThat(index1, equalTo(1));
+    assertThat(index2, equalTo(2));
+  });
+
+  testRepository("latest index is zero when there are no mutations", async (repository) => {
+    const latestIndex = await repository.fetchLatestIndex();
+
+    assertThat(latestIndex, equalTo(0));
+  });
+
+  testRepository("latest index is index of last added mutation", async (repository) => {
+    const mutation1 = testingProjectContentsMutation.cardAdd({
+      text: "<card 1>",
+    });
+    await repository.add(MUTATION_1_ID, mutation1);
+    const mutation2 = testingProjectContentsMutation.cardAdd({
+      text: "<card 2>",
+    });
+    await repository.add(MUTATION_2_ID, mutation2);
+
+    const latestIndex = await repository.fetchLatestIndex();
+
+    assertThat(latestIndex, equalTo(2));
   });
 
   testRepository("can fetch mutations after they're added", async (repository) => {

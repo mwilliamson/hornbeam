@@ -11,6 +11,7 @@ interface LoggedMutation {
 
 export interface MutationLogRepository {
   add: (id: string, mutation: ProjectContentsMutation) => Promise<number>;
+  fetchLatestIndex: () => Promise<number>;
   fetchAll: () => Promise<ReadonlyArray<LoggedMutation>>;
 }
 
@@ -20,7 +21,11 @@ export class MutationLogRepositoryInMemory implements MutationLogRepository {
   async add(id: string, mutation: ProjectContentsMutation): Promise<number> {
     this.mutations.push({id, mutation});
 
-    return this.mutations.length - 1;
+    return this.mutations.length;
+  }
+
+  async fetchLatestIndex(): Promise<number> {
+    return this.mutations.length;
   }
 
   async fetchAll(): Promise<ReadonlyArray<LoggedMutation>> {
@@ -43,7 +48,7 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
           .select(
             eb.fn.coalesce(
               eb(eb.fn.max("mutationLog.index"), "+", 1),
-              eb.lit(0)
+              eb.lit(1)
             ).as("index")
           ),
         mutation: SerializedProjectContentsMutation.encode(mutation) as JsonValue,
@@ -52,6 +57,14 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
       .executeTakeFirstOrThrow();
 
     return row.index;
+  }
+
+  async fetchLatestIndex(): Promise<number> {
+    const row = await this.database.selectFrom("mutationLog")
+      .select(eb => [eb.fn.coalesce(eb.fn.max("index"), eb.lit(0)).as("latestIndex")])
+      .executeTakeFirstOrThrow();
+
+    return row.latestIndex;
   }
 
   async fetchAll(): Promise<ReadonlyArray<LoggedMutation>> {

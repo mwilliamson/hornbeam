@@ -9,12 +9,14 @@ import { AppSnapshotRef } from "./snapshotRef";
 import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "./cards";
 import { CardHistoryFetcher } from "./cardHistory";
 import { CommentRepository, CommentRepositoryDatabase, CommentRepositoryInMemory } from "./comments";
+import { MutationLogRepository, MutationLogRepositoryDatabase, MutationLogRepositoryInMemory } from "./mutationLog";
 
 export interface RepositoryFixtures extends AsyncDisposable {
   cardHistoryFetcher: () => Promise<CardHistoryFetcher>;
   cardRepository: () => Promise<CardRepository>;
   categoryRepository: () => Promise<CategoryRepository>;
   commentRepository: () => Promise<CommentRepository>;
+  mutationLogRepository: () => Promise<MutationLogRepository>;
 }
 
 export function repositoryFixturesInMemory(): RepositoryFixtures {
@@ -34,6 +36,9 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
     },
     commentRepository: async () => {
       return new CommentRepositoryInMemory(snapshot);
+    },
+    mutationLogRepository: async () => {
+      return new MutationLogRepositoryInMemory();
     },
     [Symbol.asyncDispose]: async () => {
     },
@@ -77,6 +82,10 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
 
     commentRepository: async () => {
       return new CommentRepositoryDatabase(await getDatabase());
+    },
+
+    mutationLogRepository: async () => {
+      return new MutationLogRepositoryDatabase(await getDatabase());
     },
 
     [Symbol.asyncDispose]: async () => {

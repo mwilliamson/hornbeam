@@ -5,6 +5,18 @@
 
 import type { ColumnType } from "kysely";
 
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface Card {
@@ -34,8 +46,15 @@ export interface Comment {
   text: string;
 }
 
+export interface MutationLog {
+  id: string;
+  index: number;
+  mutation: Json;
+}
+
 export interface DB {
   cards: Card;
   categories: Category;
   comments: Comment;
+  mutationLog: MutationLog;
 }

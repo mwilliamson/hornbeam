@@ -69,7 +69,7 @@ const SerializedCommentAddMutation = t.type({
   text: t.string,
 }, "SerializedCommentAddMutation");
 
-const SerializedProjectContentsMutation = t.union([
+export const SerializedProjectContentsMutation = t.union([
   t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddMutation}),
   t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditMutation}),
   t.type({type: t.literal("cardMove"), cardMove: SerializedCardMoveMutation}),

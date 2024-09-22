@@ -40,6 +40,12 @@ export default async function createDatabase(databaseUrl: string) {
       );
 
       CREATE INDEX ix__comments__card_id ON comments(card_id);
+
+      CREATE TABLE mutation_log (
+        id uuid PRIMARY KEY,
+        index int NOT NULL,
+        mutation jsonb NOT NULL
+      );
     `);
   } finally {
     await client.end();

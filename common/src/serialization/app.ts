@@ -80,7 +80,7 @@ const SerializedProjectContentsMutation = t.union([
   t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddMutation}),
 ]);
 
-const SerializedAppUpdate = t.type({
+export const SerializedAppUpdate = t.type({
   updateId: t.string,
   mutation: SerializedProjectContentsMutation,
 }, "SerializedAppUpdate");

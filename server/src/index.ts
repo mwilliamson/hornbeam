@@ -5,7 +5,7 @@ import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import {deserializeAppUpdate} from "hornbeam-common/lib/serialization/app";
+import {SerializedAppUpdate} from "hornbeam-common/lib/serialization/app";
 import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse, ServerQuery} from "hornbeam-common/lib/serialization/serverQueries";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { databaseConnect } from "./database";
@@ -113,9 +113,13 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
     });
   });
 
-  fastify.post("/update", async (request) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const update = deserializeAppUpdate((request.body as any).update);
+  fastify.post("/update", async (request, reply) => {
+    const bodyResult = UpdateRequestBody.decode(request.body);
+    if (isLeft(bodyResult)) {
+      return reply.code(400);
+    }
+
+    const update = bodyResult.right.update;
 
     await database.transaction().execute(async transaction => {
       await mutate(transaction, update.mutation);
@@ -201,3 +205,8 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
 const QueryRequestBody = t.type({
   queries: t.readonlyArray(ServerQuery),
 }, "QueryRequestBody");
+
+
+const UpdateRequestBody = t.type({
+  update: SerializedAppUpdate,
+}, "UpdateRequestBody");

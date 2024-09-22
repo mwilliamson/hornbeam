@@ -31,6 +31,15 @@ export default async function createDatabase(databaseUrl: string) {
 
       CREATE UNIQUE INDEX uq__cards__index ON cards(index);
       CREATE UNIQUE INDEX uq__cards__number ON cards(number);
+
+      CREATE TABLE comments (
+        card_id uuid NOT NULL REFERENCES cards(id),
+        created_at timestamptz NOT NULL,
+        id uuid PRIMARY KEY,
+        text text NOT NULL
+      );
+
+      CREATE INDEX ix__comments__card_id ON comments(card_id);
     `);
   } finally {
     await client.end();

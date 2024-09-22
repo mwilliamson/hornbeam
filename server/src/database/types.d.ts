@@ -27,7 +27,15 @@ export interface Category {
   presetColorId: string;
 }
 
+export interface Comment {
+  cardId: string;
+  createdAt: Timestamp;
+  id: string;
+  text: string;
+}
+
 export interface DB {
   cards: Card;
   categories: Category;
+  comments: Comment;
 }

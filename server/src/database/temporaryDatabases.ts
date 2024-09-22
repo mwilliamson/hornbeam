@@ -101,6 +101,7 @@ export function createReusableTemporaryDatabase(databaseUrl: string): ReusableTe
   const reset = async (): Promise<void> => {
     if (connectedDatabase !== null) {
       await sql`
+        DELETE FROM comments;
         DELETE FROM cards;
         DELETE FROM categories;
       `.execute(connectedDatabase);

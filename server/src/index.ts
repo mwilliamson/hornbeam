@@ -11,6 +11,8 @@ import { CardRepositoryDatabase } from "./repositories/cards";
 import { CategoryRepositoryDatabase } from "./repositories/categories";
 import { colorSetPresetsOnly } from "hornbeam-common/lib/app/colors";
 import { ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
+import { DB } from "./database/types";
+import { Transaction } from "kysely";
 
 interface ServerOptions {
   databaseUrl: string;
@@ -48,57 +50,59 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
       serializedServerQuery => deserializeServerQuery(serializedServerQuery),
     );
 
-    return mapSeries(serverQueries, async serverQuery => {
-      switch (serverQuery.type) {
-        case "card": {
-          const cardRepository = new CardRepositoryDatabase(database);
-          const result = await cardRepository.fetchById(serverQuery.cardId);
-          return serializeCardResponse(result);
+    return database.transaction().execute(async transaction => {
+      return mapSeries(serverQueries, async serverQuery => {
+        switch (serverQuery.type) {
+          case "card": {
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const result = await cardRepository.fetchById(serverQuery.cardId);
+            return serializeCardResponse(result);
+          }
+          case "parentCard": {
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const result = await cardRepository.fetchParentByChildId(serverQuery.cardId);
+            return serializeParentCardResponse(result);
+          }
+          case "cardChildCount": {
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const result = await cardRepository.fetchChildCountByParentId(serverQuery.cardId);
+            return serializeCardChildCountResponse(result);
+          }
+          case "cardHistory": {
+            // TODO: implement card history
+            return serializeCardHistoryResponse([]);
+          }
+          case "searchCards": {
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const result = await cardRepository.search(serverQuery.searchTerm);
+            return serializeSearchCardsResponse(result);
+          }
+          case "boardCardTrees": {
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const result = await cardRepository.fetchBoardCardTrees(
+              serverQuery.boardId,
+              new Set(serverQuery.cardStatuses),
+            );
+            return serializeBoardCardTreesResponse(result);
+          }
+          case "parentBoard": {
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const result = await cardRepository.fetchParentBoard(serverQuery.boardId);
+            return serializeParentBoardResponse(result);
+          }
+          case "allCategories": {
+            const categoryRepository = new CategoryRepositoryDatabase(transaction);
+            const result = await categoryRepository.fetchAll();
+            return serializeAllCategoriesResponse(result);
+          }
+          case "allColors": {
+            return serializeAllColorsResponse(colorSetPresetsOnly.allPresetColors());
+          }
+          default: {
+            handleNever(serverQuery, null);
+          }
         }
-        case "parentCard": {
-          const cardRepository = new CardRepositoryDatabase(database);
-          const result = await cardRepository.fetchParentByChildId(serverQuery.cardId);
-          return serializeParentCardResponse(result);
-        }
-        case "cardChildCount": {
-          const cardRepository = new CardRepositoryDatabase(database);
-          const result = await cardRepository.fetchChildCountByParentId(serverQuery.cardId);
-          return serializeCardChildCountResponse(result);
-        }
-        case "cardHistory": {
-          // TODO: implement card history
-          return serializeCardHistoryResponse([]);
-        }
-        case "searchCards": {
-          const cardRepository = new CardRepositoryDatabase(database);
-          const result = await cardRepository.search(serverQuery.searchTerm);
-          return serializeSearchCardsResponse(result);
-        }
-        case "boardCardTrees": {
-          const cardRepository = new CardRepositoryDatabase(database);
-          const result = await cardRepository.fetchBoardCardTrees(
-            serverQuery.boardId,
-            new Set(serverQuery.cardStatuses),
-          );
-          return serializeBoardCardTreesResponse(result);
-        }
-        case "parentBoard": {
-          const cardRepository = new CardRepositoryDatabase(database);
-          const result = await cardRepository.fetchParentBoard(serverQuery.boardId);
-          return serializeParentBoardResponse(result);
-        }
-        case "allCategories": {
-          const categoryRepository = new CategoryRepositoryDatabase(database);
-          const result = await categoryRepository.fetchAll();
-          return serializeAllCategoriesResponse(result);
-        }
-        case "allColors": {
-          return serializeAllColorsResponse(colorSetPresetsOnly.allPresetColors());
-        }
-        default: {
-          handleNever(serverQuery, null);
-        }
-      }
+      });
     });
   });
 
@@ -106,7 +110,9 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const update = deserializeAppUpdate((request.body as any).update);
 
-    await mutate(update.mutation);
+    await database.transaction().execute(async transaction => {
+      await mutate(transaction, update.mutation);
+    });
 
     return serializeUpdateResponse({
       // TODO: proper snapshot index
@@ -114,15 +120,18 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
     });
   });
 
-  async function mutate(mutation: ProjectContentsMutation): Promise<void> {
+  async function mutate(
+    transaction: Transaction<DB>,
+    mutation: ProjectContentsMutation,
+  ): Promise<void> {
     switch (mutation.type) {
       case "cardAdd": {
-        const cardRepository = new CardRepositoryDatabase(database);
+        const cardRepository = new CardRepositoryDatabase(transaction);
         await cardRepository.add(mutation.cardAdd);
         return;
       }
       case "cardEdit": {
-        const cardRepository = new CardRepositoryDatabase(database);
+        const cardRepository = new CardRepositoryDatabase(transaction);
         await cardRepository.update(mutation.cardEdit);
         return;
       }
@@ -136,12 +145,12 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
         throw new Error("cardMoveToBefore not supported");
       }
       case "categoryAdd": {
-        const categoryRepository = new CategoryRepositoryDatabase(database);
+        const categoryRepository = new CategoryRepositoryDatabase(transaction);
         await categoryRepository.add(mutation.categoryAdd);
         return;
       }
       case "categoryReorder": {
-        const categoryRepository = new CategoryRepositoryDatabase(database);
+        const categoryRepository = new CategoryRepositoryDatabase(transaction);
         await categoryRepository.reorder(mutation.categoryReorder);
         return;
       }

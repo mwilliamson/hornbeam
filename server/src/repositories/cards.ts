@@ -88,69 +88,65 @@ export class CardRepositoryDatabase implements CardRepository {
   }
 
   async add(mutation: CardAddMutation): Promise<void> {
-    await this.database.transaction().execute(async transaction => {
-      await transaction.insertInto("cards")
-        .values((eb) => ({
-          categoryId: mutation.categoryId,
-          createdAt: new Date(mutation.createdAt.toEpochMilli()),
-          id: mutation.id,
-          index: eb.selectFrom("cards")
-            .select(
-              eb.fn.coalesce(
-                eb(eb.fn.max("cards.index"), "+", 1),
-                eb.lit(0),
-              ).as("index")
-            ),
-          isSubboardRoot: false,
-          number: eb.selectFrom("cards")
-            .select(
-              eb.fn.coalesce(
-                eb(eb.fn.max("cards.number"), "+", 1),
-                eb.lit(1),
-              ).as("number")),
-          parentCardId: mutation.parentCardId,
-          status: SerializedCardStatus.encode(CardStatus.None),
-          text: mutation.text,
-        }))
-        .execute();
-    });
+    await this.database.insertInto("cards")
+      .values((eb) => ({
+        categoryId: mutation.categoryId,
+        createdAt: new Date(mutation.createdAt.toEpochMilli()),
+        id: mutation.id,
+        index: eb.selectFrom("cards")
+          .select(
+            eb.fn.coalesce(
+              eb(eb.fn.max("cards.index"), "+", 1),
+              eb.lit(0),
+            ).as("index")
+          ),
+        isSubboardRoot: false,
+        number: eb.selectFrom("cards")
+          .select(
+            eb.fn.coalesce(
+              eb(eb.fn.max("cards.number"), "+", 1),
+              eb.lit(1),
+            ).as("number")),
+        parentCardId: mutation.parentCardId,
+        status: SerializedCardStatus.encode(CardStatus.None),
+        text: mutation.text,
+      }))
+      .execute();
   }
 
   async update(mutation: CardEditMutation): Promise<void> {
-    await this.database.transaction().execute(async transaction => {
-      let query = transaction.updateTable("cards")
-        .where("id", "=", mutation.id);
-      let queryRequired = false;
+    let query = this.database.updateTable("cards")
+      .where("id", "=", mutation.id);
+    let queryRequired = false;
 
-      if (mutation.categoryId !== undefined) {
-        query = query.set({categoryId: mutation.categoryId});
-        queryRequired = true;
-      }
+    if (mutation.categoryId !== undefined) {
+      query = query.set({categoryId: mutation.categoryId});
+      queryRequired = true;
+    }
 
-      if (mutation.isSubboardRoot !== undefined) {
-        query = query.set({isSubboardRoot: mutation.isSubboardRoot});
-        queryRequired = true;
-      }
+    if (mutation.isSubboardRoot !== undefined) {
+      query = query.set({isSubboardRoot: mutation.isSubboardRoot});
+      queryRequired = true;
+    }
 
-      if (mutation.parentCardId !== undefined) {
-        query = query.set({parentCardId: mutation.parentCardId});
-        queryRequired = true;
-      }
+    if (mutation.parentCardId !== undefined) {
+      query = query.set({parentCardId: mutation.parentCardId});
+      queryRequired = true;
+    }
 
-      if (mutation.status !== undefined) {
-        query = query.set({status: SerializedCardStatus.encode(mutation.status)});
-        queryRequired = true;
-      }
+    if (mutation.status !== undefined) {
+      query = query.set({status: SerializedCardStatus.encode(mutation.status)});
+      queryRequired = true;
+    }
 
-      if (mutation.text !== undefined) {
-        query = query.set({text: mutation.text});
-        queryRequired = true;
-      }
+    if (mutation.text !== undefined) {
+      query = query.set({text: mutation.text});
+      queryRequired = true;
+    }
 
-      if (queryRequired) {
-        await query.execute();
-      }
-    });
+    if (queryRequired) {
+      await query.execute();
+    }
   }
 
   async fetchAll(): Promise<ReadonlyArray<Card>> {
@@ -193,68 +189,62 @@ export class CardRepositoryDatabase implements CardRepository {
   }
 
   async fetchChildCountByParentId(parentId: string): Promise<number> {
-    return await this.database.transaction().execute(async transaction => {
-      const row = await transaction.selectFrom("cards")
-        .select(({fn, lit}) => [fn.count<string>(lit(0)).as("count")])
-        .where("cards.parentCardId", "=", parentId)
-        .executeTakeFirst();
+    const row = await this.database.selectFrom("cards")
+      .select(({fn, lit}) => [fn.count<string>(lit(0)).as("count")])
+      .where("cards.parentCardId", "=", parentId)
+      .executeTakeFirst();
 
-      return row === undefined ? 0 : parseInt(row.count, 10);
-    });
+    return row === undefined ? 0 : parseInt(row.count, 10);
   }
 
   async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
-    return await this.database.transaction().execute(async transaction => {
-      const cardsQuery = this.selectColumns(
-        transaction.selectFrom("cards")
-          .where(({fn, val}) => fn("strpos", ["cards.text", val(searchTerm)]), ">", 0)
-          .orderBy("cards.index")
-          .limit(20)
-      );
+    const cardsQuery = this.selectColumns(
+      this.database.selectFrom("cards")
+        .where(({fn, val}) => fn("strpos", ["cards.text", val(searchTerm)]), ">", 0)
+        .orderBy("cards.index")
+        .limit(20)
+    );
 
-      const cardRows = await cardsQuery.execute();
+    const cardRows = await cardsQuery.execute();
 
-      return cardRows.map(cardRow => this.rowToCard(cardRow));
-    });
+    return cardRows.map(cardRow => this.rowToCard(cardRow));
   }
 
   async fetchBoardCardTrees(
     boardId: BoardId,
     cardStatuses: ReadonlySet<CardStatus>,
   ): Promise<ReadonlyArray<CardTree>> {
-    return await this.database.transaction().execute(async transaction => {
-      const cardsQuery = this.selectColumns(
-        transaction
-          .withRecursive(
-            "boardCards(id, childrenAllowed)",
-            db => {
-              let rootCards = db.selectFrom("cards")
-                .select(eb => ["id", eb.lit<boolean>(true).as("childrenAllowed")]);
-              if (boardId.boardRootId === null) {
-                rootCards = rootCards.where("cards.parentCardId", "is", null);
-              } else {
-                rootCards = rootCards.where("cards.id", "=", boardId.boardRootId);
-              }
-
-              return rootCards.union(
-                db.selectFrom("cards")
-                  .select(eb => ["cards.id", eb.not(eb.ref("isSubboardRoot")).as("childrenAllowed")])
-                  .innerJoin("boardCards", "boardCards.id", "cards.parentCardId")
-                  .where("boardCards.childrenAllowed", "=", true)
-              );
+    const cardsQuery = this.selectColumns(
+      this.database
+        .withRecursive(
+          "boardCards(id, childrenAllowed)",
+          db => {
+            let rootCards = db.selectFrom("cards")
+              .select(eb => ["id", eb.lit<boolean>(true).as("childrenAllowed")]);
+            if (boardId.boardRootId === null) {
+              rootCards = rootCards.where("cards.parentCardId", "is", null);
+            } else {
+              rootCards = rootCards.where("cards.id", "=", boardId.boardRootId);
             }
-          )
-          .selectFrom("cards")
-          .innerJoin("boardCards", "boardCards.id", "cards.id")
-          .where("cards.status", "in", Array.from(cardStatuses))
-      );
 
-      const cardRows = await cardsQuery.execute();
+            return rootCards.union(
+              db.selectFrom("cards")
+                .select(eb => ["cards.id", eb.not(eb.ref("isSubboardRoot")).as("childrenAllowed")])
+                .innerJoin("boardCards", "boardCards.id", "cards.parentCardId")
+                .where("boardCards.childrenAllowed", "=", true)
+            );
+          }
+        )
+        .selectFrom("cards")
+        .innerJoin("boardCards", "boardCards.id", "cards.id")
+        .where("cards.status", "in", Array.from(cardStatuses))
+    );
 
-      const cards = cardRows.map(cardRow => this.rowToCard(cardRow));
+    const cardRows = await cardsQuery.execute();
 
-      return cardsToTrees(cards, boardId);
-    });
+    const cards = cardRows.map(cardRow => this.rowToCard(cardRow));
+
+    return cardsToTrees(cards, boardId);
   }
 
   async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
@@ -262,32 +252,30 @@ export class CardRepositoryDatabase implements CardRepository {
       return rootBoardId;
     }
 
-    return await this.database.transaction().execute(async transaction => {
-      const row = await transaction
-        .withRecursive(
-          "ancestors(id, parentId, isParentBoard)",
-          db =>
-            db.selectFrom("cards")
-              .select(eb => ["id as id", "parentCardId as parentId", eb.lit<boolean>(false).as("isParentBoard")])
-              .where("id", "=", boardId.boardRootId)
-              .union(
-                db.selectFrom("cards")
-                  .select(["cards.id as id", "cards.parentCardId as parentId", "cards.isSubboardRoot as isParentBoard"])
-                  .innerJoin("ancestors", "ancestors.parentId", "cards.id")
-                  .where("ancestors.isParentBoard", "=", false)
-              )
-        )
-        .selectFrom("ancestors")
-        .select(["id"])
-        .where("isParentBoard", "=", true)
-        .executeTakeFirst();
+    const row = await this.database
+      .withRecursive(
+        "ancestors(id, parentId, isParentBoard)",
+        db =>
+          db.selectFrom("cards")
+            .select(eb => ["id as id", "parentCardId as parentId", eb.lit<boolean>(false).as("isParentBoard")])
+            .where("id", "=", boardId.boardRootId)
+            .union(
+              db.selectFrom("cards")
+                .select(["cards.id as id", "cards.parentCardId as parentId", "cards.isSubboardRoot as isParentBoard"])
+                .innerJoin("ancestors", "ancestors.parentId", "cards.id")
+                .where("ancestors.isParentBoard", "=", false)
+            )
+      )
+      .selectFrom("ancestors")
+      .select(["id"])
+      .where("isParentBoard", "=", true)
+      .executeTakeFirst();
 
-      if (row === undefined) {
-        return rootBoardId;
-      } else {
-        return cardSubboardId(row.id);
-      }
-    });
+    if (row === undefined) {
+      return rootBoardId;
+    } else {
+      return cardSubboardId(row.id);
+    }
   }
 
   selectColumns(query: SelectQueryBuilder<DB, "cards", unknown>) {

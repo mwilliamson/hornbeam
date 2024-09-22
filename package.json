@@ -6,6 +6,7 @@
     "server"
   ],
   "scripts": {
+    "create-database": "npm run --workspace server create-database",
     "test": "cd client && npm test && cd ../server && npm test"
   },
   "dependencies": {

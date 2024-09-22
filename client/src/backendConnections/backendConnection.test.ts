@@ -179,8 +179,6 @@ export function createBackendConnectionTestSuite(
         });
 
         testBackendConnection("card history includes comments", async (backendConnection) => {
-          // TODO: temporarily disabled
-          return;
           await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
             id: CATEGORY_1_ID,
           }));

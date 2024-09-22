@@ -5,6 +5,7 @@ import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { testingCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
+import { testingCommentAddMutation } from "hornbeam-common/lib/app/comments.testing";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -15,8 +16,6 @@ export function createCardHistoryFetcherTests(
 ): void {
   testFetcher("card initially has created at entry", async (fixtures) => {
     const cardRepository = await fixtures.cardRepository();
-    const cardHistoryFetcher = await fixtures.cardHistoryFetcher();
-
     await cardRepository.add(testingCardAddMutation({
       categoryId: CATEGORY_1_ID,
       createdAt: Instant.ofEpochSecond(1713386548),
@@ -28,12 +27,44 @@ export function createCardHistoryFetcherTests(
       id: CARD_2_ID,
     }));
 
+    const cardHistoryFetcher = await fixtures.cardHistoryFetcher();
     const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(CARD_1_ID);
 
     assertThat(cardHistory, containsExactly(
       hasProperties({
         type: "created",
         instant: deepEqualTo(Instant.ofEpochSecond(1713386548)),
+      }),
+    ));
+  });
+
+  testFetcher("card history includes comments", async (fixtures) => {
+    const cardRepository = await fixtures.cardRepository();
+    await cardRepository.add(testingCardAddMutation({
+      categoryId: CATEGORY_1_ID,
+      id: CARD_1_ID,
+    }));
+
+    const commentRepository = await fixtures.commentRepository();
+    await commentRepository.add(testingCommentAddMutation({
+      cardId: CARD_1_ID,
+      createdAt: Instant.ofEpochSecond(1713386548),
+      text: "<card text>",
+    }));
+
+    const cardHistoryFetcher = await fixtures.cardHistoryFetcher();
+    const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(CARD_1_ID);
+
+    assertThat(cardHistory, containsExactly(
+      hasProperties({
+        type: "created",
+      }),
+      hasProperties({
+        type: "comment",
+        instant: deepEqualTo(Instant.ofEpochSecond(1713386548)),
+        comment: hasProperties({
+          text: "<card text>",
+        }),
       }),
     ));
   });

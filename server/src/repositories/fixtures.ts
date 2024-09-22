@@ -23,7 +23,8 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
   return {
     cardHistoryFetcher: async () => {
       const cardRepository = new CardRepositoryInMemory(snapshot);
-      return new CardHistoryFetcher(cardRepository);
+      const commentRepository = new CommentRepositoryInMemory(snapshot);
+      return new CardHistoryFetcher(cardRepository, commentRepository);
     },
     cardRepository: async () => {
       return new CardRepositoryInMemory(snapshot);
@@ -60,8 +61,10 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
 
   return {
     cardHistoryFetcher: async () => {
-      const cardRepository = new CardRepositoryDatabase(await getDatabase());
-      return new CardHistoryFetcher(cardRepository);
+      const database = await getDatabase();
+      const cardRepository = new CardRepositoryDatabase(database);
+      const commentRepository = new CommentRepositoryDatabase(database);
+      return new CardHistoryFetcher(cardRepository, commentRepository);
     },
 
     cardRepository: async () => {

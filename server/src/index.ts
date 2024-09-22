@@ -14,6 +14,7 @@ import { ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { DB } from "./database/types";
 import { Transaction } from "kysely";
 import { CardHistoryFetcher } from "./repositories/cardHistory";
+import { CommentRepositoryDatabase } from "./repositories/comments";
 
 interface ServerOptions {
   databaseUrl: string;
@@ -71,7 +72,8 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
           }
           case "cardHistory": {
             const cardRepository = new CardRepositoryDatabase(transaction);
-            const cardHistoryFetcher = new CardHistoryFetcher(cardRepository);
+            const commentRepository = new CommentRepositoryDatabase(transaction);
+            const cardHistoryFetcher = new CardHistoryFetcher(cardRepository, commentRepository);
             const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(serverQuery.cardId);
             return serializeCardHistoryResponse(cardHistory);
           }
@@ -158,7 +160,9 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
         return;
       }
       case "commentAdd": {
-        throw new Error("commentAdd not supported");
+        const commentRepository = new CommentRepositoryDatabase(transaction);
+        await commentRepository.add(mutation.commentAdd);
+        return;
       }
       default: {
         return handleNever(mutation, undefined);

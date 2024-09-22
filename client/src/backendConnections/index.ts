@@ -39,12 +39,13 @@ type BackendConnectionStatus =
   | {type: "sync-error"};
 
 interface AppQueriesSubscriber<TQueries extends AppQueries> {
-  onSuccess: (result: AppQueriesResult<TQueries>) => void;
-  onError: (error: unknown) => void;
+  readonly onSuccess: (result: AppQueriesResult<TQueries>) => void;
+  readonly onError: (error: unknown) => void;
 }
 
 interface AppQueriesSubscription {
-  execute: () => Promise<() => void>;
+  readonly queries: AppQueries;
+  readonly subscriber: AppQueriesSubscriber<never>;
 }
 
 interface TimeTravelSubscriber {
@@ -101,36 +102,16 @@ export class BackendSubscriptions {
     // TODO: track (and cache) which queries have already been executed
     const subscriptionId = nextSubscriptionId++;
 
-    let currentLoadId: number | null = null;
-
-    // Explicitly split the execution of the query against the server, and
-    // notifying any subscribers. This allows us to notify subscribers at the
-    // same time so that the UI is in sync with itself.
-    const execute = () => {
-      const loadId = nextLoadId++;
-      currentLoadId = loadId;
-
-      return this.executeQueries(queries).then(
-        result => () => {
-          if (loadId === currentLoadId) {
-            subscriber.onSuccess(result);
-          }
-        },
-        error => () => {
-          if (loadId === currentLoadId) {
-            subscriber.onError(error);
-          }
-        },
-      );
+    const querySubscription: AppQueriesSubscription = {
+      queries,
+      subscriber,
     };
 
     if (this.connectionStatus.type === "connected") {
-      execute().then(notify => notify());
+      this.loadQueriesSubscriptions([querySubscription]);
     }
 
-    this.queriesSubscriptions.set(subscriptionId, {
-      execute,
-    });
+    this.queriesSubscriptions.set(subscriptionId, querySubscription);
 
     return {
       close: () => {
@@ -164,24 +145,15 @@ export class BackendSubscriptions {
       this.updateConnectionStatus({type: "connected"});
     }
 
-    const notifyPromises: Array<Promise<() => void>> = [];
-    for (const subscriber of this.queriesSubscriptions.values()) {
-      notifyPromises.push(subscriber.execute());
-    }
-
     for (const subscriber of this.timeTravelSubscriptions.values()) {
       subscriber.onMaxSnapshotIndex(lastUpdate.snapshotIndex);
     }
 
-    for (const notify of await Promise.all(notifyPromises)) {
-      notify();
-    }
+    await this.loadQueriesSubscriptions(Array.from(this.queriesSubscriptions.values()));
   };
 
   public onTimeTravel = (newSnapshotIndex: number | null) => {
-    for (const subscriber of this.queriesSubscriptions.values()) {
-      subscriber.execute();
-    }
+    this.loadQueriesSubscriptions(Array.from(this.queriesSubscriptions.values()));
 
     for (const subscriber of this.timeTravelSubscriptions.values()) {
       subscriber.onTimeTravel(newSnapshotIndex);
@@ -204,9 +176,47 @@ export class BackendSubscriptions {
       subscriber(this.connectionStatus);
     }
   };
-}
 
-let nextLoadId = 1;
+  private loadQueriesSubscriptions(subscriptions: ReadonlyArray<AppQueriesSubscription>) {
+    if (this.lastUpdate === null) {
+      return;
+    }
+
+    const combinedQueries: AppQueries = {};
+    let queryIndex = 0;
+    for (const subscription of subscriptions) {
+      for (const query of Object.values(subscription.queries)) {
+        combinedQueries[queryIndex++] = query;
+      }
+    }
+
+    const lastUpdateAtQueryTime = this.lastUpdate;
+    const isStale = () =>
+      this.lastUpdate === null || lastUpdateAtQueryTime.snapshotIndex !== this.lastUpdate.snapshotIndex;
+
+    this.executeQueries(combinedQueries).then(
+      result => {
+        if (!isStale()) {
+          queryIndex = 0;
+          for (const subscription of subscriptions) {
+            const subscriptionResult: {[key: string]: unknown} = {};
+            for (const key of Object.keys(subscription.queries)) {
+              subscriptionResult[key] = result[queryIndex++];
+            }
+            subscription.subscriber.onSuccess(subscriptionResult as never);
+          }
+        }
+      },
+      error => {
+        if (!isStale()) {
+          for (const subscription of subscriptions) {
+            subscription.subscriber.onError(error);
+          }
+        }
+      },
+    );
+  }
+}
 
 export type ExecuteQueries = <TQueries extends AppQueries>(
   queries: TQueries,

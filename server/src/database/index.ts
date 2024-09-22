@@ -5,6 +5,7 @@ import { DB } from "./types";
 export type Database = Kysely<DB>;
 
 export async function databaseConnect(connectionString: string): Promise<Database> {
+  // TODO: set isolation level
   return new Kysely<DB>({
     dialect: new PostgresDialect({
       pool: new pg.Pool({connectionString})

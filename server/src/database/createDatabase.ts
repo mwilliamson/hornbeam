@@ -46,6 +46,8 @@ export default async function createDatabase(databaseUrl: string) {
         index int NOT NULL,
         mutation jsonb NOT NULL
       );
+
+      CREATE UNIQUE INDEX ix__mutation_log__index ON mutation_log(index);
     `);
   } finally {
     await client.end();

@@ -4,8 +4,8 @@ import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import { QueryRequestBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
-import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import { QueryRequestBody, QueryResponseBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
+import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, ServerQuery} from "hornbeam-common/lib/serialization/serverQueries";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { databaseConnect } from "./database";
 import { CardRepositoryDatabase } from "./repositories/cards";
@@ -53,8 +53,18 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
 
     const serverQueries = bodyResult.right.queries;
 
-    return database.transaction().execute(async transaction => {
-      return mapSeries(serverQueries, async serverQuery => {
+    const queryResults = await executeQueries(serverQueries);
+
+    return QueryResponseBody.encode({
+      // TODO: set snapshot index
+      snapshotIndex: 0,
+      results: queryResults,
+    });
+  });
+
+  const executeQueries = async (serverQueries: ReadonlyArray<ServerQuery>) => {
+    return await database.transaction().execute(async transaction => {
+      return await mapSeries(serverQueries, async serverQuery => {
         switch (serverQuery.type) {
           case "card": {
             const cardRepository = new CardRepositoryDatabase(transaction);
@@ -110,7 +120,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
         }
       });
     });
-  });
+  };
 
   fastify.post("/update", async (request, reply) => {
     const bodyResult = UpdateRequestBody.decode(request.body);

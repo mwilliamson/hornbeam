@@ -5,7 +5,7 @@ import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
 import { AppUpdate, ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
-import { QueryRequestBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
+import { QueryRequestBody, QueryResponseBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
 import { uuidv7 } from "uuidv7";
 import { assertNever } from "hornbeam-common/lib/util/assertNever";
 
@@ -170,7 +170,7 @@ export function connectServer(uri: string): BackendConnection {
       }
     }
 
-    const response: ReadonlyArray<unknown> = await fetchQueries(serverQueries);
+    const response = await fetchQueries(serverQueries);
     const queriesResult: {[k: string]: unknown} = {};
 
     let serverQueryIndex = 0;
@@ -189,9 +189,13 @@ export function connectServer(uri: string): BackendConnection {
   }
 
   const fetchQueries = async (queries: Array<ServerQuery>) => {
-    return fetchJson("query", QueryRequestBody.encode({
+    const response = await fetchJson("query", QueryRequestBody.encode({
       queries,
     }));
+
+    const {results} = deserialize(QueryResponseBody, response);
+
+    return results;
   };
 
   const mutate = async (mutation: ProjectContentsMutation): Promise<void> => {

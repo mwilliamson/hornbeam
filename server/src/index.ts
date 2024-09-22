@@ -1,10 +1,12 @@
 import "disposablestack/auto";
+import { isLeft } from "fp-ts/lib/Either";
+import * as t from "io-ts";
 import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
 import {deserializeAppUpdate} from "hornbeam-common/lib/serialization/app";
-import {deserializeServerQuery, serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse, ServerQuery} from "hornbeam-common/lib/serialization/serverQueries";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { databaseConnect } from "./database";
 import { CardRepositoryDatabase } from "./repositories/cards";
@@ -44,13 +46,13 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
     root: path.join(__dirname, "../../client/public"),
   });
 
-  fastify.post("/query", async (request) => {
-    // TODO: handle invalid request body
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const serializedServerQueries: ReadonlyArray<unknown> = ((request.body as any).queries);
-    const serverQueries = serializedServerQueries.map(
-      serializedServerQuery => deserializeServerQuery(serializedServerQuery),
-    );
+  fastify.post("/query", async (request, reply) => {
+    const bodyResult = QueryRequestBody.decode(request.body);
+    if (isLeft(bodyResult)) {
+      return reply.code(400);
+    }
+
+    const serverQueries = bodyResult.right.queries;
 
     return database.transaction().execute(async transaction => {
       return mapSeries(serverQueries, async serverQuery => {
@@ -195,3 +197,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
     },
   };
 }
+
+const QueryRequestBody = t.type({
+  queries: t.readonlyArray(ServerQuery),
+}, "QueryRequestBody");

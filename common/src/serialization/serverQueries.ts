@@ -102,7 +102,7 @@ const AllColorsResponse = t.readonlyArray(SerializedPresetColor);
 export const serializeAllColorsResponse = AllColorsResponse.encode;
 export const deserializeAllColorsResponse = deserializer(AllColorsResponse);
 
-const ServerQuery = t.union([
+export const ServerQuery = t.union([
   CardServerQuery,
   ParentCardServerQuery,
   CardChildCountServerQuery,

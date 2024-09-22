@@ -3,6 +3,7 @@ import { isLeft } from "fp-ts/lib/Either";
 import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
+import { uuidv7 } from "uuidv7";
 import path from "node:path";
 import { QueryRequestBody, QueryResponseBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
 import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, ServerQuery} from "hornbeam-common/lib/serialization/serverQueries";
@@ -16,6 +17,7 @@ import { DB } from "./database/types";
 import { Transaction } from "kysely";
 import { CardHistoryFetcher } from "./repositories/cardHistory";
 import { CommentRepositoryDatabase } from "./repositories/comments";
+import { MutationLogRepositoryDatabase } from "./repositories/mutationLog";
 
 interface ServerOptions {
   databaseUrl: string;
@@ -141,6 +143,15 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
   });
 
   async function mutate(
+    transaction: Transaction<DB>,
+    mutation: ProjectContentsMutation,
+  ): Promise<void> {
+    const mutationLogRepository = new MutationLogRepositoryDatabase(transaction);
+    await mutationLogRepository.add(uuidv7(), mutation);
+    await applyMutation(transaction, mutation);
+  }
+
+  async function applyMutation(
     transaction: Transaction<DB>,
     mutation: ProjectContentsMutation,
   ): Promise<void> {

@@ -122,10 +122,3 @@ export function serializeServerQuery(query: ServerQuery): SerializedServerQuery 
 }
 
 export const deserializeServerQuery = deserializer(ServerQuery);
-
-const SerializedUpdateResponse = t.readonly(t.type({
-  snapshotIndex: t.number,
-}, "SerializedUpdateResponse"));
-
-export const serializeUpdateResponse = SerializedUpdateResponse.encode;
-export const desserializeUpdateResponse = deserializer(SerializedUpdateResponse);

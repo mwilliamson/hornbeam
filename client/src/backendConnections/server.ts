@@ -1,10 +1,11 @@
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, desserializeUpdateResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
 import { AppUpdate, ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
-import { QueryRequestBody, UpdateRequestBody } from "hornbeam-common/lib/serialization/serverApi";
+import { QueryRequestBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
 import { uuidv7 } from "uuidv7";
 import { assertNever } from "hornbeam-common/lib/util/assertNever";
 
@@ -205,7 +206,7 @@ export function connectServer(uri: string): BackendConnection {
 
     const response = await fetchJson("update", UpdateRequestBody.encode({update}));
 
-    const {snapshotIndex} = desserializeUpdateResponse(response);
+    const {snapshotIndex} = deserialize(UpdateResponseBody, response);
 
     await subscriptions.onLastUpdate({
       snapshotIndex,

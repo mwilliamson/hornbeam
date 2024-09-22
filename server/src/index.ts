@@ -4,8 +4,8 @@ import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import { QueryRequestBody, UpdateRequestBody } from "hornbeam-common/lib/serialization/serverApi";
-import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
+import { QueryRequestBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
+import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { databaseConnect } from "./database";
 import { CardRepositoryDatabase } from "./repositories/cards";
@@ -124,7 +124,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
       await mutate(transaction, update.mutation);
     });
 
-    return serializeUpdateResponse({
+    return UpdateResponseBody.encode({
       // TODO: proper snapshot index
       snapshotIndex: 0,
     });

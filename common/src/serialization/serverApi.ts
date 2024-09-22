@@ -6,7 +6,10 @@ export const QueryRequestBody = t.type({
   queries: t.readonlyArray(ServerQuery),
 }, "QueryRequestBody");
 
-
 export const UpdateRequestBody = t.type({
   update: SerializedAppUpdate,
 }, "UpdateRequestBody");
+
+export const UpdateResponseBody = t.readonly(t.type({
+  snapshotIndex: t.number,
+}, "UpdateResponseBody"));

@@ -13,6 +13,7 @@ import { colorSetPresetsOnly } from "hornbeam-common/lib/app/colors";
 import { ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
 import { DB } from "./database/types";
 import { Transaction } from "kysely";
+import { CardHistoryFetcher } from "./repositories/cardHistory";
 
 interface ServerOptions {
   databaseUrl: string;
@@ -69,8 +70,10 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
             return serializeCardChildCountResponse(result);
           }
           case "cardHistory": {
-            // TODO: implement card history
-            return serializeCardHistoryResponse([]);
+            const cardRepository = new CardRepositoryDatabase(transaction);
+            const cardHistoryFetcher = new CardHistoryFetcher(cardRepository);
+            const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(serverQuery.cardId);
+            return serializeCardHistoryResponse(cardHistory);
           }
           case "searchCards": {
             const cardRepository = new CardRepositoryDatabase(transaction);

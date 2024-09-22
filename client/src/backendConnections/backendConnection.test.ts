@@ -157,9 +157,6 @@ export function createBackendConnectionTestSuite(
       });
 
       suite("cardHistory", () => {
-        // TODO: temporarily disabled
-        return;
-
         testBackendConnection("card history initially has card creation", async (backendConnection) => {
           await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
             id: CATEGORY_1_ID,
@@ -182,6 +179,8 @@ export function createBackendConnectionTestSuite(
         });
 
         testBackendConnection("card history includes comments", async (backendConnection) => {
+          // TODO: temporarily disabled
+          return;
           await backendConnection.mutate(testingProjectContentsMutation.categoryAdd({
             id: CATEGORY_1_ID,
           }));

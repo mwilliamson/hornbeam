@@ -7,8 +7,10 @@ import { testDatabaseUrl } from "../settings";
 import * as testing from "../testing";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "./cards";
+import { CardHistoryFetcher } from "./cardHistory";
 
 export interface RepositoryFixtures extends AsyncDisposable {
+  cardHistoryFetcher: () => Promise<CardHistoryFetcher>;
   cardRepository: () => Promise<CardRepository>;
   categoryRepository: () => Promise<CategoryRepository>;
 }
@@ -17,6 +19,10 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
   const snapshot = new AppSnapshotRef(initialAppSnapshot());
 
   return {
+    cardHistoryFetcher: async () => {
+      const cardRepository = new CardRepositoryInMemory(snapshot);
+      return new CardHistoryFetcher(cardRepository);
+    },
     cardRepository: async () => {
       return new CardRepositoryInMemory(snapshot);
     },
@@ -48,6 +54,11 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
   }
 
   return {
+    cardHistoryFetcher: async () => {
+      const cardRepository = new CardRepositoryDatabase(await getDatabase());
+      return new CardHistoryFetcher(cardRepository);
+    },
+
     cardRepository: async () => {
       return new CardRepositoryDatabase(await getDatabase());
     },

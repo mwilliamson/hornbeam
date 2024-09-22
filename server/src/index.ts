@@ -1,12 +1,11 @@
 import "disposablestack/auto";
 import { isLeft } from "fp-ts/lib/Either";
-import * as t from "io-ts";
 import mapSeries from "p-map-series";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import path from "node:path";
-import {SerializedAppUpdate} from "hornbeam-common/lib/serialization/app";
-import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse, ServerQuery} from "hornbeam-common/lib/serialization/serverQueries";
+import { QueryRequestBody, UpdateRequestBody } from "hornbeam-common/lib/serialization/serverApi";
+import {serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, serializeUpdateResponse} from "hornbeam-common/lib/serialization/serverQueries";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { databaseConnect } from "./database";
 import { CardRepositoryDatabase } from "./repositories/cards";
@@ -201,12 +200,3 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
     },
   };
 }
-
-const QueryRequestBody = t.type({
-  queries: t.readonlyArray(ServerQuery),
-}, "QueryRequestBody");
-
-
-const UpdateRequestBody = t.type({
-  update: SerializedAppUpdate,
-}, "UpdateRequestBody");

@@ -1,13 +1,13 @@
 import { Instant } from "@js-joda/core";
 import { uuidv7 } from "uuidv7";
 
-import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
+import { initialProjectContentsSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { Card, generateCardHistory } from "hornbeam-common/lib/app/cards";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import { rootBoardId } from "hornbeam-common/lib/app/boards";
 import CardDetailView from "./CardDetailView";
 
-const appSnapshot = initialAppSnapshot()
+const snapshot = initialProjectContentsSnapshot()
   .categoryAdd({
     color: {presetColorId: "018ef5cd-f61c-7b36-bd3c-b129e09f19e6"},
     createdAt: Instant.ofEpochSecond(1713386548),
@@ -46,7 +46,7 @@ const appSnapshot = initialAppSnapshot()
   });
 
 const card: Card = {
-  categoryId: appSnapshot.availableCategories()[1].id,
+  categoryId: snapshot.availableCategories()[1].id,
   createdAt: Instant.ofEpochMilli(1713386548306),
   id: uuidv7(),
   isSubboardRoot: false,
@@ -59,12 +59,12 @@ const card: Card = {
 export default (
   <div style={{border: "1px solid black", width: 400, minHeight: 600}}>
     <CardDetailView
-      allCategories={appSnapshot}
-      allColors={appSnapshot}
+      allCategories={snapshot}
+      allColors={snapshot}
       card={card}
       cardChildCount={2}
-      cardHistory={generateCardHistory(card, appSnapshot)}
-      cardSearcher={{searchCards: async (query: string) => appSnapshot.searchCards(query)}}
+      cardHistory={generateCardHistory(card, snapshot)}
+      cardSearcher={{searchCards: async (query: string) => snapshot.searchCards(query)}}
       onAddChildClick={() => {}}
       onCardEdit={() => Promise.resolve()}
       onCardMove={() => Promise.resolve()}

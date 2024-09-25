@@ -52,9 +52,15 @@ export interface MutationLog {
   mutation: Json;
 }
 
+export interface Project {
+  id: string;
+  name: string;
+}
+
 export interface DB {
   cards: Card;
   categories: Category;
   comments: Comment;
   mutationLog: MutationLog;
+  projects: Project;
 }

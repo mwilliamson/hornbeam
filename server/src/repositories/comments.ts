@@ -16,11 +16,14 @@ export class CommentRepositoryInMemory implements CommentRepository {
   }
 
   async add(mutation: CommentAddMutation): Promise<void> {
-    this.snapshot.update(snapshot => snapshot.commentAdd(mutation));
+    this.snapshot.mutate({
+      type: "commentAdd",
+      commentAdd: mutation,
+    });
   }
 
   async fetchByCardId(cardId: string): Promise<ReadonlyArray<Comment>> {
-    return this.snapshot.value.findCommentsByCardId(cardId);
+    return this.snapshot.value.fetchProjectContents().findCommentsByCardId(cardId);
   }
 }
 

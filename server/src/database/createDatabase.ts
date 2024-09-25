@@ -7,6 +7,11 @@ export default async function createDatabase(databaseUrl: string) {
     // TODO: use an enum for the card status?
 
     await client.query(`
+      CREATE TABLE projects (
+        id uuid PRIMARY KEY,
+        name text NOT NULL
+      );
+
       CREATE TABLE categories (
         created_at timestamptz NOT NULL,
         id uuid PRIMARY KEY,

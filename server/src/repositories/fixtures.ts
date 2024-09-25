@@ -10,6 +10,7 @@ import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "
 import { CardHistoryFetcher } from "./cardHistory";
 import { CommentRepository, CommentRepositoryDatabase, CommentRepositoryInMemory } from "./comments";
 import { MutationLogRepository, MutationLogRepositoryDatabase, MutationLogRepositoryInMemory } from "./mutationLog";
+import { ProjectRepository, ProjectRepositoryDatabase, ProjectRepositoryInMemory } from "./projects";
 
 export interface RepositoryFixtures extends AsyncDisposable {
   cardHistoryFetcher: () => Promise<CardHistoryFetcher>;
@@ -17,6 +18,7 @@ export interface RepositoryFixtures extends AsyncDisposable {
   categoryRepository: () => Promise<CategoryRepository>;
   commentRepository: () => Promise<CommentRepository>;
   mutationLogRepository: () => Promise<MutationLogRepository>;
+  projectRepository: () => Promise<ProjectRepository>;
 }
 
 export function repositoryFixturesInMemory(): RepositoryFixtures {
@@ -39,6 +41,9 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
     },
     mutationLogRepository: async () => {
       return new MutationLogRepositoryInMemory();
+    },
+    projectRepository: async () => {
+      return new ProjectRepositoryInMemory(snapshot);
     },
     [Symbol.asyncDispose]: async () => {
     },
@@ -86,6 +91,10 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
 
     mutationLogRepository: async () => {
       return new MutationLogRepositoryDatabase(await getDatabase());
+    },
+
+    projectRepository: async () => {
+      return new ProjectRepositoryDatabase(await getDatabase());
     },
 
     [Symbol.asyncDispose]: async () => {

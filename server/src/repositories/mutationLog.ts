@@ -1,16 +1,16 @@
-import { ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
-import { SerializedProjectContentsMutation } from "hornbeam-common/lib/serialization/app";
+import { AppMutation } from "hornbeam-common/lib/app/snapshots";
+import { SerializedAppMutation, SerializedProjectContentsMutation } from "hornbeam-common/lib/serialization/app";
 import { Database } from "../database";
 import { JsonValue } from "../database/types";
 import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 
 interface LoggedMutation {
   id: string;
-  mutation: ProjectContentsMutation;
+  mutation: AppMutation;
 }
 
 export interface MutationLogRepository {
-  add: (id: string, mutation: ProjectContentsMutation) => Promise<number>;
+  add: (id: string, mutation: AppMutation) => Promise<number>;
   fetchLatestIndex: () => Promise<number>;
   fetchAll: () => Promise<ReadonlyArray<LoggedMutation>>;
 }
@@ -18,7 +18,7 @@ export interface MutationLogRepository {
 export class MutationLogRepositoryInMemory implements MutationLogRepository {
   private readonly mutations: Array<LoggedMutation> = [];
 
-  async add(id: string, mutation: ProjectContentsMutation): Promise<number> {
+  async add(id: string, mutation: AppMutation): Promise<number> {
     this.mutations.push({id, mutation});
 
     return this.mutations.length;
@@ -40,7 +40,7 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
     this.database = database;
   }
 
-  async add(id: string, mutation: ProjectContentsMutation): Promise<number> {
+  async add(id: string, mutation: AppMutation): Promise<number> {
     const row = await this.database.insertInto("mutationLog")
       .values((eb) => ({
         id: id,
@@ -51,7 +51,7 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
               eb.lit(1)
             ).as("index")
           ),
-        mutation: SerializedProjectContentsMutation.encode(mutation) as JsonValue,
+        mutation: SerializedAppMutation.encode(mutation) as JsonValue,
       }))
       .returning("index")
       .executeTakeFirstOrThrow();

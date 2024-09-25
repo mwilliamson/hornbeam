@@ -16,15 +16,21 @@ export class CategoryRepositoryInMemory implements CategoryRepository {
   }
 
   async add(mutation: CategoryAddMutation): Promise<void> {
-    this.snapshot.update(snapshot => snapshot.categoryAdd(mutation));
+    this.snapshot.mutate({
+      type: "categoryAdd",
+      categoryAdd: mutation,
+    });
   }
 
   async reorder(mutation: CategoryReorderMutation): Promise<void> {
-    this.snapshot.update(snapshot => snapshot.categoryReorder(mutation));
+    this.snapshot.mutate({
+      type: "categoryReorder",
+      categoryReorder: mutation,
+    });
   }
 
   async fetchAll(): Promise<ReadonlyArray<Category>> {
-    return this.snapshot.value.allCategories();
+    return this.snapshot.value.fetchProjectContents().allCategories();
   }
 }
 

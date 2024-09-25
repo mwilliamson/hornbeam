@@ -12,12 +12,13 @@ import { databaseConnect } from "./database";
 import { CardRepositoryDatabase } from "./repositories/cards";
 import { CategoryRepositoryDatabase } from "./repositories/categories";
 import { colorSetPresetsOnly } from "hornbeam-common/lib/app/colors";
-import { ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
+import { AppMutation } from "hornbeam-common/lib/app/snapshots";
 import { DB } from "./database/types";
 import { Transaction } from "kysely";
 import { CardHistoryFetcher } from "./repositories/cardHistory";
 import { CommentRepositoryDatabase } from "./repositories/comments";
 import { MutationLogRepositoryDatabase } from "./repositories/mutationLog";
+import { ProjectRepositoryDatabase } from "./repositories/projects";
 
 interface ServerOptions {
   databaseUrl: string;
@@ -150,7 +151,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
 
   async function mutate(
     transaction: Transaction<DB>,
-    mutation: ProjectContentsMutation,
+    mutation: AppMutation,
   ): Promise<number> {
     const mutationLogRepository = new MutationLogRepositoryDatabase(transaction);
     const index = await mutationLogRepository.add(uuidv7(), mutation);
@@ -162,7 +163,7 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
 
   async function applyMutation(
     transaction: Transaction<DB>,
-    mutation: ProjectContentsMutation,
+    mutation: AppMutation,
   ): Promise<void> {
     switch (mutation.type) {
       case "cardAdd": {
@@ -197,6 +198,11 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
       case "commentAdd": {
         const commentRepository = new CommentRepositoryDatabase(transaction);
         await commentRepository.add(mutation.commentAdd);
+        return;
+      }
+      case "projectAdd": {
+        const projectRepository = new ProjectRepositoryDatabase(transaction);
+        await projectRepository.add(mutation.projectAdd);
         return;
       }
       default: {

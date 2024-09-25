@@ -4,8 +4,77 @@ import { Card, CardAddMutation, CardEditMutation, CardMoveMutation, CardMoveToAf
 import { Category, CategoryAddMutation, CategoryReorderMutation, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
 import { Comment, CommentAddMutation, CommentSet, createComment } from "./comments";
+import { createProject, Project, ProjectAddMutation } from "./projects";
 
-export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
+export class AppSnapshot {
+  private readonly projects: ReadonlyArray<Project>;
+  private readonly projectContents: ProjectContentsSnapshot;
+
+  constructor(
+    projects: ReadonlyArray<Project>,
+    projectContents: ProjectContentsSnapshot
+  ) {
+    this.projects = projects;
+    this.projectContents = projectContents;
+  }
+
+  public projectAdd(mutation: ProjectAddMutation): AppSnapshot {
+    return new AppSnapshot(
+      [...this.projects, createProject(mutation)],
+      this.projectContents,
+    );
+  }
+
+  public allProjects(): ReadonlyArray<Project> {
+    return this.projects;
+  }
+
+  public fetchProjectContents(): ProjectContentsSnapshot {
+    return this.projectContents;
+  }
+
+  public mutateProjectContents(mutation: ProjectContentsMutation): AppSnapshot {
+    return this.updateProjectContents(
+      projectContents => applyProjectContentsMutation(projectContents, mutation),
+    );
+  }
+
+  private updateProjectContents(
+    f: (projectContents: ProjectContentsSnapshot) => ProjectContentsSnapshot,
+  ): AppSnapshot {
+    return new AppSnapshot(
+      this.projects,
+      f(this.projectContents),
+    );
+  }
+}
+
+export function initialAppSnapshot(): AppSnapshot {
+  return new AppSnapshot([], initialProjectContentsSnapshot());
+}
+
+export interface AppUpdate {
+  updateId: string;
+  mutation: AppMutation;
+}
+
+export type AppMutation =
+  | ProjectContentsMutation
+  | {type: "projectAdd", projectAdd: ProjectAddMutation};
+
+export function applyAppMutation(
+  snapshot: AppSnapshot,
+  mutation: AppMutation,
+): AppSnapshot {
+  switch (mutation.type) {
+    case "projectAdd":
+      return snapshot.projectAdd(mutation.projectAdd);
+    default:
+      return snapshot.mutateProjectContents(mutation);
+  }
+}
+
+export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   private readonly cards: ReadonlyArray<Card>;
   private readonly nextCardNumber: number;
   private readonly categories: CategorySetInMemory;
@@ -26,9 +95,9 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     this.comments = comments;
   }
 
-  public cardAdd(mutation: CardAddMutation): AppSnapshot {
+  public cardAdd(mutation: CardAddMutation): ProjectContentsSnapshot {
     const card = createCard(mutation, this.nextCardNumber);
-    return new AppSnapshot(
+    return new ProjectContentsSnapshot(
       [...this.cards, card],
       this.nextCardNumber + 1,
       this.categories,
@@ -37,8 +106,8 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardEdit(request: CardEditMutation): AppSnapshot {
-    return new AppSnapshot(
+  public cardEdit(request: CardEditMutation): ProjectContentsSnapshot {
+    return new ProjectContentsSnapshot(
       this.cards.map(card => {
         if (card.id !== request.id) {
           return card;
@@ -53,7 +122,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardMove(request: CardMoveMutation): AppSnapshot {
+  public cardMove(request: CardMoveMutation): ProjectContentsSnapshot {
     const card = this.findCardById(request.id);
 
     if (card === null) {
@@ -84,7 +153,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
         return handleNever(request.direction, this);
     }
 
-    return new AppSnapshot(
+    return new ProjectContentsSnapshot(
       this.cards.map(otherCard => {
         if (otherCard.id === card.id) {
           return swapWithCard;
@@ -101,7 +170,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardMoveToAfter(request: CardMoveToAfterMutation): AppSnapshot {
+  public cardMoveToAfter(request: CardMoveToAfterMutation): ProjectContentsSnapshot {
     if (request.afterCardId === request.moveCardId) {
       return this;
     }
@@ -116,7 +185,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       return this;
     }
 
-    return new AppSnapshot(
+    return new ProjectContentsSnapshot(
       this.cards.flatMap(card => {
         if (card.id === request.moveCardId) {
           return [];
@@ -136,7 +205,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public cardMoveToBefore(request: CardMoveToBeforeMutation): AppSnapshot {
+  public cardMoveToBefore(request: CardMoveToBeforeMutation): ProjectContentsSnapshot {
     if (request.beforeCardId === request.moveCardId) {
       return this;
     }
@@ -151,7 +220,7 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
       return this;
     }
 
-    return new AppSnapshot(
+    return new ProjectContentsSnapshot(
       this.cards.flatMap(card => {
         if (card.id === request.moveCardId) {
           return [];
@@ -200,8 +269,8 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }
 
-  public categoryAdd(request: CategoryAddMutation): AppSnapshot {
-    return new AppSnapshot(
+  public categoryAdd(request: CategoryAddMutation): ProjectContentsSnapshot {
+    return new ProjectContentsSnapshot(
       this.cards,
       this.nextCardNumber,
       this.categories.categoryAdd(request),
@@ -210,8 +279,8 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     );
   }
 
-  public categoryReorder(request: CategoryReorderMutation): AppSnapshot {
-    return new AppSnapshot(
+  public categoryReorder(request: CategoryReorderMutation): ProjectContentsSnapshot {
+    return new ProjectContentsSnapshot(
       this.cards,
       this.nextCardNumber,
       this.categories.categoryReorder(request),
@@ -236,9 +305,9 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
     return this.colors.findPresetColorById(presetColorId);
   }
 
-  public commentAdd(request: CommentAddMutation): AppSnapshot {
+  public commentAdd(request: CommentAddMutation): ProjectContentsSnapshot {
     const comment = createComment(request);
-    return new AppSnapshot(
+    return new ProjectContentsSnapshot(
       this.cards,
       this.nextCardNumber,
       this.categories,
@@ -252,19 +321,14 @@ export class AppSnapshot implements CardSet, CategorySet, ColorSet, CommentSet {
   }
 }
 
-export function initialAppSnapshot(): AppSnapshot {
-  return new AppSnapshot(
+export function initialProjectContentsSnapshot(): ProjectContentsSnapshot {
+  return new ProjectContentsSnapshot(
     [],
     1,
     new CategorySetInMemory([]),
     colorSetPresetsOnly,
     [],
   );
-}
-
-export interface AppUpdate {
-  updateId: string;
-  mutation: ProjectContentsMutation;
 }
 
 export type ProjectContentsMutation =
@@ -334,7 +398,7 @@ export function projectContentsMutationCreatedAt(mutation: ProjectContentsMutati
   }
 }
 
-export function applyProjectContentsMutation(snapshot: AppSnapshot, mutation: ProjectContentsMutation): AppSnapshot {
+export function applyProjectContentsMutation(snapshot: ProjectContentsSnapshot, mutation: ProjectContentsMutation): ProjectContentsSnapshot {
   switch (mutation.type) {
     case "cardAdd":
       return snapshot.cardAdd(mutation.cardAdd);

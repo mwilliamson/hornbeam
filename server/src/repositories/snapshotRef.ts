@@ -1,4 +1,4 @@
-import { AppSnapshot } from "hornbeam-common/lib/app/snapshots";
+import { applyAppMutation, AppMutation, AppSnapshot } from "hornbeam-common/lib/app/snapshots";
 
 export class AppSnapshotRef {
   public value: AppSnapshot;
@@ -9,5 +9,9 @@ export class AppSnapshotRef {
 
   public update(f: (value: AppSnapshot) => AppSnapshot): void {
     this.value = f(this.value);
+  }
+
+  public mutate(mutation: AppMutation) {
+    this.update(snapshot => applyAppMutation(snapshot, mutation));
   }
 }

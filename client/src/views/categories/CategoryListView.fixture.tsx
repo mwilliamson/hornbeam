@@ -1,10 +1,10 @@
 import { Instant } from "@js-joda/core";
-import { initialAppSnapshot } from "hornbeam-common/lib/app/snapshots";
+import { initialProjectContentsSnapshot } from "hornbeam-common/lib/app/snapshots";
 import CategoryListView from "./CategoryListView";
 import { useState } from "react";
 
 // TODO: remove duplication with other fixtures
-const createAppSnapshot = () => initialAppSnapshot()
+const createSnapshot = () => initialProjectContentsSnapshot()
   .categoryAdd({
     color: {presetColorId: "018ef5cd-f61c-7b36-bd3c-b129e09f19e6"},
     createdAt: Instant.ofEpochSecond(1713386548),
@@ -44,7 +44,7 @@ const createAppSnapshot = () => initialAppSnapshot()
 
 export default {
   Populated: () => {
-    const [appSnapshot, setAppSnapshot] = useState(createAppSnapshot);
+    const [appSnapshot, setAppSnapshot] = useState(createSnapshot);
 
     return (
       <CategoryListView

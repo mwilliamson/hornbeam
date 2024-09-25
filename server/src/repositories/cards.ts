@@ -35,35 +35,41 @@ export class CardRepositoryInMemory implements CardRepository {
   }
 
   async add(mutation: CardAddMutation): Promise<void> {
-    return this.snapshot.update(snapshot => snapshot.cardAdd(mutation));
+    this.snapshot.mutate({
+      type: "cardAdd",
+      cardAdd: mutation
+    });
   }
 
   async update(mutation: CardEditMutation): Promise<void> {
-    return this.snapshot.update(snapshot => snapshot.cardEdit(mutation));
+    this.snapshot.mutate({
+      type: "cardEdit",
+      cardEdit: mutation,
+    });
   }
 
   async fetchAll(): Promise<ReadonlyArray<Card>> {
-    return this.snapshot.value.allCards();
+    return this.snapshot.value.fetchProjectContents().allCards();
   }
 
   async fetchById(id: string): Promise<Card | null> {
-    return this.snapshot.value.findCardById(id);
+    return this.snapshot.value.fetchProjectContents().findCardById(id);
   }
 
   async fetchParentByChildId(childId: string): Promise<Card | null> {
-    const childCard = this.snapshot.value.findCardById(childId);
+    const childCard = this.snapshot.value.fetchProjectContents().findCardById(childId);
     if (childCard === null || childCard.parentCardId === null) {
       return null;
     }
-    return this.snapshot.value.findCardById(childCard.parentCardId);
+    return this.snapshot.value.fetchProjectContents().findCardById(childCard.parentCardId);
   }
 
   async fetchChildCountByParentId(parentId: string): Promise<number> {
-    return this.snapshot.value.countCardChildren(parentId);
+    return this.snapshot.value.fetchProjectContents().countCardChildren(parentId);
   }
 
   async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
-    return this.snapshot.value.searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
+    return this.snapshot.value.fetchProjectContents().searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
   }
 
   async fetchBoardCardTrees(

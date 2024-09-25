@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "create-database": "npm run --workspace server create-database",
-    "test": "cd client && npm test && cd ../server && npm test"
+    "test": "npm test --workspace server && npm test --workspace client"
   },
   "dependencies": {
     "@types/mocha": "^10.0.7"

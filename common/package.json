@@ -5,7 +5,11 @@
     "build": "tsc",
     "build-watch": "tsc --watch",
     "check": "npm run check:eslint",
-    "check:eslint": "eslint src && echo 'No lint errors' 1>&2"
+    "check:eslint": "eslint src && echo 'No lint errors' 1>&2",
+    "test": "mocha"
   },
-  "type": "commonjs"
+  "type": "commonjs",
+  "mocha": {
+      "spec": "lib/**/*.test.js"
+  }
 }

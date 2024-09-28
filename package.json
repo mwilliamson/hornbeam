@@ -8,7 +8,7 @@
   "scripts": {
     "create-database": "npm run --workspace server create-database",
     "generate-database-types": "npm run --workspace server generate-database-types",
-    "test": "npm test --workspace server && npm test --workspace client"
+    "test": "npm test --workspace common && npm test --workspace server && npm test --workspace client"
   },
   "dependencies": {
     "@types/mocha": "^10.0.7"

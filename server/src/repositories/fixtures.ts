@@ -53,6 +53,10 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
 const temporaryDatabase = createReusableTemporaryDatabase(testDatabaseUrl());
 testing.use(temporaryDatabase);
 
+export async function fixtureDatabase(): Promise<Database> {
+  return await temporaryDatabase.getDatabase();
+}
+
 export function repositoryFixturesDatabase(): RepositoryFixtures {
   let database: Promise<Database> | null = null;
   let disposed = false;

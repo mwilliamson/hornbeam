@@ -55,6 +55,7 @@ const SerializedCategoryAddMutation = t.type({
   color: SerializedColorRef,
   id: t.string,
   name: t.string,
+  projectId: t.string,
 }, "SerializedCategoryAddMutation");
 
 const SerializedCategoryReorderMutation = t.type({

@@ -7,6 +7,7 @@ export interface Category {
   id: string;
   name: string;
   color: ColorRef;
+  projectId: string;
 }
 
 export function categoryBackgroundColorStyle(
@@ -33,6 +34,7 @@ export interface CategoryAddMutation {
   color: ColorRef;
   id: string;
   name: string;
+  projectId: string;
 }
 
 export function createCategory(request: CategoryAddMutation): Category {
@@ -40,6 +42,7 @@ export function createCategory(request: CategoryAddMutation): Category {
     color: request.color,
     id: request.id,
     name: request.name,
+    projectId: request.projectId,
   };
 }
 

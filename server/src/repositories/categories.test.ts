@@ -5,7 +5,9 @@ import { CategoryRepository } from "./categories";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
+import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
 
+const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000010000";
 const CATEGORY_1_ID = "0191be9e-f6df-7507-9e6b-000000000001";
 const CATEGORY_2_ID = "0191be9e-f6df-7507-9e6b-000000000002";
 const CATEGORY_3_ID = "0191be9e-f6df-7507-9e6b-000000000003";
@@ -25,12 +27,14 @@ export function createCategoryRepositoryTests(
         color: {presetColorId: presetColorRed.id},
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       await repository.add(categoriesTesting.testingCategoryAddMutation({
         color: {presetColorId: presetColorGreen.id},
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       const categories = await repository.fetchAll();
@@ -53,11 +57,13 @@ export function createCategoryRepositoryTests(
       await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       const categories = await repository.fetchAll();
@@ -72,16 +78,19 @@ export function createCategoryRepositoryTests(
       await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       await repository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_3_ID,
         name: "<category 3 name>",
+        projectId: PROJECT_1_ID,
       }));
 
       await repository.reorder(categoriesTesting.testingCategoryReorderMutation({
@@ -101,6 +110,12 @@ export function createCategoryRepositoryTests(
   function testRepository(name: string, f: (categories: CategoryRepository) => Promise<void>) {
     test(name, async () => {
       await using fixtures = await createFixtures();
+
+      const projectRepository = await fixtures.projectRepository();
+      await projectRepository.add(testingProjectAddMutation({
+        id: PROJECT_1_ID,
+      }));
+
       await f(await fixtures.categoryRepository());
     });
   }

@@ -46,6 +46,8 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
         createdAt: Instant.now(),
         name: validCategoryAddMutation.name,
         id: uuidv7(),
+        // TODO: pass in correct project ID
+        projectId: "",
       });
       setState(null);
     }

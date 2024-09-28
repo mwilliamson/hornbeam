@@ -10,6 +10,7 @@ import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.t
 import { CardAddMutation } from "hornbeam-common/lib/app/cards";
 import { allCardStatuses, CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
+import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -19,6 +20,7 @@ const CARD_5_ID = "0191beb5-0000-79e7-8207-000000001005";
 const CATEGORY_1_ID = "0191beb5-0000-79e7-8207-000000000001";
 const CATEGORY_2_ID = "0191beb5-0000-79e7-8207-000000000002";
 const CATEGORY_3_ID = "0191beb5-0000-79e7-8207-000000000003";
+const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000002001";
 
 export function createCardsRepositoryTests(
   createFixtures: () => RepositoryFixtures,
@@ -774,15 +776,23 @@ export function createCardsRepositoryTests(
     test(name, async () => {
       await using fixtures = await createFixtures();
 
+      const projectRepository = await fixtures.projectRepository();
+      await projectRepository.add(testingProjectAddMutation({
+        id: PROJECT_1_ID,
+      }));
+
       const categoryRepository = await fixtures.categoryRepository();
       await categoryRepository.add(testingCategoryAddMutation({
         id: CATEGORY_1_ID,
+        projectId: PROJECT_1_ID,
       }));
       await categoryRepository.add(testingCategoryAddMutation({
         id: CATEGORY_2_ID,
+        projectId: PROJECT_1_ID,
       }));
       await categoryRepository.add(testingCategoryAddMutation({
         id: CATEGORY_3_ID,
+        projectId: PROJECT_1_ID,
       }));
 
       await f(await fixtures.cardRepository());

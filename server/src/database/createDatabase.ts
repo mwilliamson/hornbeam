@@ -17,7 +17,8 @@ export default async function createDatabase(databaseUrl: string) {
         id uuid PRIMARY KEY,
         index int NOT NULL,
         name text NOT NULL,
-        preset_color_id uuid NOT NULL
+        preset_color_id uuid NOT NULL,
+        project_id uuid NOT NULL REFERENCES projects(id)
       );
 
       CREATE UNIQUE INDEX uq__categories__index ON categories(index);

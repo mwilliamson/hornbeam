@@ -5,6 +5,7 @@ import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { testingCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
 import { testingCommentAddMutation } from "hornbeam-common/lib/app/comments.testing";
+import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
 
 const CATEGORY_1_ID = "01921902-0000-7c1a-a1c3-000000000001";
 const CARD_1_ID = "01921902-0000-7c1a-a1c3-000000001001";
@@ -12,6 +13,7 @@ const CARD_2_ID = "01921902-0000-7c1a-a1c3-000000001002";
 const COMMENT_1_ID = "01921902-0000-7c1a-a1c3-000000002001";
 const COMMENT_2_ID = "01921902-0000-7c1a-a1c3-000000002002";
 const COMMENT_3_ID = "01921902-0000-7c1a-a1c3-000000002003";
+const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000003001";
 
 export function createCategoryRepositoryTests(
   createFixtures: () => RepositoryFixtures,
@@ -62,10 +64,18 @@ export function createCategoryRepositoryTests(
   function testRepository(name: string, f: (fixtures: RepositoryFixtures) => Promise<void>) {
     test(name, async () => {
       await using fixtures = await createFixtures();
+
+      const projectRepository = await fixtures.projectRepository();
+      await projectRepository.add(testingProjectAddMutation({
+        id: PROJECT_1_ID,
+      }));
+
       const categoryRepository = await fixtures.categoryRepository();
       await categoryRepository.add(categoriesTesting.testingCategoryAddMutation({
         id: CATEGORY_1_ID,
+        projectId: PROJECT_1_ID,
       }));
+
       await f(fixtures);
     });
   }

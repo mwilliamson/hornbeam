@@ -6,4 +6,5 @@ export const SerializedCategory = t.readonly(t.type({
   color: SerializedColorRef,
   id: t.string,
   name: t.string,
+  projectId: t.string,
 }, "SerializedCategory"));

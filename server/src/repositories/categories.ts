@@ -55,6 +55,7 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
           ),
         name: mutation.name,
         presetColorId: mutation.color.presetColorId,
+        projectId: mutation.projectId,
       }))
       .execute();
   }
@@ -79,7 +80,7 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
 
   async fetchAll(): Promise<ReadonlyArray<Category>> {
     const categoryRows = await this.database.selectFrom("categories")
-      .select(["id", "name", "presetColorId"])
+      .select(["id", "name", "presetColorId", "projectId"])
       .orderBy("index")
       .execute();
 
@@ -87,6 +88,7 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
       color: {presetColorId: categoryRow.presetColorId},
       id: categoryRow.id,
       name: categoryRow.name,
+      projectId: categoryRow.projectId,
     }));
   }
 }

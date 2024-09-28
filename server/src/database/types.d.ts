@@ -37,6 +37,7 @@ export interface Category {
   index: number;
   name: string;
   presetColorId: string;
+  projectId: string;
 }
 
 export interface Comment {

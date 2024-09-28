@@ -104,6 +104,7 @@ export function createReusableTemporaryDatabase(databaseUrl: string): ReusableTe
         DELETE FROM comments;
         DELETE FROM cards;
         DELETE FROM categories;
+        DELETE FROM projects;
         DELETE FROM mutation_log;
       `.execute(connectedDatabase);
     }

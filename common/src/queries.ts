@@ -67,6 +67,7 @@ export type AppQuery<R> =
   | {
     readonly type: "allColors";
     readonly proof: Leibniz<ColorSet, R>;
+    readonly projectId: string;
   }
   // Projects
   | {
@@ -155,10 +156,15 @@ export function availableCategoriesQuery(
   };
 }
 
-export const allColorsQuery: AppQuery<ColorSet> = {
-  type: "allColors",
-  proof,
-};
+export function allColorsQuery(
+  {projectId}: {projectId: string},
+): AppQuery<ColorSet>{
+  return {
+    type: "allColors",
+    proof,
+    projectId,
+  };
+}
 
 export const allProjectsQuery: AppQuery<ReadonlyArray<Project>> = {
   type: "allProjects",

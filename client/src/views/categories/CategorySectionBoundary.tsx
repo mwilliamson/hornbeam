@@ -17,7 +17,7 @@ export default function CategorySectionBoundary(props: CategorySectionBoundaryPr
     <Boundary
       queries={{
         allCategories: allCategoriesQuery({projectId}),
-        allColors: allColorsQuery,
+        allColors: allColorsQuery({projectId}),
       }}
       render={({allCategories, allColors}, sendMutation) => (
         <CategorySection

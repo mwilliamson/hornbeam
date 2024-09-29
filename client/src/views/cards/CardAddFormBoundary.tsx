@@ -20,7 +20,7 @@ export default function CardAddFormBoundary(props: CardAddFormBoundaryProps) {
     <Boundary
       queries={{
         availableCategories: availableCategoriesQuery({projectId}),
-        allColors: allColorsQuery,
+        allColors: allColorsQuery({projectId}),
       }}
       render={({availableCategories, allColors}, mutate) => (
         <CardAddForm

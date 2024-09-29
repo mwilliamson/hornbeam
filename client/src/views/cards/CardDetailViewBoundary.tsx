@@ -22,7 +22,7 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
     <Boundary
       queries={{
         allCategories: allCategoriesQuery({projectId}),
-        allColors: allColorsQuery,
+        allColors: allColorsQuery({projectId}),
         card: cardQuery(cardId),
         cardChildCount: cardChildCountQuery(cardId),
         cardHistory: cardHistoryQuery(cardId),

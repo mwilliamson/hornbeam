@@ -476,7 +476,9 @@ export function createBackendConnectionTestSuite(
       });
 
       testBackendConnection("allColors", async (backendConnection) => {
-        const allColors = await backendConnection.executeQuery(allColorsQuery);
+        const allColors = await backendConnection.executeQuery(allColorsQuery({
+          projectId: PROJECT_1_ID,
+        }));
 
         assertThat(allColors.allPresetColors(), containsExactly(
           ...presetColors.map(presetColor => hasProperties({name: presetColor.name}))

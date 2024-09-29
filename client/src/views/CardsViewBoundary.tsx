@@ -32,7 +32,7 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
     <Boundary
       queries={{
         allCategories: allCategoriesQuery({projectId}),
-        allColors: allColorsQuery,
+        allColors: allColorsQuery({projectId}),
         boardCardTrees: boardCardTreesQuery({
           cardStatuses: visibleCardStatuses,
           boardId: selectedBoardId,

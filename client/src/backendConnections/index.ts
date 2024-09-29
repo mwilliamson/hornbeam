@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 
-import { ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
+import { AppMutation } from "hornbeam-common/lib/app/snapshots";
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 
 export type BackendConnectionState =
@@ -236,7 +236,7 @@ export interface BackendConnection {
   setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;
 }
 
-export type Mutate = (mutation: ProjectContentsMutation) => Promise<void>;
+export type Mutate = (mutation: AppMutation) => Promise<void>;
 
 const BackendConnectionContext = React.createContext<BackendConnection | null>(null);
 

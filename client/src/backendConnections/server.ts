@@ -1,10 +1,10 @@
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
-import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { deserializeAllCategoriesResponse, deserializeAllColorsResponse, deserializeAllProjectsResponse, deserializeBoardCardTreesResponse, deserializeCardChildCountResponse, deserializeCardHistoryResponse, deserializeCardResponse, deserializeParentBoardResponse, deserializeParentCardResponse, deserializeSearchCardsResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
-import { AppUpdate, ProjectContentsMutation } from "hornbeam-common/lib/app/snapshots";
+import { AppMutation, AppUpdate } from "hornbeam-common/lib/app/snapshots";
 import { QueryRequestBody, QueryResponseBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
 import { uuidv7 } from "uuidv7";
 import { assertNever } from "hornbeam-common/lib/util/assertNever";
@@ -139,6 +139,18 @@ export function connectServer(uri: string): BackendConnection {
         return [serverQuery, deserialize];
       }
 
+      case "allProjects": {
+        const serverQuery: ServerQuery = {
+          type: "allProjects",
+        };
+
+        const deserialize = (response: unknown) => {
+          return query.proof(deserializeAllProjectsResponse(response));
+        };
+
+        return [serverQuery, deserialize];
+      }
+
       default:
         return assertNever(query);
     }
@@ -198,7 +210,7 @@ export function connectServer(uri: string): BackendConnection {
     return results;
   };
 
-  const mutate = async (mutation: ProjectContentsMutation): Promise<void> => {
+  const mutate = async (mutation: AppMutation): Promise<void> => {
     // TODO: send active queries as part of request?
 
     const updateId = uuidv7();

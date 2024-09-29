@@ -1,7 +1,7 @@
 import { Instant } from "@js-joda/core";
 import { BoardId } from "hornbeam-common/lib/app/boards";
 import { generateId } from "hornbeam-common/lib/app/ids";
-import { projectContentsMutations } from "hornbeam-common/lib/app/snapshots";
+import { appMutations } from "hornbeam-common/lib/app/snapshots";
 import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
 import Boundary from "../Boundary";
 import CardDetailView from "./CardDetailView";
@@ -50,17 +50,17 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
             searchCards: searchTerm => query(searchCardsQuery(searchTerm)),
           }}
           onAddChildClick={() => onCardAddClick({parentCard: card})}
-          onCardEdit={(mutation) => mutate(projectContentsMutations.cardEdit({
+          onCardEdit={(mutation) => mutate(appMutations.cardEdit({
             ...mutation,
             createdAt: Instant.now(),
             id: card.id,
           }))}
-          onCardMove={(direction) => mutate(projectContentsMutations.cardMove({
+          onCardMove={(direction) => mutate(appMutations.cardMove({
             createdAt: Instant.now(),
             direction,
             id: card.id,
           }))}
-          onCommentAdd={(text) => mutate(projectContentsMutations.commentAdd({
+          onCommentAdd={(text) => mutate(appMutations.commentAdd({
             cardId: card.id,
             createdAt: Instant.now(),
             id: generateId(),

@@ -341,7 +341,7 @@ export type ProjectContentsMutation =
   | {type: "categoryReorder", categoryReorder: CategoryReorderMutation}
   | {type: "commentAdd", commentAdd: CommentAddMutation};
 
-export const projectContentsMutations = {
+export const appMutations = {
   cardAdd(mutation: CardAddMutation): ProjectContentsMutation {
     return {type: "cardAdd", cardAdd: mutation};
   },
@@ -372,6 +372,10 @@ export const projectContentsMutations = {
 
   commentAdd(mutation: CommentAddMutation): ProjectContentsMutation {
     return {type: "commentAdd", commentAdd: mutation};
+  },
+
+  projectAdd(mutation: ProjectAddMutation): AppMutation {
+    return {type: "projectAdd", projectAdd: mutation};
   },
 };
 

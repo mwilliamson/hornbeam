@@ -6,6 +6,7 @@ import { SerializedCardTree } from "./cardTrees";
 import { SerializedBoardId } from "./boards";
 import { SerializedCardStatus } from "./cardStatuses";
 import { deserializer } from "./deserialize";
+import { SerializedProject } from "./projects";
 
 const CardServerQuery = t.type({
   type: t.literal("card"),
@@ -102,6 +103,10 @@ const AllColorsResponse = t.readonlyArray(SerializedPresetColor);
 export const serializeAllColorsResponse = AllColorsResponse.encode;
 export const deserializeAllColorsResponse = deserializer(AllColorsResponse);
 
+const AllProjectsServerQuery = t.type({
+  type: t.literal("allProjects"),
+}, "AllProjectsServerQuery");
+
 export const ServerQuery = t.union([
   CardServerQuery,
   ParentCardServerQuery,
@@ -112,7 +117,13 @@ export const ServerQuery = t.union([
   ParentBoardServerQuery,
   AllCategoriesServerQuery,
   AllColorsServerQuery,
+  AllProjectsServerQuery,
 ], "ServerQuery");
+
+const AllProjectsResponse = t.readonlyArray(SerializedProject);
+
+export const serializeAllProjectsResponse = AllProjectsResponse.encode;
+export const deserializeAllProjectsResponse = deserializer(AllProjectsResponse);
 
 export type ServerQuery = t.TypeOf<typeof ServerQuery>;
 export type SerializedServerQuery = t.OutputOf<typeof ServerQuery>;

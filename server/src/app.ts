@@ -9,7 +9,7 @@ import { CommentRepositoryDatabase } from "./repositories/comments";
 import { ProjectRepositoryDatabase } from "./repositories/projects";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { CardRepositoryDatabase } from "./repositories/cards";
-import { serializeAllCategoriesResponse, serializeAllColorsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
+import { serializeAllCategoriesResponse, serializeAllColorsResponse, serializeAllProjectsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import mapSeries from "p-map-series";
 import { colorSetPresetsOnly } from "hornbeam-common/lib/app/colors";
 import { CardHistoryFetcher } from "./repositories/cardHistory";
@@ -97,6 +97,11 @@ class AppTransaction {
         }
         case "allColors": {
           return serializeAllColorsResponse(colorSetPresetsOnly.allPresetColors());
+        }
+        case "allProjects": {
+          const projectRepository = new ProjectRepositoryDatabase(this.transaction);
+          const result = await projectRepository.fetchAll();
+          return serializeAllProjectsResponse(result);
         }
         default: {
           handleNever(serverQuery, null);

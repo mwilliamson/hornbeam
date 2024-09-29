@@ -4,6 +4,7 @@ import { CardStatus } from "./app/cardStatuses";
 import { CardTree } from "./app/cardTrees";
 import { Category, CategorySet } from "./app/categories";
 import { ColorSet } from "./app/colors";
+import { Project } from "./app/projects";
 
 interface Leibniz<A, B> {
   (a: A): B
@@ -64,6 +65,11 @@ export type AppQuery<R> =
   | {
     readonly type: "allColors";
     readonly proof: Leibniz<ColorSet, R>;
+  }
+  // Projects
+  | {
+    readonly type: "allProjects";
+    readonly proof: Leibniz<ReadonlyArray<Project>, R>;
   };
 
 export function cardQuery(cardId: string): AppQuery<Card | null> {
@@ -141,6 +147,11 @@ export const availableCategoriesQuery: AppQuery<ReadonlyArray<Category>> = {
 
 export const allColorsQuery: AppQuery<ColorSet> = {
   type: "allColors",
+  proof,
+};
+
+export const allProjectsQuery: AppQuery<ReadonlyArray<Project>> = {
+  type: "allProjects",
   proof,
 };
 

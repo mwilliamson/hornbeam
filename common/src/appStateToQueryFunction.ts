@@ -82,5 +82,8 @@ export function queryAppSnapshot<R>(
     case "allColors": {
       return query.proof(projectContentsSnapshot);
     }
+    case "allProjects": {
+      return query.proof(snapshot.allProjects());
+    }
   }
 }

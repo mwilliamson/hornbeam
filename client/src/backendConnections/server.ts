@@ -16,6 +16,7 @@ export function connectServer(uri: string): BackendConnection {
         const serverQuery: ServerQuery = {
           type: "card",
           cardId: query.cardId,
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -29,6 +30,7 @@ export function connectServer(uri: string): BackendConnection {
         const serverQuery: ServerQuery = {
           type: "parentCard",
           cardId: query.cardId,
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -42,6 +44,7 @@ export function connectServer(uri: string): BackendConnection {
         const serverQuery: ServerQuery = {
           type: "cardChildCount",
           cardId: query.cardId,
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -55,6 +58,7 @@ export function connectServer(uri: string): BackendConnection {
         const serverQuery: ServerQuery = {
           type: "cardHistory",
           cardId: query.cardId,
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -67,6 +71,7 @@ export function connectServer(uri: string): BackendConnection {
       case "searchCards": {
         const serverQuery: ServerQuery = {
           type: "searchCards",
+          projectId: query.projectId,
           searchTerm: query.searchTerm,
         };
 
@@ -82,6 +87,7 @@ export function connectServer(uri: string): BackendConnection {
           type: "boardCardTrees",
           boardId: query.boardId,
           cardStatuses: Array.from(query.cardStatuses),
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -95,6 +101,7 @@ export function connectServer(uri: string): BackendConnection {
         const serverQuery: ServerQuery = {
           type: "parentBoard",
           boardId: query.boardId,
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -105,7 +112,7 @@ export function connectServer(uri: string): BackendConnection {
       }
 
       case "allCategories": {
-        const [serverQuery, deserializeAllCategories] = allCategoriesSerialization();
+        const [serverQuery, deserializeAllCategories] = allCategoriesSerialization(query);
 
         const deserialize = (response: unknown) => {
           return query.proof(deserializeAllCategories(response));
@@ -115,7 +122,7 @@ export function connectServer(uri: string): BackendConnection {
       }
 
       case "availableCategories": {
-        const [serverQuery, deserializeAllCategories] = allCategoriesSerialization();
+        const [serverQuery, deserializeAllCategories] = allCategoriesSerialization(query);
 
         const deserialize = (response: unknown) => {
           return query.proof(deserializeAllCategories(response).allCategories());
@@ -127,6 +134,7 @@ export function connectServer(uri: string): BackendConnection {
       case "allColors": {
         const serverQuery: ServerQuery = {
           type: "allColors",
+          projectId: query.projectId,
         };
 
         const deserialize = (response: unknown) => {
@@ -156,9 +164,12 @@ export function connectServer(uri: string): BackendConnection {
     }
   };
 
-  const allCategoriesSerialization = (): [ServerQuery, (response: unknown) => CategorySet] => {
+  const allCategoriesSerialization = (
+    {projectId}: {projectId: string},
+  ): [ServerQuery, (response: unknown) => CategorySet] => {
     const serverQuery: ServerQuery = {
       type: "allCategories",
+      projectId,
     };
 
     const deserialize = (response: unknown) => {

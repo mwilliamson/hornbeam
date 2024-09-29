@@ -11,6 +11,7 @@ import { SerializedProject } from "./projects";
 const CardServerQuery = t.type({
   type: t.literal("card"),
   cardId: t.string,
+  projectId: t.string,
 }, "CardServerQuery");
 
 const CardResponse = t.union([
@@ -24,6 +25,7 @@ export const deserializeCardResponse = deserializer(CardResponse);
 const ParentCardServerQuery = t.type({
   type: t.literal("parentCard"),
   cardId: t.string,
+  projectId: t.string,
 }, "ParentCardServerQuery");
 
 const ParentCardResponse = t.union([
@@ -37,6 +39,7 @@ export const deserializeParentCardResponse = deserializer(ParentCardResponse);
 const CardChildCountServerQuery = t.type({
   type: t.literal("cardChildCount"),
   cardId: t.string,
+  projectId: t.string,
 }, "CardChildCountServerQuery");
 
 const CardChildCountResponse = t.number;
@@ -47,6 +50,7 @@ export const deserializeCardChildCountResponse = deserializer(CardChildCountResp
 const CardHistoryServerQuery = t.type({
   type: t.literal("cardHistory"),
   cardId: t.string,
+  projectId: t.string,
 }, "CardHistoryServerQuery");
 
 const CardHistoryResponse = t.readonlyArray(SerializedCardEvent);
@@ -56,6 +60,7 @@ export const deserializeCardHistoryResponse = deserializer(CardHistoryResponse);
 
 const SearchCardsServerQuery = t.type({
   type: t.literal("searchCards"),
+  projectId: t.string,
   searchTerm: t.string,
 });
 
@@ -68,6 +73,7 @@ const BoardCardTreesServerQuery = t.type({
   type: t.literal("boardCardTrees"),
   boardId: SerializedBoardId,
   cardStatuses: t.readonlyArray(SerializedCardStatus),
+  projectId: t.string,
 }, "BoardCardTreesServerQuery");
 
 const BoardCardTreesResponse = t.readonlyArray(SerializedCardTree);
@@ -78,6 +84,7 @@ export const deserializeBoardCardTreesResponse = deserializer(BoardCardTreesResp
 const ParentBoardServerQuery = t.type({
   type: t.literal("parentBoard"),
   boardId: SerializedBoardId,
+  projectId: t.string,
 });
 
 const ParentBoardResponse = SerializedBoardId;
@@ -87,6 +94,7 @@ export const deserializeParentBoardResponse = deserializer(ParentBoardResponse);
 
 const AllCategoriesServerQuery = t.type({
   type: t.literal("allCategories"),
+  projectId: t.string,
 }, "AllCategoriesServerQuery");
 
 const AllCategoriesResponse = t.readonlyArray(SerializedCategory);
@@ -96,6 +104,7 @@ export const deserializeAllCategoriesResponse = deserializer(AllCategoriesRespon
 
 const AllColorsServerQuery = t.type({
   type: t.literal("allColors"),
+  projectId: t.string,
 }, "AllColorsServerQuery");
 
 const AllColorsResponse = t.readonlyArray(SerializedPresetColor);

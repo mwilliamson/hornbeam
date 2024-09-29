@@ -24,7 +24,10 @@ fileSuite(__filename, () => {
     }
 
     const categories = await app.transaction(async transaction => {
-      const result = await transaction.query([{type: "allCategories"}]);
+      const result = await transaction.query([{
+        type: "allCategories",
+        projectId: "01922aaa-ad4c-731f-a696-086f32fa53c8",
+      }]);
       return result.queryResults[0] as ReadonlyArray<unknown>;
     });
 

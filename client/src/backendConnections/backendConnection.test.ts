@@ -25,7 +25,11 @@ export function createBackendConnectionTestSuite(
   suite(name, () => {
     suite("queries", () => {
       suite("card", () => {
-        testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
+        testBackendConnection("unrecognised card ID returns null", async (backendConnection) => {
+          await backendConnection.mutate(testingAppMutation.projectAdd({
+            id: PROJECT_1_ID,
+          }));
+
           const card = await backendConnection.executeQuery(cardQuery({
             cardId: CARD_1_ID,
             projectId: PROJECT_1_ID,
@@ -66,7 +70,11 @@ export function createBackendConnectionTestSuite(
       });
 
       suite("parentCard", () => {
-        testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
+        testBackendConnection("unrecognised card ID returns null", async (backendConnection) => {
+          await backendConnection.mutate(testingAppMutation.projectAdd({
+            id: PROJECT_1_ID,
+          }));
+
           const card = await backendConnection.executeQuery(parentCardQuery({
             cardId: CARD_1_ID,
             projectId: PROJECT_1_ID,
@@ -135,7 +143,11 @@ export function createBackendConnectionTestSuite(
       });
 
       suite("cardChildCount", () => {
-        testBackendConnection("unrecognised ID returns 0", async (backendConnection) => {
+        testBackendConnection("unrecognised card ID returns 0", async (backendConnection) => {
+          await backendConnection.mutate(testingAppMutation.projectAdd({
+            id: PROJECT_1_ID,
+          }));
+
           const card = await backendConnection.executeQuery(cardChildCountQuery({
             cardId: CARD_1_ID,
             projectId: PROJECT_1_ID,
@@ -419,6 +431,10 @@ export function createBackendConnectionTestSuite(
 
       suite("parentBoard", () => {
         testBackendConnection("root board parent is itself", async (backendConnection) => {
+          await backendConnection.mutate(testingAppMutation.projectAdd({
+            id: PROJECT_1_ID,
+          }));
+
           const parentBoardId = await backendConnection.executeQuery(parentBoardQuery({
             boardId: rootBoardId,
             projectId: PROJECT_1_ID,
@@ -517,6 +533,10 @@ export function createBackendConnectionTestSuite(
       });
 
       testBackendConnection("allColors", async (backendConnection) => {
+        await backendConnection.mutate(testingAppMutation.projectAdd({
+          id: PROJECT_1_ID,
+        }));
+
         const allColors = await backendConnection.executeQuery(allColorsQuery({
           projectId: PROJECT_1_ID,
         }));

@@ -49,12 +49,14 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
             await mutate(appMutations.cardMoveToAfter({
               ...mutation,
               createdAt: Instant.now(),
+              projectId,
             }));
           }}
           onCardMoveToBefore={async (mutation) => {
             await mutate(appMutations.cardMoveToBefore({
               ...mutation,
               createdAt: Instant.now(),
+              projectId,
             }));
           }}
           onCardSelect={onCardSelect}

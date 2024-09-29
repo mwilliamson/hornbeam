@@ -8,20 +8,22 @@ import { createProject, Project, ProjectAddMutation } from "./projects";
 
 export class AppSnapshot {
   private readonly projects: ReadonlyArray<Project>;
-  private readonly projectContents: ProjectContentsSnapshot;
+  private readonly projectContents: Map<string, ProjectContentsSnapshot>;
 
   constructor(
     projects: ReadonlyArray<Project>,
-    projectContents: ProjectContentsSnapshot
+    projectContents: Map<string, ProjectContentsSnapshot>,
   ) {
     this.projects = projects;
     this.projectContents = projectContents;
   }
 
   public projectAdd(mutation: ProjectAddMutation): AppSnapshot {
+    const projectContents = new Map(this.projectContents);
+    projectContents.set(mutation.id, initialProjectContentsSnapshot());
     return new AppSnapshot(
       [...this.projects, createProject(mutation)],
-      this.projectContents,
+      projectContents,
     );
   }
 
@@ -29,28 +31,39 @@ export class AppSnapshot {
     return this.projects;
   }
 
-  public fetchProjectContents(): ProjectContentsSnapshot {
-    return this.projectContents;
+  public fetchProjectContents(projectId: string): ProjectContentsSnapshot {
+    const projectContents = this.projectContents.get(projectId);
+    if (projectContents === undefined) {
+      throw new Error(`project not found: ${projectId}`);
+    } else {
+      return projectContents;
+    }
   }
 
-  public mutateProjectContents(mutation: ProjectContentsMutation): AppSnapshot {
+  public mutateProjectContents(
+    mutation: ProjectContentsMutation
+  ): AppSnapshot {
+    // TODO: use proper project ID
+    const projectId = mutation.type === "categoryAdd" ? mutation.categoryAdd.projectId : this.allProjects()[0].id;
     return this.updateProjectContents(
+      projectId,
       projectContents => applyProjectContentsMutation(projectContents, mutation),
     );
   }
 
   private updateProjectContents(
+    projectId: string,
     f: (projectContents: ProjectContentsSnapshot) => ProjectContentsSnapshot,
   ): AppSnapshot {
-    return new AppSnapshot(
-      this.projects,
-      f(this.projectContents),
-    );
+    const projectContents = new Map(this.projectContents);
+    projectContents.set(projectId, f(this.fetchProjectContents(projectId)));
+
+    return new AppSnapshot(this.projects, projectContents);
   }
 }
 
 export function initialAppSnapshot(): AppSnapshot {
-  return new AppSnapshot([], initialProjectContentsSnapshot());
+  return new AppSnapshot([], new Map());
 }
 
 export interface AppUpdate {
@@ -192,7 +205,10 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
         } else if (card.id === request.afterCardId) {
           return [
             card,
-            updateCard(movedCard, {parentCardId: request.parentCardId}),
+            updateCard(movedCard, {
+              parentCardId: request.parentCardId,
+              projectId: request.projectId,
+            }),
           ];
         } else {
           return [card];
@@ -226,7 +242,10 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
           return [];
         } else if (card.id === request.beforeCardId) {
           return [
-            updateCard(movedCard, {parentCardId: request.parentCardId}),
+            updateCard(movedCard, {
+              parentCardId: request.parentCardId,
+              projectId: request.projectId,
+            }),
             card,
           ];
         } else {

@@ -62,6 +62,7 @@ export interface CardEditMutation {
   id: string;
   isSubboardRoot?: boolean;
   parentCardId?: string | null;
+  projectId: string;
   status?: CardStatus;
   text?: string;
 }
@@ -83,6 +84,7 @@ export interface CardMoveMutation {
   createdAt: Instant;
   direction: "up" | "down";
   id: string;
+  projectId: string;
 }
 
 export interface CardMoveToBeforeMutation {
@@ -90,6 +92,7 @@ export interface CardMoveToBeforeMutation {
   createdAt: Instant;
   moveCardId: string;
   parentCardId: string | null;
+  projectId: string;
 }
 
 export interface CardMoveToAfterMutation {
@@ -97,6 +100,7 @@ export interface CardMoveToAfterMutation {
   createdAt: Instant;
   moveCardId: string;
   parentCardId: string | null;
+  projectId: string;
 }
 
 export function validateCardText(elementId: string, text: string): ValidationResult<string> {

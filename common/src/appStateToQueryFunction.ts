@@ -26,13 +26,14 @@ export function queryAppSnapshot<R>(
   snapshot: AppSnapshot,
   query: AppQuery<R>,
 ): R {
-  const projectContentsSnapshot = snapshot.fetchProjectContents();
-
   switch (query.type) {
     case "card": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       return query.proof(projectContentsSnapshot.findCardById(query.cardId));
     }
     case "parentCard": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
+
       const card = projectContentsSnapshot.findCardById(query.cardId);
       if (card === null || card.parentCardId === null) {
         return query.proof(null);
@@ -41,23 +42,28 @@ export function queryAppSnapshot<R>(
       return query.proof(projectContentsSnapshot.findCardById(card.parentCardId));
     }
     case "cardChildCount": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       return query.proof(projectContentsSnapshot.countCardChildren(query.cardId));
     }
     case "cardHistory": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       const card = projectContentsSnapshot.findCardById(query.cardId);
       const cardHistory = card === null ? [] : generateCardHistory(card, projectContentsSnapshot);
       return query.proof(cardHistory);
     }
     case "searchCards": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       return query.proof(projectContentsSnapshot.searchCards(query.searchTerm));
     }
     case "boardCardTrees": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       const cards = projectContentsSnapshot.allCards()
         .filter(card => query.cardStatuses.has(card.status));
 
       return query.proof(cardsToTrees(cards, query.boardId));
     }
     case "parentBoard": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       let cardId: string | null = query.boardId.boardRootId;
 
       while (cardId !== null) {
@@ -74,12 +80,15 @@ export function queryAppSnapshot<R>(
       return query.proof(cardId === null ? rootBoardId : cardSubboardId(cardId));
     }
     case "allCategories": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       return query.proof(projectContentsSnapshot);
     }
     case "availableCategories": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       return query.proof(projectContentsSnapshot.availableCategories());
     }
     case "allColors": {
+      const projectContentsSnapshot = snapshot.fetchProjectContents(query.projectId);
       return query.proof(projectContentsSnapshot);
     }
     case "allProjects": {

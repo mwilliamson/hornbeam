@@ -23,7 +23,9 @@ export class CommentRepositoryInMemory implements CommentRepository {
   }
 
   async fetchByCardId(cardId: string): Promise<ReadonlyArray<Comment>> {
-    return this.snapshot.value.fetchProjectContents().findCommentsByCardId(cardId);
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return this.snapshot.value.fetchProjectContents(projectId).findCommentsByCardId(cardId);
   }
 }
 

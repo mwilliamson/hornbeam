@@ -14,5 +14,7 @@ test("hornbeam.log is valid", async () => {
     appState = applyAppUpdate(appState, appUpdate);
   }
 
-  assert.ok(appState.latestSnapshot().fetchProjectContents().allCards().length > 20);
+  const projectContents = appState.latestSnapshot()
+    .fetchProjectContents("01922aaa-ad4c-731f-a696-086f32fa53c8");
+  assert.ok(projectContents.allCards().length > 20);
 });

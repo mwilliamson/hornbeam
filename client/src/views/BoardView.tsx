@@ -118,6 +118,7 @@ export default function BoardView(props: BoardViewProps) {
             createdAt: Instant.now(),
             id: viewState.selectedCardId,
             status: CardStatus.Deleted,
+            projectId,
           }));
         }
       }

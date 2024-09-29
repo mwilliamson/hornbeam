@@ -49,27 +49,37 @@ export class CardRepositoryInMemory implements CardRepository {
   }
 
   async fetchAll(): Promise<ReadonlyArray<Card>> {
-    return this.snapshot.value.fetchProjectContents().allCards();
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return this.snapshot.value.fetchProjectContents(projectId).allCards();
   }
 
   async fetchById(id: string): Promise<Card | null> {
-    return this.snapshot.value.fetchProjectContents().findCardById(id);
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return this.snapshot.value.fetchProjectContents(projectId).findCardById(id);
   }
 
   async fetchParentByChildId(childId: string): Promise<Card | null> {
-    const childCard = this.snapshot.value.fetchProjectContents().findCardById(childId);
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    const childCard = this.snapshot.value.fetchProjectContents(projectId).findCardById(childId);
     if (childCard === null || childCard.parentCardId === null) {
       return null;
     }
-    return this.snapshot.value.fetchProjectContents().findCardById(childCard.parentCardId);
+    return this.snapshot.value.fetchProjectContents(projectId).findCardById(childCard.parentCardId);
   }
 
   async fetchChildCountByParentId(parentId: string): Promise<number> {
-    return this.snapshot.value.fetchProjectContents().countCardChildren(parentId);
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return this.snapshot.value.fetchProjectContents(projectId).countCardChildren(parentId);
   }
 
   async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
-    return this.snapshot.value.fetchProjectContents().searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return this.snapshot.value.fetchProjectContents(projectId).searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
   }
 
   async fetchBoardCardTrees(

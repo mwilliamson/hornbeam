@@ -92,7 +92,7 @@ class AppTransaction {
         }
         case "allCategories": {
           const categoryRepository = new CategoryRepositoryDatabase(this.transaction);
-          const result = await categoryRepository.fetchAll();
+          const result = await categoryRepository.fetchAllByProjectId(serverQuery.projectId);
           return serializeAllCategoriesResponse(result);
         }
         case "allColors": {

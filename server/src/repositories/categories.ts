@@ -5,7 +5,7 @@ import { AppSnapshotRef } from "./snapshotRef";
 export interface CategoryRepository {
   add: (mutation: CategoryAddMutation) => Promise<void>;
   reorder: (mutation: CategoryReorderMutation) => Promise<void>;
-  fetchAll: () => Promise<ReadonlyArray<Category>>;
+  fetchAllByProjectId: (projectId: string) => Promise<ReadonlyArray<Category>>;
 }
 
 export class CategoryRepositoryInMemory implements CategoryRepository {
@@ -29,8 +29,8 @@ export class CategoryRepositoryInMemory implements CategoryRepository {
     });
   }
 
-  async fetchAll(): Promise<ReadonlyArray<Category>> {
-    return this.snapshot.value.fetchProjectContents().allCategories();
+  async fetchAllByProjectId(projectId: string): Promise<ReadonlyArray<Category>> {
+    return this.snapshot.value.fetchProjectContents(projectId).allCategories();
   }
 }
 
@@ -78,9 +78,10 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
       .execute();
   }
 
-  async fetchAll(): Promise<ReadonlyArray<Category>> {
+  async fetchAllByProjectId(projectId: string): Promise<ReadonlyArray<Category>> {
     const categoryRows = await this.database.selectFrom("categories")
       .select(["id", "name", "presetColorId", "projectId"])
+      .where("projectId", "=", projectId)
       .orderBy("index")
       .execute();
 

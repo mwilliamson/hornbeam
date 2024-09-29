@@ -7,17 +7,18 @@ import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
 
-const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000010000";
 const CATEGORY_1_ID = "0191be9e-f6df-7507-9e6b-000000000001";
 const CATEGORY_2_ID = "0191be9e-f6df-7507-9e6b-000000000002";
 const CATEGORY_3_ID = "0191be9e-f6df-7507-9e6b-000000000003";
+const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000010001";
+const PROJECT_2_ID = "01923983-2f95-7d79-975f-000000010002";
 
 export function createCategoryRepositoryTests(
   createFixtures: () => RepositoryFixtures,
 ): void {
   suite("fetchAll()", () => {
     testRepository("no categories", async (repository) => {
-      const categories = await repository.fetchAll();
+      const categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
 
       assertThat(categories, containsExactly());
     });
@@ -37,7 +38,7 @@ export function createCategoryRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const categories = await repository.fetchAll();
+      const categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
 
       assertThat(categories, containsExactly(
         hasProperties({
@@ -66,11 +67,37 @@ export function createCategoryRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const categories = await repository.fetchAll();
+      const categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
 
       assertThat(categories, isSequence(
         hasProperties({name: "<category 1 name>"}),
         hasProperties({name: "<category 2 name>"}),
+      ));
+    });
+
+    testRepository("categories from other project are not fetched", async (repository) => {
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
+        color: {presetColorId: presetColorRed.id},
+        id: CATEGORY_1_ID,
+        name: "<category 1 name>",
+        projectId: PROJECT_1_ID,
+      }));
+
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
+        color: {presetColorId: presetColorGreen.id},
+        id: CATEGORY_2_ID,
+        name: "<category 2 name>",
+        projectId: PROJECT_2_ID,
+      }));
+
+      const categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
+
+      assertThat(categories, containsExactly(
+        hasProperties({
+          color: deepEqualTo({presetColorId: presetColorRed.id}),
+          id: CATEGORY_1_ID,
+          name: "<category 1 name>",
+        }),
       ));
     });
 
@@ -97,7 +124,7 @@ export function createCategoryRepositoryTests(
         ids: [CATEGORY_2_ID, CATEGORY_1_ID, CATEGORY_3_ID],
       }));
 
-      const categories = await repository.fetchAll();
+      const categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
 
       assertThat(categories, isSequence(
         hasProperties({name: "<category 2 name>"}),
@@ -114,6 +141,9 @@ export function createCategoryRepositoryTests(
       const projectRepository = await fixtures.projectRepository();
       await projectRepository.add(testingProjectAddMutation({
         id: PROJECT_1_ID,
+      }));
+      await projectRepository.add(testingProjectAddMutation({
+        id: PROJECT_2_ID,
       }));
 
       await f(await fixtures.categoryRepository());

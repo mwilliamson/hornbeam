@@ -55,16 +55,19 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
             ...mutation,
             createdAt: Instant.now(),
             id: card.id,
+            projectId,
           }))}
           onCardMove={(direction) => mutate(appMutations.cardMove({
             createdAt: Instant.now(),
             direction,
             id: card.id,
+            projectId,
           }))}
           onCommentAdd={(text) => mutate(appMutations.commentAdd({
             cardId: card.id,
             createdAt: Instant.now(),
             id: generateId(),
+            projectId,
             text,
           }))}
           onBoardOpen={onBoardOpen}

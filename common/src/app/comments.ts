@@ -11,6 +11,7 @@ export interface CommentAddMutation {
   cardId: string;
   createdAt: Instant;
   id: string;
+  projectId: string,
   text: string;
 }
 

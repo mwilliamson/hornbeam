@@ -21,6 +21,7 @@ const SerializedCardEditMutation = t.intersection([
   t.type({
     createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
     id: t.string,
+    projectId: t.string,
   }),
   t.partial({
     categoryId: t.string,
@@ -35,6 +36,7 @@ const SerializedCardMoveMutation = t.type({
   createdAt: t2.instant,
   direction: t.keyof({"down": null, "up": null}),
   id: t.string,
+  projectId: t.string,
 }, "SerializedCardMoveMutation");
 
 const SerializedCardMoveToAfterMutation = t.type({
@@ -42,6 +44,7 @@ const SerializedCardMoveToAfterMutation = t.type({
   afterCardId: t.string,
   moveCardId: t.string,
   parentCardId: t.union([t.string, t.null]),
+  projectId: t.string,
 }, "SerializedCardMoveToAfterMutation");
 
 const SerializedCardMoveToBeforeMutation = t.type({
@@ -49,6 +52,7 @@ const SerializedCardMoveToBeforeMutation = t.type({
   beforeCardId: t.string,
   moveCardId: t.string,
   parentCardId: t.union([t.string, t.null]),
+  projectId: t.string,
 }, "SerializedCardMoveToBeforeMutation");
 
 const SerializedCategoryAddMutation = t.type({
@@ -69,6 +73,7 @@ const SerializedCommentAddMutation = t.type({
   cardId: t.string,
   createdAt: t2.instant,
   id: t.string,
+  projectId: t.string,
   text: t.string,
 }, "SerializedCommentAddMutation");
 

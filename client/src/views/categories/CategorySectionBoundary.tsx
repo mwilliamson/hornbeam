@@ -1,6 +1,6 @@
 import { Instant } from "@js-joda/core";
+import { uuidv7 } from "uuidv7";
 
-import { CategoryAddMutation } from "hornbeam-common/lib/app/categories";
 import { appMutations } from "hornbeam-common/lib/app/snapshots";
 import Boundary from "../Boundary";
 import { allCategoriesQuery, allColorsQuery } from "hornbeam-common/lib/queries";
@@ -23,14 +23,18 @@ export default function CategorySectionBoundary(props: CategorySectionBoundaryPr
         <CategorySection
           categories={allCategories.allCategories()}
           allColors={allColors}
-          projectId={projectId}
           onReorder={async ids => await sendMutation(appMutations.categoryReorder({
             createdAt: Instant.now(),
             ids,
             projectId,
           }))}
-          onCategoryAdd={async (mutation: CategoryAddMutation) => {
-            await sendMutation(appMutations.categoryAdd(mutation));
+          onCategoryAdd={async (mutation) => {
+            await sendMutation(appMutations.categoryAdd({
+              ...mutation,
+              createdAt: Instant.now(),
+              id: uuidv7(),
+              projectId,
+            }));
           }}
         />
       )}

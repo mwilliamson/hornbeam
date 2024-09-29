@@ -1,7 +1,5 @@
 
-import { Instant } from "@js-joda/core";
 import { useId, useState } from "react";
-import { uuidv7 } from "uuidv7";
 
 import { CategoryAddMutation } from "hornbeam-common/lib/app/categories";
 import { ColorSet } from "hornbeam-common/lib/app/colors";
@@ -20,13 +18,11 @@ interface AddCategoryState {
 
 interface AddCategorySectionProps {
   allColors: ColorSet;
-  // TODO: omit createdAt, id, and projectId from mutation?
-  onCategoryAdd: (mutation: CategoryAddMutation) => Promise<void>;
-  projectId: string;
+  onCategoryAdd: (mutation: Omit<CategoryAddMutation, "createdAt" | "id" | "projectId">) => Promise<void>;
 }
 
 export default function AddCategorySection(props: AddCategorySectionProps) {
-  const {allColors, onCategoryAdd, projectId} = props;
+  const {allColors, onCategoryAdd} = props;
 
   const [state, setState] = useState<AddCategoryState | null>(null);
 
@@ -45,10 +41,7 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
       // TODO: handle errors (here and elsewhere)
       await onCategoryAdd({
         color: {presetColorId: validCategoryAddMutation.presetColorId},
-        createdAt: Instant.now(),
         name: validCategoryAddMutation.name,
-        id: uuidv7(),
-        projectId,
       });
       setState(null);
     }

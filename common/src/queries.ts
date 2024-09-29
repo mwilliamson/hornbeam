@@ -82,8 +82,13 @@ export type AppQuery<R> =
     readonly proof: Leibniz<ReadonlyArray<Project>, R>;
   };
 
+interface CardQuery {
+  readonly cardId: string;
+  readonly projectId: string;
+}
+
 export function cardQuery(
-  {cardId, projectId}: {cardId: string, projectId: string},
+  {cardId, projectId}: CardQuery,
 ): AppQuery<Card | null> {
   return {
     type: "card",
@@ -93,8 +98,13 @@ export function cardQuery(
   };
 }
 
+interface ParentCardQuery {
+  readonly cardId: string;
+  readonly projectId: string;
+}
+
 export function parentCardQuery(
-  {cardId, projectId}: {cardId: string, projectId: string},
+  {cardId, projectId}: ParentCardQuery,
 ): AppQuery<Card | null> {
   return {
     type: "parentCard",
@@ -104,8 +114,13 @@ export function parentCardQuery(
   };
 }
 
+interface CardChildCountQuery {
+  readonly cardId: string;
+  readonly projectId: string;
+}
+
 export function cardChildCountQuery(
-  {cardId, projectId}: {cardId: string, projectId: string},
+  {cardId, projectId}: CardChildCountQuery,
 ): AppQuery<number> {
   return {
     type: "cardChildCount",
@@ -115,8 +130,13 @@ export function cardChildCountQuery(
   };
 }
 
+interface CardHistoryQuery {
+  readonly cardId: string;
+  readonly projectId: string;
+}
+
 export function cardHistoryQuery(
-  {cardId, projectId}: {cardId: string, projectId: string},
+  {cardId, projectId}: CardHistoryQuery,
 ): AppQuery<CardHistory> {
   return {
     type: "cardHistory",
@@ -126,8 +146,13 @@ export function cardHistoryQuery(
   };
 }
 
+interface SearchCardsQuery {
+  readonly projectId: string;
+  readonly searchTerm: string;
+}
+
 export function searchCardsQuery(
-  {projectId, searchTerm}: {projectId: string, searchTerm: string},
+  {projectId, searchTerm}: SearchCardsQuery,
 ): AppQuery<ReadonlyArray<Card>> {
   return {
     type: "searchCards",
@@ -137,15 +162,17 @@ export function searchCardsQuery(
   };
 }
 
+interface BoardCardTreesQuery {
+  readonly cardStatuses: ReadonlySet<CardStatus>;
+  readonly boardId: BoardId;
+  readonly projectId: string;
+}
+
 export function boardCardTreesQuery({
   cardStatuses,
   boardId,
   projectId,
-}: {
-  readonly cardStatuses: ReadonlySet<CardStatus>;
-  readonly boardId: BoardId;
-  readonly projectId: string;
-}): AppQuery<ReadonlyArray<CardTree>> {
+}: BoardCardTreesQuery): AppQuery<ReadonlyArray<CardTree>> {
   return {
     type: "boardCardTrees",
     proof,
@@ -155,8 +182,13 @@ export function boardCardTreesQuery({
   };
 }
 
+interface ParentBoardQuery {
+  readonly boardId: BoardId;
+  readonly projectId: string;
+}
+
 export function parentBoardQuery(
-  {boardId, projectId}: {boardId: BoardId, projectId: string},
+  {boardId, projectId}: ParentBoardQuery,
 ): AppQuery<BoardId> {
   return {
     type: "parentBoard",
@@ -166,7 +198,11 @@ export function parentBoardQuery(
   };
 }
 
-export function allCategoriesQuery({projectId}: {projectId: string}): AppQuery<CategorySet> {
+interface AllCategoriesQuery {
+  readonly projectId: string;
+}
+
+export function allCategoriesQuery({projectId}: AllCategoriesQuery): AppQuery<CategorySet> {
   return {
     type: "allCategories",
     proof,
@@ -174,8 +210,12 @@ export function allCategoriesQuery({projectId}: {projectId: string}): AppQuery<C
   };
 }
 
+interface AvailableCategoriesQuery {
+  readonly projectId: string;
+}
+
 export function availableCategoriesQuery(
-  {projectId}: {projectId: string},
+  {projectId}: AvailableCategoriesQuery,
 ): AppQuery<ReadonlyArray<Category>> {
   return {
     type: "availableCategories",
@@ -184,8 +224,12 @@ export function availableCategoriesQuery(
   };
 }
 
+interface AllColorsQuery {
+  readonly projectId: string;
+}
+
 export function allColorsQuery(
-  {projectId}: {projectId: string},
+  {projectId}: AllColorsQuery,
 ): AppQuery<ColorSet>{
   return {
     type: "allColors",

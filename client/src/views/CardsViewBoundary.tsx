@@ -36,6 +36,7 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
         boardCardTrees: boardCardTreesQuery({
           cardStatuses: visibleCardStatuses,
           boardId: selectedBoardId,
+          projectId,
         }),
       }}
       render={({allCategories, allColors, boardCardTrees: boardCards}, mutate) => (

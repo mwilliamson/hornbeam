@@ -23,10 +23,10 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
       queries={{
         allCategories: allCategoriesQuery({projectId}),
         allColors: allColorsQuery({projectId}),
-        card: cardQuery(cardId),
-        cardChildCount: cardChildCountQuery(cardId),
-        cardHistory: cardHistoryQuery(cardId),
-        parentCard: parentCardQuery(cardId),
+        card: cardQuery({cardId, projectId}),
+        cardChildCount: cardChildCountQuery({cardId, projectId}),
+        cardHistory: cardHistoryQuery({cardId, projectId}),
+        parentCard: parentCardQuery({cardId, projectId}),
       }}
       render={(
         {
@@ -48,7 +48,7 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
           cardChildCount={cardChildCount}
           cardHistory={cardHistory}
           cardSearcher={{
-            searchCards: searchTerm => query(searchCardsQuery(searchTerm)),
+            searchCards: searchTerm => query(searchCardsQuery({projectId, searchTerm})),
           }}
           onAddChildClick={() => onCardAddClick({parentCard: card})}
           onCardEdit={(mutation) => mutate(appMutations.cardEdit({

@@ -137,7 +137,10 @@ export default function BoardView(props: BoardViewProps) {
         return;
       }
       // TODO: deselect selected card if not visible on the board?
-      const query = parentBoardQuery(viewState.selectedBoardId);
+      const query = parentBoardQuery({
+        boardId: viewState.selectedBoardId,
+        projectId,
+      });
       const parentBoardId = await backendConnection.executeQuery(query);
       handleBoardOpen(parentBoardId);
     };
@@ -151,6 +154,7 @@ export default function BoardView(props: BoardViewProps) {
           onSettingsClick={handleSettingsClick}
           onTimeTravelStart={handleTimeTravelStart}
           boardId={viewState.selectedBoardId}
+          projectId={projectId}
         />
       </div>
       <div className="BoardView-Bottom">

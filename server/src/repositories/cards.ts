@@ -76,11 +76,15 @@ export class CardRepositoryInMemory implements CardRepository {
     boardId: BoardId,
     cardStatuses: ReadonlySet<CardStatus>,
   ): Promise<ReadonlyArray<CardTree>> {
-    return queryAppSnapshot(this.snapshot.value, boardCardTreesQuery({boardId, cardStatuses}));
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return queryAppSnapshot(this.snapshot.value, boardCardTreesQuery({boardId, cardStatuses, projectId}));
   }
 
   async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
-    return queryAppSnapshot(this.snapshot.value, parentBoardQuery(boardId));
+    // TODO: use proper project ID
+    const projectId = this.snapshot.value.allProjects()[0].id;
+    return queryAppSnapshot(this.snapshot.value, parentBoardQuery({boardId, projectId}));
   }
 }
 

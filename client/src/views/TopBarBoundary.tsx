@@ -10,6 +10,7 @@ interface TopBarBoundaryProps {
   onSettingsClick: () => void;
   onTimeTravelStart: (() => void) | null;
   boardId: BoardId;
+  projectId: string;
 }
 
 export default function TopBarBoundary(props: TopBarBoundaryProps) {
@@ -19,12 +20,16 @@ export default function TopBarBoundary(props: TopBarBoundaryProps) {
     onSettingsClick,
     onTimeTravelStart,
     boardId,
+    projectId,
   } = props;
 
   return (
     <Boundary
       queries={{
-        boardRoot: boardId.boardRootId === null ? null : cardQuery(boardId.boardRootId)
+        boardRoot: boardId.boardRootId === null ? null : cardQuery({
+          cardId: boardId.boardRootId,
+          projectId,
+        })
       }}
       render={({boardRoot}) => (
         <TopBar

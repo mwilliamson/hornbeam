@@ -26,7 +26,10 @@ export function createBackendConnectionTestSuite(
     suite("queries", () => {
       suite("card", () => {
         testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
-          const card = await backendConnection.executeQuery(cardQuery(CARD_1_ID));
+          const card = await backendConnection.executeQuery(cardQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, equalTo(null));
         });
@@ -53,7 +56,10 @@ export function createBackendConnectionTestSuite(
             text: "<card text 2>",
           }));
 
-          const card = await backendConnection.executeQuery(cardQuery(CARD_2_ID));
+          const card = await backendConnection.executeQuery(cardQuery({
+            cardId: CARD_2_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, hasProperties({text: "<card text 2>"}));
         });
@@ -61,7 +67,10 @@ export function createBackendConnectionTestSuite(
 
       suite("parentCard", () => {
         testBackendConnection("unrecognised ID returns null", async (backendConnection) => {
-          const card = await backendConnection.executeQuery(parentCardQuery(CARD_1_ID));
+          const card = await backendConnection.executeQuery(parentCardQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, equalTo(null));
         });
@@ -82,7 +91,10 @@ export function createBackendConnectionTestSuite(
             parentCardId: null,
           }));
 
-          const card = await backendConnection.executeQuery(parentCardQuery(CARD_1_ID));
+          const card = await backendConnection.executeQuery(parentCardQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, equalTo(null));
         });
@@ -113,7 +125,10 @@ export function createBackendConnectionTestSuite(
             parentCardId,
           }));
 
-          const card = await backendConnection.executeQuery(parentCardQuery(childCardId));
+          const card = await backendConnection.executeQuery(parentCardQuery({
+            cardId: childCardId,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, hasProperties({text: "<parent card text>"}));
         });
@@ -121,7 +136,10 @@ export function createBackendConnectionTestSuite(
 
       suite("cardChildCount", () => {
         testBackendConnection("unrecognised ID returns 0", async (backendConnection) => {
-          const card = await backendConnection.executeQuery(cardChildCountQuery(CARD_1_ID));
+          const card = await backendConnection.executeQuery(cardChildCountQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, equalTo(0));
         });
@@ -142,7 +160,10 @@ export function createBackendConnectionTestSuite(
             parentCardId: null,
           }));
 
-          const card = await backendConnection.executeQuery(cardChildCountQuery(CARD_1_ID));
+          const card = await backendConnection.executeQuery(cardChildCountQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, equalTo(0));
         });
@@ -177,7 +198,10 @@ export function createBackendConnectionTestSuite(
             parentCardId,
           }));
 
-          const card = await backendConnection.executeQuery(cardChildCountQuery(parentCardId));
+          const card = await backendConnection.executeQuery(cardChildCountQuery({
+            cardId: parentCardId,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(card, equalTo(2));
         });
@@ -200,7 +224,10 @@ export function createBackendConnectionTestSuite(
             id: CARD_1_ID,
           }));
 
-          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(CARD_1_ID));
+          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(cardHistory, containsExactly(
             hasProperties({
@@ -231,7 +258,10 @@ export function createBackendConnectionTestSuite(
             text: "<card text>",
           }));
 
-          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery(CARD_1_ID));
+          const cardHistory = await backendConnection.executeQuery(cardHistoryQuery({
+            cardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(cardHistory, containsExactly(
             hasProperties({
@@ -276,7 +306,10 @@ export function createBackendConnectionTestSuite(
           text: "dd",
         }));
 
-        const cardHistory = await backendConnection.executeQuery(searchCardsQuery("a"));
+        const cardHistory = await backendConnection.executeQuery(searchCardsQuery({
+          projectId: PROJECT_1_ID,
+          searchTerm: "a",
+        }));
 
         assertThat(cardHistory, containsExactly(
           hasProperties({text: "ab"}),
@@ -314,6 +347,7 @@ export function createBackendConnectionTestSuite(
           const boardCardTrees = await backendConnection.executeQuery(boardCardTreesQuery({
             boardId: rootBoardId,
             cardStatuses: new Set(allCardStatuses),
+            projectId: PROJECT_1_ID,
           }));
 
           assertThat(boardCardTrees, containsExactly(
@@ -362,6 +396,7 @@ export function createBackendConnectionTestSuite(
           const boardCardTrees = await backendConnection.executeQuery(boardCardTreesQuery({
             boardId: rootBoardId,
             cardStatuses: new Set(allCardStatuses),
+            projectId: PROJECT_1_ID,
           }));
 
           assertThat(boardCardTrees, containsExactly(
@@ -384,7 +419,10 @@ export function createBackendConnectionTestSuite(
 
       suite("parentBoard", () => {
         testBackendConnection("root board parent is itself", async (backendConnection) => {
-          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery(rootBoardId));
+          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery({
+            boardId: rootBoardId,
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(parentBoardId, deepEqualTo(rootBoardId));
         });
@@ -419,7 +457,10 @@ export function createBackendConnectionTestSuite(
             isSubboardRoot: true,
           }));
 
-          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery(cardSubboardId(CARD_2_ID)));
+          const parentBoardId = await backendConnection.executeQuery(parentBoardQuery({
+            boardId: cardSubboardId(CARD_2_ID),
+            projectId: PROJECT_1_ID,
+          }));
 
           assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_1_ID)));
         });
@@ -528,9 +569,9 @@ export function createBackendConnectionTestSuite(
 
       const result = await backendConnection.executeQueries({
         a: null,
-        b: cardQuery(CARD_1_ID),
+        b: cardQuery({cardId: CARD_1_ID, projectId: PROJECT_1_ID}),
         c: null,
-        d: cardQuery(CARD_2_ID),
+        d: cardQuery({cardId: CARD_2_ID, projectId: PROJECT_1_ID}),
       });
 
       assertThat(result, hasProperties({

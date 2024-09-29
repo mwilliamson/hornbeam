@@ -20,25 +20,30 @@ export type AppQuery<R> =
     readonly type: "card";
     readonly proof: Leibniz<Card | null, R>;
     readonly cardId: string;
+    readonly projectId: string;
   }
   | {
     readonly type: "parentCard";
     readonly proof: Leibniz<Card | null, R>;
     readonly cardId: string;
+    readonly projectId: string;
   }
   | {
     readonly type: "cardChildCount";
     readonly proof: Leibniz<number, R>;
     readonly cardId: string;
+    readonly projectId: string;
   }
   | {
     readonly type: "cardHistory";
     readonly proof: Leibniz<CardHistory, R>;
     readonly cardId: string;
+    readonly projectId: string;
   }
   | {
     readonly type: "searchCards";
     readonly proof: Leibniz<ReadonlyArray<Card>, R>;
+    readonly projectId: string;
     readonly searchTerm: string;
   }
   | {
@@ -46,11 +51,13 @@ export type AppQuery<R> =
     readonly proof: Leibniz<ReadonlyArray<CardTree>, R>;
     readonly cardStatuses: ReadonlySet<CardStatus>;
     readonly boardId: BoardId;
+    readonly projectId: string;
   }
   | {
     readonly type: "parentBoard";
     readonly proof: Leibniz<BoardId, R>;
     readonly boardId: BoardId;
+    readonly projectId: string;
   }
   // Categories
   | {
@@ -75,66 +82,87 @@ export type AppQuery<R> =
     readonly proof: Leibniz<ReadonlyArray<Project>, R>;
   };
 
-export function cardQuery(cardId: string): AppQuery<Card | null> {
+export function cardQuery(
+  {cardId, projectId}: {cardId: string, projectId: string},
+): AppQuery<Card | null> {
   return {
     type: "card",
     proof,
     cardId,
+    projectId,
   };
 }
 
-export function parentCardQuery(cardId: string): AppQuery<Card | null> {
+export function parentCardQuery(
+  {cardId, projectId}: {cardId: string, projectId: string},
+): AppQuery<Card | null> {
   return {
     type: "parentCard",
     proof,
     cardId,
+    projectId,
   };
 }
 
-export function cardChildCountQuery(cardId: string): AppQuery<number> {
+export function cardChildCountQuery(
+  {cardId, projectId}: {cardId: string, projectId: string},
+): AppQuery<number> {
   return {
     type: "cardChildCount",
     proof,
     cardId,
+    projectId,
   };
 }
 
-export function cardHistoryQuery(cardId: string): AppQuery<CardHistory> {
+export function cardHistoryQuery(
+  {cardId, projectId}: {cardId: string, projectId: string},
+): AppQuery<CardHistory> {
   return {
     type: "cardHistory",
     proof,
     cardId,
+    projectId,
   };
 }
 
-export function searchCardsQuery(searchTerm: string): AppQuery<ReadonlyArray<Card>> {
+export function searchCardsQuery(
+  {projectId, searchTerm}: {projectId: string, searchTerm: string},
+): AppQuery<ReadonlyArray<Card>> {
   return {
     type: "searchCards",
-    searchTerm,
     proof,
+    projectId,
+    searchTerm,
   };
 }
 
 export function boardCardTreesQuery({
   cardStatuses,
   boardId,
+  projectId,
 }: {
   readonly cardStatuses: ReadonlySet<CardStatus>;
   readonly boardId: BoardId;
+  readonly projectId: string;
 }): AppQuery<ReadonlyArray<CardTree>> {
   return {
     type: "boardCardTrees",
     proof,
     cardStatuses,
     boardId,
+    projectId,
   };
 }
 
-export function parentBoardQuery(boardId: BoardId): AppQuery<BoardId> {
+export function parentBoardQuery(
+  {boardId, projectId}: {boardId: BoardId, projectId: string},
+): AppQuery<BoardId> {
   return {
     type: "parentBoard",
     proof,
     boardId,
+    projectId,
   };
 }
 

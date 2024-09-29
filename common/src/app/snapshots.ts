@@ -402,7 +402,7 @@ export function projectContentsMutationCreatedAt(mutation: ProjectContentsMutati
   }
 }
 
-export function applyProjectContentsMutation(snapshot: ProjectContentsSnapshot, mutation: ProjectContentsMutation): ProjectContentsSnapshot {
+function applyProjectContentsMutation(snapshot: ProjectContentsSnapshot, mutation: ProjectContentsMutation): ProjectContentsSnapshot {
   switch (mutation.type) {
     case "cardAdd":
       return snapshot.cardAdd(mutation.cardAdd);

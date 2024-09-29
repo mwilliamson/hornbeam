@@ -1,8 +1,8 @@
 import { Instant } from "@js-joda/core";
-import { uuidv7 } from "uuidv7";
 import { allProjectsQuery } from "hornbeam-common/lib/queries";
 import Boundary from "../Boundary";
 import { ProjectsView } from "./ProjectsView";
+import { generateId } from "hornbeam-common/lib/app/ids";
 
 interface ProjectsViewBoundaryProps {
   onProjectSelect: (id: string) => void;
@@ -24,7 +24,7 @@ export function ProjectsViewBoundary(props: ProjectsViewBoundaryProps) {
             projectAdd: {
               ...mutation,
               createdAt: Instant.now(),
-              id: uuidv7(),
+              id: generateId(),
             },
           })}
           onProjectSelect={onProjectSelect}

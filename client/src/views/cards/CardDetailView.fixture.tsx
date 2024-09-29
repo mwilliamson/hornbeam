@@ -1,5 +1,4 @@
 import { Instant } from "@js-joda/core";
-import { uuidv7 } from "uuidv7";
 
 import { initialProjectContentsSnapshot } from "hornbeam-common/lib/app/snapshots";
 import { Card, generateCardHistory } from "hornbeam-common/lib/app/cards";
@@ -7,6 +6,7 @@ import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import { rootBoardId } from "hornbeam-common/lib/app/boards";
 import CardDetailView from "./CardDetailView";
 import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
+import { generateId } from "hornbeam-common/lib/app/ids";
 
 const snapshot = initialProjectContentsSnapshot()
   .categoryAdd(testingCategoryAddMutation({
@@ -43,7 +43,7 @@ const snapshot = initialProjectContentsSnapshot()
 const card: Card = {
   categoryId: snapshot.availableCategories()[1].id,
   createdAt: Instant.ofEpochMilli(1713386548306),
-  id: uuidv7(),
+  id: generateId(),
   isSubboardRoot: false,
   number: 42,
   parentCardId: null,

@@ -1,10 +1,10 @@
 import { Instant } from "@js-joda/core";
-import { uuidv7 } from "uuidv7";
 
 import { appMutations } from "hornbeam-common/lib/app/snapshots";
 import Boundary from "../Boundary";
 import { allCategoriesQuery, allColorsQuery } from "hornbeam-common/lib/queries";
 import CategorySection from "./CategorySection";
+import { generateId } from "hornbeam-common/lib/app/ids";
 
 interface CategorySectionBoundaryProps {
   projectId: string;
@@ -32,7 +32,7 @@ export default function CategorySectionBoundary(props: CategorySectionBoundaryPr
             await sendMutation(appMutations.categoryAdd({
               ...mutation,
               createdAt: Instant.now(),
-              id: uuidv7(),
+              id: generateId(),
               projectId,
             }));
           }}

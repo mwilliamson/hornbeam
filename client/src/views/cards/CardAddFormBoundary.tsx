@@ -33,6 +33,7 @@ export default function CardAddFormBoundary(props: CardAddFormBoundaryProps) {
               createdAt: Instant.now(),
               id: generateId(),
               parentCardId,
+              projectId,
               text,
             }));
             onClose();

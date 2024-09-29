@@ -13,6 +13,7 @@ const SerializedCardAddMutation = t.type({
   createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
   id: t.string,
   parentCardId: t.union([t.string, t.null]),
+  projectId: t.string,
   text: t.string,
 }, "SerializedCardAddMutation");
 

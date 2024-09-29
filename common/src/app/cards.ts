@@ -39,6 +39,7 @@ export interface CardAddMutation {
   createdAt: Instant;
   id: string;
   parentCardId: string | null;
+  projectId: string;
   text: string;
 }
 

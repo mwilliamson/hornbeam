@@ -27,6 +27,7 @@ export default function CategorySectionBoundary(props: CategorySectionBoundaryPr
           onReorder={async ids => await sendMutation(appMutations.categoryReorder({
             createdAt: Instant.now(),
             ids,
+            projectId,
           }))}
           onCategoryAdd={async (mutation: CategoryAddMutation) => {
             await sendMutation(appMutations.categoryAdd(mutation));

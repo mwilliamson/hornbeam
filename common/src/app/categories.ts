@@ -49,6 +49,7 @@ export function createCategory(request: CategoryAddMutation): Category {
 export interface CategoryReorderMutation {
   createdAt: Instant;
   ids: ReadonlyArray<string>;
+  projectId: string;
 }
 
 export interface CategorySet {

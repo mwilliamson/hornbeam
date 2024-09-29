@@ -61,6 +61,7 @@ const SerializedCategoryAddMutation = t.type({
 const SerializedCategoryReorderMutation = t.type({
   createdAt: t2.instant,
   ids: t.readonlyArray(t.string),
+  projectId: t.string,
 }, "SerializedCategoryReorderMutation");
 
 const SerializedCommentAddMutation = t.type({

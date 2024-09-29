@@ -2,7 +2,7 @@ import { Instant } from "@js-joda/core";
 import { initialProjectContentsSnapshot } from "hornbeam-common/lib/app/snapshots";
 import CategoryListView from "./CategoryListView";
 import { useState } from "react";
-import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
+import { testingCategoryAddMutation, testingCategoryReorderMutation } from "hornbeam-common/lib/app/categories.testing";
 
 // TODO: remove duplication with other fixtures
 const createSnapshot = () => initialProjectContentsSnapshot()
@@ -47,10 +47,10 @@ export default {
         allColors={appSnapshot}
         onReorder={async (categoryIds) => {
           await new Promise(resolve => setTimeout(resolve, 500));
-          setAppSnapshot(appSnapshot.categoryReorder({
+          setAppSnapshot(appSnapshot.categoryReorder(testingCategoryReorderMutation({
             createdAt: Instant.now(),
             ids: categoryIds,
-          }));
+          })));
         }}
       />
     );

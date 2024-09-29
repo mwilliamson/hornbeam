@@ -6,7 +6,13 @@ import Boundary from "../Boundary";
 import { allCategoriesQuery, allColorsQuery } from "hornbeam-common/lib/queries";
 import CategorySection from "./CategorySection";
 
-export default function CategorySectionBoundary() {
+interface CategorySectionBoundaryProps {
+  projectId: string;
+}
+
+export default function CategorySectionBoundary(props: CategorySectionBoundaryProps) {
+  const {projectId} = props;
+
   return (
     <Boundary
       queries={{
@@ -17,6 +23,7 @@ export default function CategorySectionBoundary() {
         <CategorySection
           categories={allCategories.allCategories()}
           allColors={allColors}
+          projectId={projectId}
           onReorder={async ids => await sendMutation(appMutations.categoryReorder({
             createdAt: Instant.now(),
             ids,

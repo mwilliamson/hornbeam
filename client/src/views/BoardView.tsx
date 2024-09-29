@@ -51,10 +51,11 @@ const initialViewState: ViewState = {
 
 interface BoardViewProps {
   backendConnection: BackendConnection;
+  projectId: string;
 }
 
 export default function BoardView(props: BoardViewProps) {
-  const {backendConnection} = props;
+  const {backendConnection, projectId} = props;
   const {mutate} = backendConnection;
   const timeTravel = useTimeTravel();
 
@@ -179,6 +180,7 @@ export default function BoardView(props: BoardViewProps) {
               onCardAddClose={handleCardAddClose}
               onSettingsClose={handleSettingsClose}
               onBoardOpen={handleBoardOpen}
+              projectId={projectId}
               viewState={viewState}
             />
           </div>
@@ -199,6 +201,7 @@ interface SidebarProps {
   onCardAddClose: () => void;
   onSettingsClose: () => void;
   onBoardOpen: (boardId: BoardId) => void;
+  projectId: string;
   viewState: ViewState;
 }
 
@@ -208,6 +211,7 @@ function Sidebar(props: SidebarProps) {
     onCardAddClose,
     onSettingsClose,
     onBoardOpen,
+    projectId,
     viewState,
   } = props;
 
@@ -242,6 +246,7 @@ function Sidebar(props: SidebarProps) {
       return (
         <Pane header="Settings">
           <SettingsView
+            projectId={projectId}
             onBack={onSettingsClose}
           />
         </Pane>

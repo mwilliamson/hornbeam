@@ -4,7 +4,7 @@ import ReactDOM from "react-dom/client";
 import { connectSimpleSync } from "./backendConnections/simpleSync";
 import { BackendConnection } from "./backendConnections";
 import BackendConnect from "./views/BackendConnect";
-import BoardView from "./views/BoardView";
+import AppView from "./views/AppView";
 
 function webSocketUri(): string {
   const location = window.location;
@@ -26,7 +26,7 @@ function SimpleSyncClient() {
   return (
     <BackendConnect connect={connect}>
       {backendConnection => (
-        <BoardView backendConnection={backendConnection} />
+        <AppView backendConnection={backendConnection} />
       )}
     </BackendConnect>
   );

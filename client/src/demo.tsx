@@ -7,7 +7,7 @@ import hornbeamLog from "../../hornbeam.log";
 import { connectInMemory } from "./backendConnections/inMemory";
 import BackendConnect from "./views/BackendConnect";
 import { BackendConnection } from "./backendConnections";
-import BoardView from "./views/BoardView";
+import AppView from "./views/AppView";
 
 function connect(): BackendConnection {
   let appState = initialAppState();
@@ -24,7 +24,7 @@ function Client() {
   return (
     <BackendConnect connect={connect}>
       {backendConnection => (
-        <BoardView backendConnection={backendConnection} />
+        <AppView backendConnection={backendConnection} />
       )}
     </BackendConnect>
   );

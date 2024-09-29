@@ -20,11 +20,13 @@ interface AddCategoryState {
 
 interface AddCategorySectionProps {
   allColors: ColorSet;
+  // TODO: omit createdAt, id, and projectId from mutation?
   onCategoryAdd: (mutation: CategoryAddMutation) => Promise<void>;
+  projectId: string;
 }
 
 export default function AddCategorySection(props: AddCategorySectionProps) {
-  const {allColors, onCategoryAdd} = props;
+  const {allColors, onCategoryAdd, projectId} = props;
 
   const [state, setState] = useState<AddCategoryState | null>(null);
 
@@ -46,8 +48,7 @@ export default function AddCategorySection(props: AddCategorySectionProps) {
         createdAt: Instant.now(),
         name: validCategoryAddMutation.name,
         id: uuidv7(),
-        // TODO: pass in correct project ID
-        projectId: "",
+        projectId,
       });
       setState(null);
     }

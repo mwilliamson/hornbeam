@@ -6,12 +6,13 @@ import CategoryListView from "./CategoryListView";
 interface CategorySectionProps {
   categories: ReadonlyArray<Category>;
   allColors: ColorSet;
+  projectId: string;
   onCategoryAdd: (mutation: CategoryAddMutation) => Promise<void>;
   onReorder: (categoryIds: ReadonlyArray<string>) => Promise<void>;
 }
 
 export default function CategorySection(props: CategorySectionProps) {
-  const {categories, allColors, onCategoryAdd, onReorder} = props;
+  const {categories, allColors, projectId, onCategoryAdd, onReorder} = props;
 
   return (
     <>
@@ -24,6 +25,7 @@ export default function CategorySection(props: CategorySectionProps) {
       <AddCategorySection
         allColors={allColors}
         onCategoryAdd={onCategoryAdd}
+        projectId={projectId}
       />
     </>
   );

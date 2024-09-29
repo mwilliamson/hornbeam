@@ -5,11 +5,12 @@ import ControlGroup from "./widgets/ControlGroup";
 import LinkButton from "./widgets/LinkButton";
 
 interface SettingsViewProps {
+  projectId: string;
   onBack: () => void;
 }
 
 export default function SettingsView(props: SettingsViewProps) {
-  const {onBack} = props;
+  const {projectId, onBack} = props;
 
   return (
     <section>
@@ -22,7 +23,7 @@ export default function SettingsView(props: SettingsViewProps) {
 
       <h3>Categories</h3>
 
-      <CategorySectionBoundary />
+      <CategorySectionBoundary projectId={projectId} />
     </section>
   );
 }

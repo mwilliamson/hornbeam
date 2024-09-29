@@ -11,7 +11,7 @@ const defaultCommentAddCardId = "0191bea4-0003-7e56-a31e-999999999999";
 const defaultCommentAddId = "0191bea3-0004-7e56-a31e-999999999999";
 const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
 
-export const testingProjectContentsMutation = {
+export const testingAppMutation = {
   cardAdd: (mutation: Partial<CardAddMutation>): ProjectContentsMutation => {
     return projectContentsMutations.cardAdd(testingCardAddMutation(mutation));
   },

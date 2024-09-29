@@ -1,6 +1,6 @@
 import { assertThat, containsExactly, deepEqualTo, equalTo, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
-import { testingProjectContentsMutation } from "hornbeam-common/lib/app/snapshots.testing";
+import { testingAppMutation } from "hornbeam-common/lib/app/snapshots.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { MutationLogRepository } from "./mutationLog";
@@ -12,11 +12,11 @@ export function createMutationLogRepositoryTests(
   createFixtures: () => RepositoryFixtures,
 ): void {
   testRepository("adding mutation returns index", async (repository) => {
-    const mutation1 = testingProjectContentsMutation.cardAdd({
+    const mutation1 = testingAppMutation.cardAdd({
       text: "<card 1>",
     });
     const index1 = await repository.add(MUTATION_1_ID, mutation1);
-    const mutation2 = testingProjectContentsMutation.cardAdd({
+    const mutation2 = testingAppMutation.cardAdd({
       text: "<card 2>",
     });
     const index2 = await repository.add(MUTATION_2_ID, mutation2);
@@ -32,11 +32,11 @@ export function createMutationLogRepositoryTests(
   });
 
   testRepository("latest index is index of last added mutation", async (repository) => {
-    const mutation1 = testingProjectContentsMutation.cardAdd({
+    const mutation1 = testingAppMutation.cardAdd({
       text: "<card 1>",
     });
     await repository.add(MUTATION_1_ID, mutation1);
-    const mutation2 = testingProjectContentsMutation.cardAdd({
+    const mutation2 = testingAppMutation.cardAdd({
       text: "<card 2>",
     });
     await repository.add(MUTATION_2_ID, mutation2);
@@ -47,11 +47,11 @@ export function createMutationLogRepositoryTests(
   });
 
   testRepository("can fetch mutations after they're added", async (repository) => {
-    const mutation1 = testingProjectContentsMutation.cardAdd({
+    const mutation1 = testingAppMutation.cardAdd({
       text: "<card 1>",
     });
     await repository.add(MUTATION_1_ID, mutation1);
-    const mutation2 = testingProjectContentsMutation.cardAdd({
+    const mutation2 = testingAppMutation.cardAdd({
       text: "<card 2>",
     });
     await repository.add(MUTATION_2_ID, mutation2);

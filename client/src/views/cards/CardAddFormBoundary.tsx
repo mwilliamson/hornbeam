@@ -10,15 +10,16 @@ import { CardFormInitialState, ValidCardFormValues } from "./CardForm";
 interface CardAddFormBoundaryProps {
   initialValue: CardFormInitialState;
   onClose: () => void;
+  projectId: string;
 }
 
 export default function CardAddFormBoundary(props: CardAddFormBoundaryProps) {
-  const {initialValue, onClose} = props;
+  const {initialValue, onClose, projectId} = props;
 
   return (
     <Boundary
       queries={{
-        availableCategories: availableCategoriesQuery,
+        availableCategories: availableCategoriesQuery({projectId}),
         allColors: allColorsQuery,
       }}
       render={({availableCategories, allColors}, mutate) => (

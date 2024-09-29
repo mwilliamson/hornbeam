@@ -11,16 +11,17 @@ interface CardDetailViewBoundaryProps {
   cardId: string;
   onCardAddClick: (initialCard: CardFormInitialState) => void;
   onBoardOpen: (boardId: BoardId) => void;
+  projectId: string;
   selectedBoardId: BoardId;
 }
 
 export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProps) {
-  const {cardId, onCardAddClick, onBoardOpen, selectedBoardId} = props;
+  const {cardId, onCardAddClick, onBoardOpen, projectId, selectedBoardId} = props;
 
   return (
     <Boundary
       queries={{
-        allCategories: allCategoriesQuery,
+        allCategories: allCategoriesQuery({projectId}),
         allColors: allColorsQuery,
         card: cardQuery(cardId),
         cardChildCount: cardChildCountQuery(cardId),

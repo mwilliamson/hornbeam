@@ -56,10 +56,12 @@ export type AppQuery<R> =
   | {
     readonly type: "allCategories";
     readonly proof: Leibniz<CategorySet, R>;
+    readonly projectId: string;
   }
   | {
     readonly type: "availableCategories";
     readonly proof: Leibniz<ReadonlyArray<Category>, R>;
+    readonly projectId: string;
   }
   // Colors
   | {
@@ -135,15 +137,23 @@ export function parentBoardQuery(boardId: BoardId): AppQuery<BoardId> {
   };
 }
 
-export const allCategoriesQuery: AppQuery<CategorySet> = {
-  type: "allCategories",
-  proof,
-};
+export function allCategoriesQuery({projectId}: {projectId: string}): AppQuery<CategorySet> {
+  return {
+    type: "allCategories",
+    proof,
+    projectId,
+  };
+}
 
-export const availableCategoriesQuery: AppQuery<ReadonlyArray<Category>> = {
-  type: "availableCategories",
-  proof,
-};
+export function availableCategoriesQuery(
+  {projectId}: {projectId: string},
+): AppQuery<ReadonlyArray<Category>> {
+  return {
+    type: "availableCategories",
+    proof,
+    projectId,
+  };
+}
 
 export const allColorsQuery: AppQuery<ColorSet> = {
   type: "allColors",

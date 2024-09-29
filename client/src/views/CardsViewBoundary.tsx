@@ -12,6 +12,7 @@ interface CardsViewBoundaryProps {
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
   onBoardOpen: (boardId: BoardId) => void;
+  projectId: string;
   selectedBoardId: BoardId;
   visibleCardStatuses: ReadonlySet<CardStatus>;
 }
@@ -22,6 +23,7 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
     onCardSelect,
     onCardAddChildClick,
     onBoardOpen,
+    projectId,
     selectedBoardId,
     visibleCardStatuses,
   } = props;
@@ -29,7 +31,7 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
   return (
     <Boundary
       queries={{
-        allCategories: allCategoriesQuery,
+        allCategories: allCategoriesQuery({projectId}),
         allColors: allColorsQuery,
         boardCardTrees: boardCardTreesQuery({
           cardStatuses: visibleCardStatuses,

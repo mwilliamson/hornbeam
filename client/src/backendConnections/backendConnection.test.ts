@@ -441,7 +441,8 @@ export function createBackendConnectionTestSuite(
           projectId: PROJECT_1_ID,
         }));
 
-        const allCategories = await backendConnection.executeQuery(allCategoriesQuery);
+        const query = allCategoriesQuery({projectId: PROJECT_1_ID});
+        const allCategories = await backendConnection.executeQuery(query);
 
         assertThat(allCategories.allCategories(), containsExactly(
           hasProperties({name: "<category name 1>"}),
@@ -465,7 +466,8 @@ export function createBackendConnectionTestSuite(
           projectId: PROJECT_1_ID,
         }));
 
-        const availableCategories = await backendConnection.executeQuery(availableCategoriesQuery);
+        const query = availableCategoriesQuery({projectId: PROJECT_1_ID});
+        const availableCategories = await backendConnection.executeQuery(query);
 
         assertThat(availableCategories, containsExactly(
           hasProperties({name: "<category name 1>"}),

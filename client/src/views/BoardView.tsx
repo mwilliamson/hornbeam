@@ -161,6 +161,7 @@ export default function BoardView(props: BoardViewProps) {
               onCardSelect={(cardId) => setViewState({...viewState, selectedCardId: cardId})}
               onCardAddChildClick={(card) => handleCardAddClick({parentCard: card})}
               onBoardOpen={(boardId) => setViewState({...viewState, selectedBoardId: boardId})}
+              projectId={projectId}
               selectedBoardId={viewState.selectedBoardId}
               visibleCardStatuses={viewState.cardFilters.cardStatuses}
             />
@@ -222,6 +223,7 @@ function Sidebar(props: SidebarProps) {
           <CardAddFormBoundary
             initialValue={viewState.sidebar.cardFormInitialState}
             onClose={onCardAddClose}
+            projectId={projectId}
           />
         </Pane>
       );
@@ -236,6 +238,7 @@ function Sidebar(props: SidebarProps) {
               cardId={viewState.selectedCardId}
               onCardAddClick={onCardAddClick}
               onBoardOpen={onBoardOpen}
+              projectId={projectId}
               selectedBoardId={viewState.selectedBoardId}
             />
           </Pane>

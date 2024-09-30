@@ -19,7 +19,7 @@ export class CardHistoryFetcher {
       return [];
     }
 
-    const comments = await this.commentRepository.fetchByCardId(query.cardId);
+    const comments = await this.commentRepository.fetchCardComments(query);
 
     return [
       {

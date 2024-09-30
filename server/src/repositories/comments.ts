@@ -3,9 +3,14 @@ import { Comment, CommentAddMutation } from "hornbeam-common/lib/app/comments";
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
 
+interface CardCommentQuery {
+  cardId: string;
+  projectId: string;
+}
+
 export interface CommentRepository {
   add: (mutation: CommentAddMutation) => Promise<void>;
-  fetchByCardId: (cardId: string) => Promise<ReadonlyArray<Comment>>;
+  fetchCardComments: (query: CardCommentQuery) => Promise<ReadonlyArray<Comment>>;
 }
 
 export class CommentRepositoryInMemory implements CommentRepository {
@@ -22,10 +27,10 @@ export class CommentRepositoryInMemory implements CommentRepository {
     });
   }
 
-  async fetchByCardId(cardId: string): Promise<ReadonlyArray<Comment>> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
-    return this.snapshot.value.fetchProjectContents(projectId).findCommentsByCardId(cardId);
+  async fetchCardComments(query: CardCommentQuery): Promise<ReadonlyArray<Comment>> {
+    return this.snapshot.value
+      .fetchProjectContents(query.projectId)
+      .findCommentsByCardId(query.cardId);
   }
 }
 
@@ -47,11 +52,13 @@ export class CommentRepositoryDatabase implements CommentRepository {
       .execute();
   }
 
-  async fetchByCardId(cardId: string): Promise<ReadonlyArray<Comment>> {
+  async fetchCardComments(query: CardCommentQuery): Promise<ReadonlyArray<Comment>> {
     const commentRows = await this.database.selectFrom("comments")
-      .select(["cardId", "createdAt", "id", "text"])
-      .orderBy("createdAt")
-      .where("cardId", "=", cardId)
+      .select(["comments.cardId", "comments.createdAt", "comments.id", "comments.text"])
+      .innerJoin("cards", "cards.id", "comments.cardId")
+      .orderBy("comments.createdAt")
+      .where("comments.cardId", "=", query.cardId)
+      .where("cards.projectId", "=", query.projectId)
       .execute();
 
     return commentRows.map(commentRow => ({

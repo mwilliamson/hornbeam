@@ -102,7 +102,10 @@ export function createCardsRepositoryTests(
 
   suite("fetchParentByChildId()", () => {
     testRepository("when there are no cards then fetchParentByChildId() returns null", async (repository) => {
-      const card = await repository.fetchParentByChildId(CARD_1_ID);
+      const card = await repository.fetchParentByChildId({
+        cardId: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(card, equalTo(null));
     });
@@ -114,7 +117,30 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const card = await repository.fetchParentByChildId(CARD_1_ID);
+      const card = await repository.fetchParentByChildId({
+        cardId: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+      });
+
+      assertThat(card, equalTo(null));
+    });
+
+    testRepository("when card is not in project then returns null", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        parentCardId: null,
+        projectId: PROJECT_1_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+      }));
+
+      const card = await repository.fetchParentByChildId({
+        cardId: CARD_2_ID,
+        projectId: PROJECT_2_ID,
+      });
 
       assertThat(card, equalTo(null));
     });
@@ -147,7 +173,10 @@ export function createCardsRepositoryTests(
         text: "<child card 2>",
       }));
 
-      const card = await repository.fetchParentByChildId(child2Id);
+      const card = await repository.fetchParentByChildId({
+        cardId: child2Id,
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(card, hasProperties({text: "<parent card 2>"}));
     });

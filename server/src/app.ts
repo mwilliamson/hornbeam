@@ -57,7 +57,7 @@ class AppTransaction {
         }
         case "parentCard": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.fetchParentByChildId(serverQuery.cardId);
+          const result = await cardRepository.fetchParentByChildId(serverQuery);
           return serializeParentCardResponse(result);
         }
         case "cardChildCount": {

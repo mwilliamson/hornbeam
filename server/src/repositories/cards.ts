@@ -9,7 +9,7 @@ import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
-import { boardCardTreesQuery, CardQuery, parentBoardQuery } from "hornbeam-common/lib/queries";
+import { boardCardTreesQuery, CardQuery, parentBoardQuery, ParentCardQuery } from "hornbeam-common/lib/queries";
 import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 
 export interface CardRepository {
@@ -17,7 +17,7 @@ export interface CardRepository {
   update: (mutation: CardEditMutation) => Promise<void>;
   fetchByProjectId: (projectId: string) => Promise<ReadonlyArray<Card>>;
   fetchById: (query: CardQuery) => Promise<Card | null>;
-  fetchParentByChildId: (childId: string) => Promise<Card | null>;
+  fetchParentByChildId: (query: ParentCardQuery) => Promise<Card | null>;
   fetchChildCountByParentId: (parentId: string) => Promise<number>;
   search: (searchTerm: string) => Promise<ReadonlyArray<Card>>;
   fetchBoardCardTrees: (
@@ -58,14 +58,17 @@ export class CardRepositoryInMemory implements CardRepository {
       .findCardById(query.cardId);
   }
 
-  async fetchParentByChildId(childId: string): Promise<Card | null> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
-    const childCard = this.snapshot.value.fetchProjectContents(projectId).findCardById(childId);
+  async fetchParentByChildId(query: ParentCardQuery): Promise<Card | null> {
+    const projectContents = this.snapshot.value
+      .fetchProjectContents(query.projectId);
+
+    const childCard = projectContents.findCardById(query.cardId);
+
     if (childCard === null || childCard.parentCardId === null) {
       return null;
     }
-    return this.snapshot.value.fetchProjectContents(projectId).findCardById(childCard.parentCardId);
+
+    return projectContents.findCardById(childCard.parentCardId);
   }
 
   async fetchChildCountByParentId(parentId: string): Promise<number> {
@@ -200,11 +203,13 @@ export class CardRepositoryDatabase implements CardRepository {
     }
   }
 
-  async fetchParentByChildId(childId: string): Promise<Card | null> {
+  async fetchParentByChildId(query: ParentCardQuery): Promise<Card | null> {
     const cardQuery = this.selectColumns(
       this.database.selectFrom("cards")
         .innerJoin("cards as child_cards", "cards.id", "child_cards.parentCardId")
-        .where("child_cards.id", "=", childId)
+        .where("cards.projectId", "=", query.projectId)
+        .where("child_cards.projectId", "=", query.projectId)
+        .where("child_cards.id", "=", query.cardId)
     );
 
     const cardRow = await cardQuery.executeTakeFirst();

@@ -98,7 +98,7 @@ export function cardQuery(
   };
 }
 
-interface ParentCardQuery {
+export interface ParentCardQuery {
   readonly cardId: string;
   readonly projectId: string;
 }

@@ -79,10 +79,11 @@ class AppTransaction {
         }
         case "boardCardTrees": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.fetchBoardCardTrees(
-            serverQuery.boardId,
-            new Set(serverQuery.cardStatuses),
-          );
+          const result = await cardRepository.fetchBoardCardTrees({
+            boardId: serverQuery.boardId,
+            cardStatuses: new Set(serverQuery.cardStatuses),
+            projectId: serverQuery.projectId,
+          });
           return serializeBoardCardTreesResponse(result);
         }
         case "parentBoard": {

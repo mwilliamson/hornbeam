@@ -162,9 +162,9 @@ export function searchCardsQuery(
   };
 }
 
-interface BoardCardTreesQuery {
-  readonly cardStatuses: ReadonlySet<CardStatus>;
+export interface BoardCardTreesQuery {
   readonly boardId: BoardId;
+  readonly cardStatuses: ReadonlySet<CardStatus>;
   readonly projectId: string;
 }
 

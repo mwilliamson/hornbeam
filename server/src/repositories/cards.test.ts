@@ -351,7 +351,11 @@ export function createCardsRepositoryTests(
         text: "<card 2>",
       }));
 
-      const cardTrees = await repository.fetchBoardCardTrees(rootBoardId, new Set(allCardStatuses));
+      const cardTrees = await repository.fetchBoardCardTrees({
+        boardId: rootBoardId,
+        cardStatuses: new Set(allCardStatuses),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(cardTrees, containsExactly(
         hasProperties({
@@ -395,7 +399,11 @@ export function createCardsRepositoryTests(
         text: "<card 5>",
       }));
 
-      const cardTrees = await repository.fetchBoardCardTrees(rootBoardId, new Set(allCardStatuses));
+      const cardTrees = await repository.fetchBoardCardTrees({
+        boardId: rootBoardId,
+        cardStatuses: new Set(allCardStatuses),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(cardTrees, containsExactly(
         hasProperties({
@@ -441,7 +449,11 @@ export function createCardsRepositoryTests(
         text: "<card 2>",
       }));
 
-      const cardTrees = await repository.fetchBoardCardTrees(rootBoardId, new Set(allCardStatuses));
+      const cardTrees = await repository.fetchBoardCardTrees({
+        boardId: rootBoardId,
+        cardStatuses: new Set(allCardStatuses),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(cardTrees, containsExactly(
         hasProperties({
@@ -480,10 +492,11 @@ export function createCardsRepositoryTests(
         text: "<card 4>",
       }));
 
-      const cardTrees = await repository.fetchBoardCardTrees(
-        cardSubboardId(CARD_1_ID),
-        new Set(allCardStatuses),
-      );
+      const cardTrees = await repository.fetchBoardCardTrees({
+        boardId: cardSubboardId(CARD_1_ID),
+        cardStatuses: new Set(allCardStatuses),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(cardTrees, containsExactly(
         hasProperties({
@@ -535,10 +548,11 @@ export function createCardsRepositoryTests(
         status: CardStatus.Done,
       }));
 
-      const cardTrees = await repository.fetchBoardCardTrees(
-        rootBoardId,
-        new Set([CardStatus.None, CardStatus.Done]),
-      );
+      const cardTrees = await repository.fetchBoardCardTrees({
+        boardId: rootBoardId,
+        cardStatuses: new Set([CardStatus.None, CardStatus.Done]),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(cardTrees, containsExactly(
         hasProperties({
@@ -546,6 +560,31 @@ export function createCardsRepositoryTests(
         }),
         hasProperties({
           card: hasProperties({text: "<card 3>"}),
+        }),
+      ));
+    });
+
+    testRepository("cards are filtered by project", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+        text: "<card 1>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        projectId: PROJECT_2_ID,
+        text: "<card 2>",
+      }));
+
+      const cardTrees = await repository.fetchBoardCardTrees({
+        boardId: rootBoardId,
+        cardStatuses: new Set(allCardStatuses),
+        projectId: PROJECT_2_ID,
+      });
+
+      assertThat(cardTrees, containsExactly(
+        hasProperties({
+          card: hasProperties({text: "<card 2>"}),
         }),
       ));
     });

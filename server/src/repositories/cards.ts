@@ -9,7 +9,7 @@ import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
-import { boardCardTreesQuery, CardChildCountQuery, CardQuery, parentBoardQuery, ParentCardQuery, SearchCardsQuery } from "hornbeam-common/lib/queries";
+import { BoardCardTreesQuery, boardCardTreesQuery, CardChildCountQuery, CardQuery, parentBoardQuery, ParentCardQuery, SearchCardsQuery } from "hornbeam-common/lib/queries";
 import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 
 export interface CardRepository {
@@ -20,10 +20,7 @@ export interface CardRepository {
   fetchParent: (query: ParentCardQuery) => Promise<Card | null>;
   fetchChildCount: (query: CardChildCountQuery) => Promise<number>;
   search: (query: SearchCardsQuery) => Promise<ReadonlyArray<Card>>;
-  fetchBoardCardTrees: (
-    boardId: BoardId,
-    cardStatuses: ReadonlySet<CardStatus>,
-  ) => Promise<ReadonlyArray<CardTree>>;
+  fetchBoardCardTrees: (query: BoardCardTreesQuery) => Promise<ReadonlyArray<CardTree>>;
   fetchParentBoard: (boardId: BoardId) => Promise<BoardId>;
 }
 
@@ -84,13 +81,8 @@ export class CardRepositoryInMemory implements CardRepository {
       .slice(0, MAX_SEARCH_RESULTS);
   }
 
-  async fetchBoardCardTrees(
-    boardId: BoardId,
-    cardStatuses: ReadonlySet<CardStatus>,
-  ): Promise<ReadonlyArray<CardTree>> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
-    return queryAppSnapshot(this.snapshot.value, boardCardTreesQuery({boardId, cardStatuses, projectId}));
+  async fetchBoardCardTrees(query: BoardCardTreesQuery): Promise<ReadonlyArray<CardTree>> {
+    return queryAppSnapshot(this.snapshot.value, boardCardTreesQuery(query));
   }
 
   async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
@@ -248,21 +240,19 @@ export class CardRepositoryDatabase implements CardRepository {
     return cardRows.map(cardRow => this.rowToCard(cardRow));
   }
 
-  async fetchBoardCardTrees(
-    boardId: BoardId,
-    cardStatuses: ReadonlySet<CardStatus>,
-  ): Promise<ReadonlyArray<CardTree>> {
+  async fetchBoardCardTrees(query: BoardCardTreesQuery): Promise<ReadonlyArray<CardTree>> {
     const cardsQuery = this.selectColumns(
       this.database
         .withRecursive(
           "boardCards(id, childrenAllowed)",
           db => {
             let rootCards = db.selectFrom("cards")
-              .select(eb => ["id", eb.lit<boolean>(true).as("childrenAllowed")]);
-            if (boardId.boardRootId === null) {
+              .select(eb => ["id", eb.lit<boolean>(true).as("childrenAllowed")])
+              .where("cards.projectId", "=", query.projectId);
+            if (query.boardId.boardRootId === null) {
               rootCards = rootCards.where("cards.parentCardId", "is", null);
             } else {
-              rootCards = rootCards.where("cards.id", "=", boardId.boardRootId);
+              rootCards = rootCards.where("cards.id", "=", query.boardId.boardRootId);
             }
 
             return rootCards.union(
@@ -270,19 +260,21 @@ export class CardRepositoryDatabase implements CardRepository {
                 .select(eb => ["cards.id", eb.not(eb.ref("isSubboardRoot")).as("childrenAllowed")])
                 .innerJoin("boardCards", "boardCards.id", "cards.parentCardId")
                 .where("boardCards.childrenAllowed", "=", true)
+                .where("cards.projectId", "=", query.projectId)
             );
           }
         )
         .selectFrom("cards")
         .innerJoin("boardCards", "boardCards.id", "cards.id")
-        .where("cards.status", "in", Array.from(cardStatuses))
+        .where("cards.status", "in", Array.from(query.cardStatuses))
+        .where("cards.projectId", "=", query.projectId)
     );
 
     const cardRows = await cardsQuery.execute();
 
     const cards = cardRows.map(cardRow => this.rowToCard(cardRow));
 
-    return cardsToTrees(cards, boardId);
+    return cardsToTrees(cards, query.boardId);
   }
 
   async fetchParentBoard(boardId: BoardId): Promise<BoardId> {

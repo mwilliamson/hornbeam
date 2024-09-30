@@ -119,15 +119,19 @@ export class CardRepositoryDatabase implements CardRepository {
               eb(eb.fn.max("cards.index"), "+", 1),
               eb.lit(0),
             ).as("index")
-          ),
+          )
+          .where("projectId", "=", mutation.projectId),
         isSubboardRoot: false,
         number: eb.selectFrom("cards")
           .select(
             eb.fn.coalesce(
               eb(eb.fn.max("cards.number"), "+", 1),
               eb.lit(1),
-            ).as("number")),
+            ).as("number")
+          )
+          .where("projectId", "=", mutation.projectId),
         parentCardId: mutation.parentCardId,
+        projectId: mutation.projectId,
         status: SerializedCardStatus.encode(CardStatus.None),
         text: mutation.text,
       }))
@@ -140,6 +144,7 @@ export class CardRepositoryDatabase implements CardRepository {
     let queryRequired = false;
 
     if (mutation.categoryId !== undefined) {
+      // TODO: check category is valid
       query = query.set({categoryId: mutation.categoryId});
       queryRequired = true;
     }
@@ -150,6 +155,7 @@ export class CardRepositoryDatabase implements CardRepository {
     }
 
     if (mutation.parentCardId !== undefined) {
+      // TODO: check parent is valid
       query = query.set({parentCardId: mutation.parentCardId});
       queryRequired = true;
     }

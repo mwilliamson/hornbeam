@@ -22,11 +22,13 @@ export function createCardHistoryFetcherTests(
       categoryId: CATEGORY_1_ID,
       createdAt: Instant.ofEpochSecond(1713386548),
       id: CARD_1_ID,
+      projectId: PROJECT_1_ID,
     }));
     await cardRepository.add(testingCardAddMutation({
       categoryId: CATEGORY_1_ID,
       createdAt: Instant.ofEpochSecond(1713386549),
       id: CARD_2_ID,
+      projectId: PROJECT_1_ID,
     }));
 
     const cardHistoryFetcher = await fixtures.cardHistoryFetcher();
@@ -45,6 +47,7 @@ export function createCardHistoryFetcherTests(
     await cardRepository.add(testingCardAddMutation({
       categoryId: CATEGORY_1_ID,
       id: CARD_1_ID,
+      projectId: PROJECT_1_ID,
     }));
 
     const commentRepository = await fixtures.commentRepository();

@@ -27,6 +27,7 @@ export interface Card {
   isSubboardRoot: boolean;
   number: number;
   parentCardId: string | null;
+  projectId: string;
   status: string;
   text: string;
 }

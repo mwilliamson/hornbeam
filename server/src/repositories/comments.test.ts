@@ -24,10 +24,12 @@ export function createCategoryRepositoryTests(
       await cardRepository.add(testingCardAddMutation({
         categoryId: CATEGORY_1_ID,
         id: CARD_1_ID,
+        projectId: PROJECT_1_ID,
       }));
       await cardRepository.add(testingCardAddMutation({
         categoryId: CATEGORY_1_ID,
         id: CARD_2_ID,
+        projectId: PROJECT_1_ID,
       }));
 
       const commentRepository = await repository.commentRepository();

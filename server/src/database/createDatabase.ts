@@ -31,12 +31,13 @@ export default async function createDatabase(databaseUrl: string) {
         is_subboard_root bool NOT NULL,
         number int NOT NULL,
         parent_card_id uuid NULL REFERENCES cards(id),
+        project_id uuid NOT NULL REFERENCES projects(id),
         status text NOT NULL,
         text text NOT NULL
       );
 
-      CREATE UNIQUE INDEX uq__cards__index ON cards(index);
-      CREATE UNIQUE INDEX uq__cards__number ON cards(number);
+      CREATE UNIQUE INDEX uq__cards__index ON cards(project_id, index);
+      CREATE UNIQUE INDEX uq__cards__number ON cards(project_id, number);
 
       CREATE TABLE comments (
         card_id uuid NOT NULL REFERENCES cards(id),

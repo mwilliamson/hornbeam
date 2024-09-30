@@ -51,12 +51,14 @@ export function createBackendConnectionTestSuite(
           await backendConnection.mutate(testingAppMutation.cardAdd({
             categoryId: CATEGORY_1_ID,
             id: CARD_1_ID,
+            projectId: PROJECT_1_ID,
             text: "<card text 1>",
           }));
 
           await backendConnection.mutate(testingAppMutation.cardAdd({
             categoryId: CATEGORY_1_ID,
             id: CARD_2_ID,
+            projectId: PROJECT_1_ID,
             text: "<card text 2>",
           }));
 
@@ -97,6 +99,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: CARD_1_ID,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
           }));
 
           const card = await backendConnection.executeQuery(parentCardQuery({
@@ -123,6 +126,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
             text: "<parent card text>",
           }));
 
@@ -131,6 +135,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: childCardId,
             parentCardId,
+            projectId: PROJECT_1_ID,
           }));
 
           const card = await backendConnection.executeQuery(parentCardQuery({
@@ -170,6 +175,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: CARD_1_ID,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
           }));
 
           const card = await backendConnection.executeQuery(cardChildCountQuery({
@@ -196,6 +202,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
             text: "<parent card text>",
           }));
 
@@ -203,11 +210,13 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: CARD_2_ID,
             parentCardId,
+            projectId: PROJECT_1_ID,
           }));
           await backendConnection.mutate(testingAppMutation.cardAdd({
             categoryId: CATEGORY_1_ID,
             id: CARD_3_ID,
             parentCardId,
+            projectId: PROJECT_1_ID,
           }));
 
           const card = await backendConnection.executeQuery(cardChildCountQuery({
@@ -234,6 +243,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             createdAt: Instant.ofEpochSecond(1713386548),
             id: CARD_1_ID,
+            projectId: PROJECT_1_ID,
           }));
 
           const cardHistory = await backendConnection.executeQuery(cardHistoryQuery({
@@ -262,6 +272,7 @@ export function createBackendConnectionTestSuite(
           await backendConnection.mutate(testingAppMutation.cardAdd({
             categoryId: CATEGORY_1_ID,
             id: CARD_1_ID,
+            projectId: PROJECT_1_ID,
           }));
 
           await backendConnection.mutate(testingAppMutation.commentAdd({
@@ -303,18 +314,21 @@ export function createBackendConnectionTestSuite(
         await backendConnection.mutate(testingAppMutation.cardAdd({
           categoryId: CATEGORY_1_ID,
           id: CARD_1_ID,
+          projectId: PROJECT_1_ID,
           text: "ab",
         }));
 
         await backendConnection.mutate(testingAppMutation.cardAdd({
           categoryId: CATEGORY_1_ID,
           id: CARD_2_ID,
+          projectId: PROJECT_1_ID,
           text: "ac",
         }));
 
         await backendConnection.mutate(testingAppMutation.cardAdd({
           categoryId: CATEGORY_1_ID,
           id: CARD_3_ID,
+          projectId: PROJECT_1_ID,
           text: "dd",
         }));
 
@@ -346,6 +360,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
             text: "<parent card text>",
           }));
 
@@ -353,6 +368,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: CARD_2_ID,
             parentCardId,
+            projectId: PROJECT_1_ID,
             text: "<child card text>",
           }));
 
@@ -395,6 +411,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: parentCardId,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
             text: "<parent card text>",
           }));
 
@@ -402,6 +419,7 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: CARD_2_ID,
             parentCardId,
+            projectId: PROJECT_1_ID,
             text: "<child card text>",
           }));
 
@@ -457,20 +475,24 @@ export function createBackendConnectionTestSuite(
             categoryId: CATEGORY_1_ID,
             id: CARD_1_ID,
             parentCardId: null,
+            projectId: PROJECT_1_ID,
           }));
           await backendConnection.mutate(testingAppMutation.cardEdit({
             id: CARD_1_ID,
             isSubboardRoot: true,
+            projectId: PROJECT_1_ID,
           }));
 
           await backendConnection.mutate(testingAppMutation.cardAdd({
             categoryId: CATEGORY_1_ID,
             id: CARD_2_ID,
             parentCardId: CARD_1_ID,
+            projectId: PROJECT_1_ID,
           }));
           await backendConnection.mutate(testingAppMutation.cardEdit({
             id: CARD_2_ID,
             isSubboardRoot: true,
+            projectId: PROJECT_1_ID,
           }));
 
           const parentBoardId = await backendConnection.executeQuery(parentBoardQuery({
@@ -578,12 +600,14 @@ export function createBackendConnectionTestSuite(
       await backendConnection.mutate(testingAppMutation.cardAdd({
         categoryId: CATEGORY_1_ID,
         id: CARD_1_ID,
+        projectId: PROJECT_1_ID,
         text: "<card text 1>",
       }));
 
       await backendConnection.mutate(testingAppMutation.cardAdd({
         categoryId: CATEGORY_1_ID,
         id: CARD_2_ID,
+        projectId: PROJECT_1_ID,
         text: "<card text 2>",
       }));
 

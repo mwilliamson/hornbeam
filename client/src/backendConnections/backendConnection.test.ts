@@ -278,6 +278,7 @@ export function createBackendConnectionTestSuite(
           await backendConnection.mutate(testingAppMutation.commentAdd({
             cardId: CARD_1_ID,
             createdAt: Instant.ofEpochSecond(1713386548),
+            projectId: PROJECT_1_ID,
             text: "<card text>",
           }));
 

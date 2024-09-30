@@ -26,6 +26,39 @@ const PROJECT_2_ID = "01923983-2f95-7d79-975f-000000002002";
 export function createCardsRepositoryTests(
   createFixtures: () => RepositoryFixtures,
 ): void {
+  suite("fetchByProjectId()", () => {
+    testRepository("when there are no cards then returns empty list", async (repository) => {
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
+
+      assertThat(card, containsExactly());
+    });
+
+    testRepository("when there are cards then returns card with matching project ID", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+        text: "<card 1 text>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        projectId: PROJECT_1_ID,
+        text: "<card 2 text>",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_3_ID,
+        projectId: PROJECT_2_ID,
+        text: "<card 3 text>",
+      }));
+
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
+
+      assertThat(card, containsExactly(
+        hasProperties({text: "<card 1 text>"}),
+        hasProperties({text: "<card 2 text>"}),
+      ));
+    });
+  });
+
   suite("fetchById()", () => {
     testRepository("when there are no cards then fetchById() returns null", async (repository) => {
       const card = await repository.fetchById({cardId: CARD_1_ID, projectId: PROJECT_1_ID});
@@ -222,7 +255,7 @@ export function createCardsRepositoryTests(
         text: "<card 3 text>",
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({number: 1, text: "<card 1 text>"}),
@@ -580,7 +613,7 @@ export function createCardsRepositoryTests(
         text: "<card 3 text>",
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({id: CARD_1_ID, text: "<card 1 text>"}),
@@ -609,7 +642,7 @@ export function createCardsRepositoryTests(
         text: "<card 3>",
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({categoryId: CATEGORY_1_ID, text: "<card 1>"}),
@@ -638,7 +671,7 @@ export function createCardsRepositoryTests(
         text: "<card 3>",
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({createdAt: deepEqualTo(Instant.ofEpochSecond(1000)), text: "<card 1>"}),
@@ -686,7 +719,7 @@ export function createCardsRepositoryTests(
         text: "<child card 3>",
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({parentCardId: null, text: "<parent card 1>"}),
@@ -716,7 +749,7 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({id: CARD_1_ID, text: "<card 1>"}),
@@ -744,7 +777,7 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({categoryId: CATEGORY_3_ID, text: "<card 1>"}),
@@ -770,7 +803,7 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({isSubboardRoot: true, text: "<card 1>"}),
@@ -804,7 +837,7 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({parentCardId: CARD_3_ID, text: "<card 1>"}),
@@ -831,7 +864,7 @@ export function createCardsRepositoryTests(
         status: CardStatus.Done,
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({status: CardStatus.Done, text: "<card 1>"}),
@@ -857,7 +890,7 @@ export function createCardsRepositoryTests(
         text: "<updated text>",
       }));
 
-      const card = await repository.fetchAll();
+      const card = await repository.fetchByProjectId(PROJECT_1_ID);
 
       assertThat(card, containsExactly(
         hasProperties({id: CARD_1_ID, text: "<updated text>"}),

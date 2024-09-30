@@ -57,6 +57,7 @@ export function createCardHistoryFetcherTests(
     await commentRepository.add(testingCommentAddMutation({
       cardId: CARD_1_ID,
       createdAt: Instant.ofEpochSecond(1713386548),
+      projectId: PROJECT_1_ID,
       text: "<card text>",
     }));
 

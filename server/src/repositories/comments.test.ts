@@ -36,16 +36,19 @@ export function createCategoryRepositoryTests(
       await commentRepository.add(testingCommentAddMutation({
         cardId: CARD_1_ID,
         id: COMMENT_1_ID,
+        projectId: PROJECT_1_ID,
         text: "<comment 1a>",
       }));
       await commentRepository.add(testingCommentAddMutation({
         cardId: CARD_1_ID,
         id: COMMENT_2_ID,
+        projectId: PROJECT_1_ID,
         text: "<comment 1b>",
       }));
       await commentRepository.add(testingCommentAddMutation({
         cardId: CARD_2_ID,
         id: COMMENT_3_ID,
+        projectId: PROJECT_1_ID,
         text: "<comment 2>",
       }));
 

@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import { handleNever } from "../util/assertNever";
+import { assertNever, handleNever } from "../util/assertNever";
 import { Card, CardAddMutation, CardEditMutation, CardMoveMutation, CardMoveToAfterMutation, CardMoveToBeforeMutation, CardSet, createCard, updateCard } from "./cards";
 import { Category, CategoryAddMutation, CategoryReorderMutation, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
@@ -43,8 +43,8 @@ export class AppSnapshot {
   public mutateProjectContents(
     mutation: ProjectContentsMutation
   ): AppSnapshot {
-    // TODO: use proper project ID
-    const projectId = mutation.type === "categoryAdd" ? mutation.categoryAdd.projectId : this.allProjects()[0].id;
+    const projectId = projectContentsMutationProjectId(mutation);
+
     return this.updateProjectContents(
       projectId,
       projectContents => applyProjectContentsMutation(projectContents, mutation),
@@ -418,6 +418,29 @@ export function projectContentsMutationCreatedAt(mutation: ProjectContentsMutati
       return mutation.commentAdd.createdAt;
     default:
       return handleNever(mutation, Instant.now());
+  }
+}
+
+function projectContentsMutationProjectId(mutation: ProjectContentsMutation): string {
+  switch (mutation.type) {
+    case "cardAdd":
+      return mutation.cardAdd.projectId;
+    case "cardEdit":
+      return mutation.cardEdit.projectId;
+    case "cardMove":
+      return mutation.cardMove.projectId;
+    case "cardMoveToAfter":
+      return mutation.cardMoveToAfter.projectId;
+    case "cardMoveToBefore":
+      return mutation.cardMoveToBefore.projectId;
+    case "categoryAdd":
+      return mutation.categoryAdd.projectId;
+    case "categoryReorder":
+      return mutation.categoryReorder.projectId;
+    case "commentAdd":
+      return mutation.commentAdd.projectId;
+    default:
+      return assertNever(mutation);
   }
 }
 

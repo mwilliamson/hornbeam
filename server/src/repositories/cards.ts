@@ -15,7 +15,7 @@ import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
   update: (mutation: CardEditMutation) => Promise<void>;
-  fetchAll: () => Promise<ReadonlyArray<Card>>;
+  fetchByProjectId: (projectId: string) => Promise<ReadonlyArray<Card>>;
   fetchById: (query: CardQuery) => Promise<Card | null>;
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
   fetchChildCountByParentId: (parentId: string) => Promise<number>;
@@ -48,9 +48,7 @@ export class CardRepositoryInMemory implements CardRepository {
     });
   }
 
-  async fetchAll(): Promise<ReadonlyArray<Card>> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
+  async fetchByProjectId(projectId: string): Promise<ReadonlyArray<Card>> {
     return this.snapshot.value.fetchProjectContents(projectId).allCards();
   }
 
@@ -175,8 +173,11 @@ export class CardRepositoryDatabase implements CardRepository {
     }
   }
 
-  async fetchAll(): Promise<ReadonlyArray<Card>> {
-    const cardsQuery = this.selectColumns(this.database.selectFrom("cards"));
+  async fetchByProjectId(projectId: string): Promise<ReadonlyArray<Card>> {
+    const cardsQuery = this.selectColumns(
+      this.database.selectFrom("cards")
+        .where("projectId", "=", projectId)
+    );
 
     const cardRows = await cardsQuery.execute();
 

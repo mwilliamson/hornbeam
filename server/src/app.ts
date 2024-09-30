@@ -57,12 +57,12 @@ class AppTransaction {
         }
         case "parentCard": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.fetchParentByChildId(serverQuery);
+          const result = await cardRepository.fetchParent(serverQuery);
           return serializeParentCardResponse(result);
         }
         case "cardChildCount": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.fetchChildCountByParentId(serverQuery.cardId);
+          const result = await cardRepository.fetchChildCount(serverQuery);
           return serializeCardChildCountResponse(result);
         }
         case "cardHistory": {

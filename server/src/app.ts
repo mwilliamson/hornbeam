@@ -88,7 +88,7 @@ class AppTransaction {
         }
         case "parentBoard": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.fetchParentBoard(serverQuery.boardId);
+          const result = await cardRepository.fetchParentBoard(serverQuery);
           return serializeParentBoardResponse(result);
         }
         case "allCategories": {

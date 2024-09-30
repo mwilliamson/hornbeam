@@ -9,7 +9,7 @@ import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
-import { BoardCardTreesQuery, boardCardTreesQuery, CardChildCountQuery, CardQuery, parentBoardQuery, ParentCardQuery, SearchCardsQuery } from "hornbeam-common/lib/queries";
+import { BoardCardTreesQuery, boardCardTreesQuery, CardChildCountQuery, CardQuery, ParentBoardQuery, parentBoardQuery, ParentCardQuery, SearchCardsQuery } from "hornbeam-common/lib/queries";
 import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 
 export interface CardRepository {
@@ -21,7 +21,7 @@ export interface CardRepository {
   fetchChildCount: (query: CardChildCountQuery) => Promise<number>;
   search: (query: SearchCardsQuery) => Promise<ReadonlyArray<Card>>;
   fetchBoardCardTrees: (query: BoardCardTreesQuery) => Promise<ReadonlyArray<CardTree>>;
-  fetchParentBoard: (boardId: BoardId) => Promise<BoardId>;
+  fetchParentBoard: (query: ParentBoardQuery) => Promise<BoardId>;
 }
 
 export class CardRepositoryInMemory implements CardRepository {
@@ -85,10 +85,8 @@ export class CardRepositoryInMemory implements CardRepository {
     return queryAppSnapshot(this.snapshot.value, boardCardTreesQuery(query));
   }
 
-  async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
-    return queryAppSnapshot(this.snapshot.value, parentBoardQuery({boardId, projectId}));
+  async fetchParentBoard(query: ParentBoardQuery): Promise<BoardId> {
+    return queryAppSnapshot(this.snapshot.value, parentBoardQuery(query));
   }
 }
 
@@ -277,8 +275,8 @@ export class CardRepositoryDatabase implements CardRepository {
     return cardsToTrees(cards, query.boardId);
   }
 
-  async fetchParentBoard(boardId: BoardId): Promise<BoardId> {
-    if (boardId.boardRootId === null) {
+  async fetchParentBoard(query: ParentBoardQuery): Promise<BoardId> {
+    if (query.boardId.boardRootId === null) {
       return rootBoardId;
     }
 
@@ -288,12 +286,14 @@ export class CardRepositoryDatabase implements CardRepository {
         db =>
           db.selectFrom("cards")
             .select(eb => ["id as id", "parentCardId as parentId", eb.lit<boolean>(false).as("isParentBoard")])
-            .where("id", "=", boardId.boardRootId)
+            .where("id", "=", query.boardId.boardRootId)
+            .where("cards.projectId", "=", query.projectId)
             .union(
               db.selectFrom("cards")
                 .select(["cards.id as id", "cards.parentCardId as parentId", "cards.isSubboardRoot as isParentBoard"])
                 .innerJoin("ancestors", "ancestors.parentId", "cards.id")
                 .where("ancestors.isParentBoard", "=", false)
+                .where("cards.projectId", "=", query.projectId)
             )
       )
       .selectFrom("ancestors")

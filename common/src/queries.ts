@@ -182,7 +182,7 @@ export function boardCardTreesQuery({
   };
 }
 
-interface ParentBoardQuery {
+export interface ParentBoardQuery {
   readonly boardId: BoardId;
   readonly projectId: string;
 }

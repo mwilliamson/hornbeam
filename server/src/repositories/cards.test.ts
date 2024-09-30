@@ -592,7 +592,10 @@ export function createCardsRepositoryTests(
 
   suite("parent board", () => {
     testRepository("parent of root board is root board", async (repository) => {
-      const parentBoardId = await repository.fetchParentBoard(rootBoardId);
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: rootBoardId,
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(parentBoardId, deepEqualTo(rootBoardId));
     });
@@ -607,7 +610,10 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_1_ID));
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: cardSubboardId(CARD_1_ID),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(parentBoardId, deepEqualTo(rootBoardId));
     });
@@ -623,7 +629,34 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_2_ID));
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: cardSubboardId(CARD_2_ID),
+        projectId: PROJECT_1_ID,
+      });
+
+      assertThat(parentBoardId, deepEqualTo(rootBoardId));
+    });
+
+    testRepository("when card is not in project then parent of subboard is root board", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        projectId: PROJECT_2_ID,
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        parentCardId: CARD_1_ID,
+        projectId: PROJECT_2_ID,
+      }));
+      await repository.update(testingCardEditMutation({
+        id: CARD_1_ID,
+        isSubboardRoot: true,
+        projectId: PROJECT_2_ID,
+      }));
+
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: cardSubboardId(CARD_2_ID),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(parentBoardId, deepEqualTo(rootBoardId));
     });
@@ -644,7 +677,10 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_2_ID));
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: cardSubboardId(CARD_2_ID),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_1_ID)));
     });
@@ -670,7 +706,10 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_3_ID));
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: cardSubboardId(CARD_3_ID),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_1_ID)));
     });
@@ -701,7 +740,10 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
 
-      const parentBoardId = await repository.fetchParentBoard(cardSubboardId(CARD_3_ID));
+      const parentBoardId = await repository.fetchParentBoard({
+        boardId: cardSubboardId(CARD_3_ID),
+        projectId: PROJECT_1_ID,
+      });
 
       assertThat(parentBoardId, deepEqualTo(cardSubboardId(CARD_2_ID)));
     });

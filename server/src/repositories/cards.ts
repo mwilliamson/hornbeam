@@ -9,14 +9,14 @@ import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
-import { boardCardTreesQuery, parentBoardQuery } from "hornbeam-common/lib/queries";
+import { boardCardTreesQuery, CardQuery, parentBoardQuery } from "hornbeam-common/lib/queries";
 import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 
 export interface CardRepository {
   add: (mutation: CardAddMutation) => Promise<void>;
   update: (mutation: CardEditMutation) => Promise<void>;
   fetchAll: () => Promise<ReadonlyArray<Card>>;
-  fetchById: (id: string) => Promise<Card | null>;
+  fetchById: (query: CardQuery) => Promise<Card | null>;
   fetchParentByChildId: (childId: string) => Promise<Card | null>;
   fetchChildCountByParentId: (parentId: string) => Promise<number>;
   search: (searchTerm: string) => Promise<ReadonlyArray<Card>>;
@@ -54,10 +54,10 @@ export class CardRepositoryInMemory implements CardRepository {
     return this.snapshot.value.fetchProjectContents(projectId).allCards();
   }
 
-  async fetchById(id: string): Promise<Card | null> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
-    return this.snapshot.value.fetchProjectContents(projectId).findCardById(id);
+  async fetchById(query: CardQuery): Promise<Card | null> {
+    return this.snapshot.value
+      .fetchProjectContents(query.projectId)
+      .findCardById(query.cardId);
   }
 
   async fetchParentByChildId(childId: string): Promise<Card | null> {
@@ -183,10 +183,11 @@ export class CardRepositoryDatabase implements CardRepository {
     return cardRows.map(cardRow => this.rowToCard(cardRow));
   }
 
-  async fetchById(id: string): Promise<Card | null> {
+  async fetchById(query: CardQuery): Promise<Card | null> {
     const cardQuery = this.selectColumns(
       this.database.selectFrom("cards")
-        .where("id", "=", id)
+        .where("id", "=", query.cardId)
+        .where("projectId", "=", query.projectId)
     );
 
     const cardRow = await cardQuery.executeTakeFirst();

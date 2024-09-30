@@ -1,6 +1,7 @@
 import { CardHistory } from "hornbeam-common/lib/app/cards";
 import { CardRepository } from "./cards";
 import { CommentRepository } from "./comments";
+import { CardHistoryQuery } from "hornbeam-common/lib/queries";
 
 export class CardHistoryFetcher {
   private readonly cardRepository: CardRepository;
@@ -11,14 +12,14 @@ export class CardHistoryFetcher {
     this.commentRepository = commentRepository;
   }
 
-  async fetchCardHistoryById(cardId: string): Promise<CardHistory> {
-    const card = await this.cardRepository.fetchById(cardId);
+  async fetchCardHistoryById(query: CardHistoryQuery): Promise<CardHistory> {
+    const card = await this.cardRepository.fetchById(query);
 
     if (card === null) {
       return [];
     }
 
-    const comments = await this.commentRepository.fetchByCardId(cardId);
+    const comments = await this.commentRepository.fetchByCardId(query.cardId);
 
     return [
       {

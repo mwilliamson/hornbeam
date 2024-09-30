@@ -52,7 +52,7 @@ class AppTransaction {
       switch (serverQuery.type) {
         case "card": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.fetchById(serverQuery.cardId);
+          const result = await cardRepository.fetchById(serverQuery);
           return serializeCardResponse(result);
         }
         case "parentCard": {
@@ -69,7 +69,7 @@ class AppTransaction {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
           const commentRepository = new CommentRepositoryDatabase(this.transaction);
           const cardHistoryFetcher = new CardHistoryFetcher(cardRepository, commentRepository);
-          const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(serverQuery.cardId);
+          const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(serverQuery);
           return serializeCardHistoryResponse(cardHistory);
         }
         case "searchCards": {

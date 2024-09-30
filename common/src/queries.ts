@@ -82,7 +82,7 @@ export type AppQuery<R> =
     readonly proof: Leibniz<ReadonlyArray<Project>, R>;
   };
 
-interface CardQuery {
+export interface CardQuery {
   readonly cardId: string;
   readonly projectId: string;
 }
@@ -130,7 +130,7 @@ export function cardChildCountQuery(
   };
 }
 
-interface CardHistoryQuery {
+export interface CardHistoryQuery {
   readonly cardId: string;
   readonly projectId: string;
 }

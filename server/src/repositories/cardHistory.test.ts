@@ -32,7 +32,10 @@ export function createCardHistoryFetcherTests(
     }));
 
     const cardHistoryFetcher = await fixtures.cardHistoryFetcher();
-    const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(CARD_1_ID);
+    const cardHistory = await cardHistoryFetcher.fetchCardHistoryById({
+      cardId: CARD_1_ID,
+      projectId: PROJECT_1_ID,
+    });
 
     assertThat(cardHistory, containsExactly(
       hasProperties({
@@ -58,7 +61,10 @@ export function createCardHistoryFetcherTests(
     }));
 
     const cardHistoryFetcher = await fixtures.cardHistoryFetcher();
-    const cardHistory = await cardHistoryFetcher.fetchCardHistoryById(CARD_1_ID);
+    const cardHistory = await cardHistoryFetcher.fetchCardHistoryById({
+      cardId: CARD_1_ID,
+      projectId: PROJECT_1_ID,
+    });
 
     assertThat(cardHistory, containsExactly(
       hasProperties({

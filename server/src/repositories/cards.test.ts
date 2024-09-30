@@ -21,13 +21,14 @@ const CATEGORY_1_ID = "0191beb5-0000-79e7-8207-000000000001";
 const CATEGORY_2_ID = "0191beb5-0000-79e7-8207-000000000002";
 const CATEGORY_3_ID = "0191beb5-0000-79e7-8207-000000000003";
 const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000002001";
+const PROJECT_2_ID = "01923983-2f95-7d79-975f-000000002002";
 
 export function createCardsRepositoryTests(
   createFixtures: () => RepositoryFixtures,
 ): void {
   suite("fetchById()", () => {
     testRepository("when there are no cards then fetchById() returns null", async (repository) => {
-      const card = await repository.fetchById(CARD_1_ID);
+      const card = await repository.fetchById({cardId: CARD_1_ID, projectId: PROJECT_1_ID});
 
       assertThat(card, equalTo(null));
     });
@@ -49,9 +50,20 @@ export function createCardsRepositoryTests(
         text: "<card 3 text>",
       }));
 
-      const card = await repository.fetchById(CARD_2_ID);
+      const card = await repository.fetchById({cardId: CARD_2_ID, projectId: PROJECT_1_ID});
 
       assertThat(card, hasProperties({text: "<card 2 text>"}));
+    });
+
+    testRepository("when card does not match project ID then card is not found", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+      }));
+
+      const card = await repository.fetchById({cardId: CARD_1_ID, projectId: PROJECT_2_ID});
+
+      assertThat(card, equalTo(null));
     });
   });
 
@@ -868,6 +880,9 @@ export function createCardsRepositoryTests(
       const projectRepository = await fixtures.projectRepository();
       await projectRepository.add(testingProjectAddMutation({
         id: PROJECT_1_ID,
+      }));
+      await projectRepository.add(testingProjectAddMutation({
+        id: PROJECT_2_ID,
       }));
 
       const categoryRepository = await fixtures.categoryRepository();

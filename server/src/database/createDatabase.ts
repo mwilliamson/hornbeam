@@ -21,7 +21,7 @@ export default async function createDatabase(databaseUrl: string) {
         project_id uuid NOT NULL REFERENCES projects(id)
       );
 
-      CREATE UNIQUE INDEX uq__categories__index ON categories(index);
+      CREATE UNIQUE INDEX uq__categories__index ON categories(project_id, index);
 
       CREATE TABLE cards (
         category_id uuid NOT NULL REFERENCES categories(id),

@@ -10,6 +10,7 @@ import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.test
 const CATEGORY_1_ID = "0191be9e-f6df-7507-9e6b-000000000001";
 const CATEGORY_2_ID = "0191be9e-f6df-7507-9e6b-000000000002";
 const CATEGORY_3_ID = "0191be9e-f6df-7507-9e6b-000000000003";
+const CATEGORY_4_ID = "0191be9e-f6df-7507-9e6b-000000000004";
 const PROJECT_1_ID = "01923983-2f95-7d79-975f-000000010001";
 const PROJECT_2_ID = "01923983-2f95-7d79-975f-000000010002";
 
@@ -122,6 +123,7 @@ export function createCategoryRepositoryTests(
 
       await repository.reorder(categoriesTesting.testingCategoryReorderMutation({
         ids: [CATEGORY_2_ID, CATEGORY_1_ID, CATEGORY_3_ID],
+        projectId: PROJECT_1_ID,
       }));
 
       const categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
@@ -130,6 +132,49 @@ export function createCategoryRepositoryTests(
         hasProperties({name: "<category 2 name>"}),
         hasProperties({name: "<category 1 name>"}),
         hasProperties({name: "<category 3 name>"}),
+      ));
+    });
+
+    testRepository("reordering project's categories does not affect other projects", async (repository) => {
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
+        id: CATEGORY_1_ID,
+        name: "<category 1 name>",
+        projectId: PROJECT_1_ID,
+      }));
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
+        id: CATEGORY_2_ID,
+        name: "<category 2 name>",
+        projectId: PROJECT_1_ID,
+      }));
+
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
+        id: CATEGORY_3_ID,
+        name: "<category 3 name>",
+        projectId: PROJECT_2_ID,
+      }));
+      await repository.add(categoriesTesting.testingCategoryAddMutation({
+        id: CATEGORY_4_ID,
+        name: "<category 4 name>",
+        projectId: PROJECT_2_ID,
+      }));
+
+      await repository.reorder(categoriesTesting.testingCategoryReorderMutation({
+        ids: [CATEGORY_2_ID, CATEGORY_4_ID, CATEGORY_1_ID, CATEGORY_3_ID],
+        projectId: PROJECT_1_ID,
+      }));
+
+      const project1Categories = await repository.fetchAllByProjectId(PROJECT_1_ID);
+
+      assertThat(project1Categories, isSequence(
+        hasProperties({name: "<category 2 name>"}),
+        hasProperties({name: "<category 1 name>"}),
+      ));
+
+      const project2Categories = await repository.fetchAllByProjectId(PROJECT_2_ID);
+
+      assertThat(project2Categories, isSequence(
+        hasProperties({name: "<category 3 name>"}),
+        hasProperties({name: "<category 4 name>"}),
       ));
     });
   });

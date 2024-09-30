@@ -52,7 +52,8 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
               eb(eb.fn.max("categories.index"), "+", 1),
               eb.lit(0)
             ).as("index")
-          ),
+          )
+          .where("categories.projectId", "=", mutation.projectId),
         name: mutation.name,
         presetColorId: mutation.color.presetColorId,
         projectId: mutation.projectId,
@@ -69,12 +70,14 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
       .set((eb) => ({
         index: eb.neg(eb.ref("categories.index"))
       }))
+      .where("projectId", "=", mutation.projectId)
       .execute();
 
     await this.database.updateTable("categories")
       .set((eb) => ({
         index: eb.fn<number>("array_position", [eb.val(mutation.ids), eb.ref("categories.id")])
       }))
+      .where("projectId", "=", mutation.projectId)
       .execute();
   }
 

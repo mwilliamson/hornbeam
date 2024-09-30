@@ -9,7 +9,7 @@ import { DB } from "../database/types";
 import { SelectQueryBuilder } from "kysely";
 import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
-import { boardCardTreesQuery, CardChildCountQuery, CardQuery, parentBoardQuery, ParentCardQuery } from "hornbeam-common/lib/queries";
+import { boardCardTreesQuery, CardChildCountQuery, CardQuery, parentBoardQuery, ParentCardQuery, SearchCardsQuery } from "hornbeam-common/lib/queries";
 import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
 
 export interface CardRepository {
@@ -19,7 +19,7 @@ export interface CardRepository {
   fetchById: (query: CardQuery) => Promise<Card | null>;
   fetchParent: (query: ParentCardQuery) => Promise<Card | null>;
   fetchChildCount: (query: CardChildCountQuery) => Promise<number>;
-  search: (searchTerm: string) => Promise<ReadonlyArray<Card>>;
+  search: (query: SearchCardsQuery) => Promise<ReadonlyArray<Card>>;
   fetchBoardCardTrees: (
     boardId: BoardId,
     cardStatuses: ReadonlySet<CardStatus>,
@@ -77,10 +77,11 @@ export class CardRepositoryInMemory implements CardRepository {
       .countCardChildren(query.cardId);
   }
 
-  async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
-    // TODO: use proper project ID
-    const projectId = this.snapshot.value.allProjects()[0].id;
-    return this.snapshot.value.fetchProjectContents(projectId).searchCards(searchTerm).slice(0, MAX_SEARCH_RESULTS);
+  async search(query: SearchCardsQuery): Promise<ReadonlyArray<Card>> {
+    return this.snapshot.value
+      .fetchProjectContents(query.projectId)
+      .searchCards(query.searchTerm)
+      .slice(0, MAX_SEARCH_RESULTS);
   }
 
   async fetchBoardCardTrees(
@@ -233,10 +234,11 @@ export class CardRepositoryDatabase implements CardRepository {
     return row === undefined ? 0 : parseInt(row.count, 10);
   }
 
-  async search(searchTerm: string): Promise<ReadonlyArray<Card>> {
+  async search(query: SearchCardsQuery): Promise<ReadonlyArray<Card>> {
     const cardsQuery = this.selectColumns(
       this.database.selectFrom("cards")
-        .where(({fn, val}) => fn("strpos", ["cards.text", val(searchTerm)]), ">", 0)
+        .where(({fn, val}) => fn("strpos", ["cards.text", val(query.searchTerm)]), ">", 0)
+        .where("cards.projectId", "=", query.projectId)
         .orderBy("cards.index")
         .limit(20)
     );

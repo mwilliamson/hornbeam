@@ -74,7 +74,7 @@ class AppTransaction {
         }
         case "searchCards": {
           const cardRepository = new CardRepositoryDatabase(this.transaction);
-          const result = await cardRepository.search(serverQuery.searchTerm);
+          const result = await cardRepository.search(serverQuery);
           return serializeSearchCardsResponse(result);
         }
         case "boardCardTrees": {

@@ -267,7 +267,7 @@ export function createCardsRepositoryTests(
         text: "cd",
       }));
 
-      const cards = await repository.search("bc");
+      const cards = await repository.search({searchTerm: "bc", projectId: PROJECT_1_ID});
 
       assertThat(cards, containsExactly(
         hasProperties({text: "abcd"}),
@@ -285,9 +285,28 @@ export function createCardsRepositoryTests(
         }));
       }
 
-      const cards = await repository.search("bc");
+      const cards = await repository.search({searchTerm: "bc", projectId: PROJECT_1_ID});
 
       assertThat(cards.length, equalTo(20));
+    });
+
+    testRepository("results are filtered by project", async (repository) => {
+      await repository.add(cardAddMutation({
+        id: CARD_1_ID,
+        projectId: PROJECT_1_ID,
+        text: "ab",
+      }));
+      await repository.add(cardAddMutation({
+        id: CARD_2_ID,
+        projectId: PROJECT_2_ID,
+        text: "ac",
+      }));
+
+      const cards = await repository.search({searchTerm: "a", projectId: PROJECT_2_ID});
+
+      assertThat(cards, containsExactly(
+        hasProperties({text: "ac"})
+      ));
     });
   });
 

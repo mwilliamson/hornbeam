@@ -146,7 +146,7 @@ export function cardHistoryQuery(
   };
 }
 
-interface SearchCardsQuery {
+export interface SearchCardsQuery {
   readonly projectId: string;
   readonly searchTerm: string;
 }

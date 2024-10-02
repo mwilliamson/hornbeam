@@ -1,4 +1,3 @@
-import { Instant } from "@js-joda/core";
 import { useEffect, useId, useState } from "react";
 
 import { BoardId, isRootBoardId, rootBoardId } from "hornbeam-common/lib/app/boards";
@@ -115,7 +114,6 @@ export default function BoardView(props: BoardViewProps) {
         if (viewState.selectedCardId !== null) {
           // TODO: wait
           mutate(appMutations.cardEdit({
-            createdAt: Instant.now(),
             id: viewState.selectedCardId,
             status: CardStatus.Deleted,
             projectId,
@@ -129,7 +127,7 @@ export default function BoardView(props: BoardViewProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [viewState.selectedCardId, mutate]);
+  }, [viewState.selectedCardId, mutate, projectId]);
 
   const handleBoardUp = isRootBoardId(viewState.selectedBoardId)
     ? undefined

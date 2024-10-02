@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import { Card, CardAddMutation, CardEditMutation } from "hornbeam-common/lib/app/cards";
+import { Card, CardAddEffect, CardEditEffect } from "hornbeam-common/lib/app/cards";
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
@@ -11,10 +11,11 @@ import { BoardId, cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/bo
 import { queryAppSnapshot } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BoardCardTreesQuery, boardCardTreesQuery, CardChildCountQuery, CardQuery, ParentBoardQuery, parentBoardQuery, ParentCardQuery, SearchCardsQuery } from "hornbeam-common/lib/queries";
 import { cardsToTrees, CardTree } from "hornbeam-common/lib/app/cardTrees";
+import { appEffects } from "hornbeam-common/lib/app/snapshots";
 
 export interface CardRepository {
-  add: (mutation: CardAddMutation) => Promise<void>;
-  update: (mutation: CardEditMutation) => Promise<void>;
+  add: (effect: CardAddEffect) => Promise<void>;
+  update: (effect: CardEditEffect) => Promise<void>;
   fetchByProjectId: (projectId: string) => Promise<ReadonlyArray<Card>>;
   fetchById: (query: CardQuery) => Promise<Card | null>;
   fetchParent: (query: ParentCardQuery) => Promise<Card | null>;
@@ -31,18 +32,12 @@ export class CardRepositoryInMemory implements CardRepository {
     this.snapshot = snapshot;
   }
 
-  async add(mutation: CardAddMutation): Promise<void> {
-    this.snapshot.mutate({
-      type: "cardAdd",
-      cardAdd: mutation
-    });
+  async add(effect: CardAddEffect): Promise<void> {
+    this.snapshot.applyEffect(appEffects.cardAdd(effect));
   }
 
-  async update(mutation: CardEditMutation): Promise<void> {
-    this.snapshot.mutate({
-      type: "cardEdit",
-      cardEdit: mutation,
-    });
+  async update(effect: CardEditEffect): Promise<void> {
+    this.snapshot.applyEffect(appEffects.cardEdit(effect));
   }
 
   async fetchByProjectId(projectId: string): Promise<ReadonlyArray<Card>> {
@@ -99,12 +94,12 @@ export class CardRepositoryDatabase implements CardRepository {
     this.database = database;
   }
 
-  async add(mutation: CardAddMutation): Promise<void> {
+  async add(effect: CardAddEffect): Promise<void> {
     await this.database.insertInto("cards")
       .values((eb) => ({
-        categoryId: mutation.categoryId,
-        createdAt: new Date(mutation.createdAt.toEpochMilli()),
-        id: mutation.id,
+        categoryId: effect.categoryId,
+        createdAt: new Date(effect.createdAt.toEpochMilli()),
+        id: effect.id,
         index: eb.selectFrom("cards")
           .select(
             eb.fn.coalesce(
@@ -112,7 +107,7 @@ export class CardRepositoryDatabase implements CardRepository {
               eb.lit(0),
             ).as("index")
           )
-          .where("projectId", "=", mutation.projectId),
+          .where("projectId", "=", effect.projectId),
         isSubboardRoot: false,
         number: eb.selectFrom("cards")
           .select(
@@ -121,44 +116,44 @@ export class CardRepositoryDatabase implements CardRepository {
               eb.lit(1),
             ).as("number")
           )
-          .where("projectId", "=", mutation.projectId),
-        parentCardId: mutation.parentCardId,
-        projectId: mutation.projectId,
+          .where("projectId", "=", effect.projectId),
+        parentCardId: effect.parentCardId,
+        projectId: effect.projectId,
         status: SerializedCardStatus.encode(CardStatus.None),
-        text: mutation.text,
+        text: effect.text,
       }))
       .execute();
   }
 
-  async update(mutation: CardEditMutation): Promise<void> {
+  async update(effect: CardEditEffect): Promise<void> {
     let query = this.database.updateTable("cards")
-      .where("id", "=", mutation.id);
+      .where("id", "=", effect.id);
     let queryRequired = false;
 
-    if (mutation.categoryId !== undefined) {
+    if (effect.categoryId !== undefined) {
       // TODO: check category is valid
-      query = query.set({categoryId: mutation.categoryId});
+      query = query.set({categoryId: effect.categoryId});
       queryRequired = true;
     }
 
-    if (mutation.isSubboardRoot !== undefined) {
-      query = query.set({isSubboardRoot: mutation.isSubboardRoot});
+    if (effect.isSubboardRoot !== undefined) {
+      query = query.set({isSubboardRoot: effect.isSubboardRoot});
       queryRequired = true;
     }
 
-    if (mutation.parentCardId !== undefined) {
+    if (effect.parentCardId !== undefined) {
       // TODO: check parent is valid
-      query = query.set({parentCardId: mutation.parentCardId});
+      query = query.set({parentCardId: effect.parentCardId});
       queryRequired = true;
     }
 
-    if (mutation.status !== undefined) {
-      query = query.set({status: SerializedCardStatus.encode(mutation.status)});
+    if (effect.status !== undefined) {
+      query = query.set({status: SerializedCardStatus.encode(effect.status)});
       queryRequired = true;
     }
 
-    if (mutation.text !== undefined) {
-      query = query.set({text: mutation.text});
+    if (effect.text !== undefined) {
+      query = query.set({text: effect.text});
       queryRequired = true;
     }
 

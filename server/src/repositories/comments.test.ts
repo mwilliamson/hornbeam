@@ -3,9 +3,9 @@ import { suite, test } from "mocha";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
-import { testingCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
-import { testingCommentAddMutation } from "hornbeam-common/lib/app/comments.testing";
-import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
+import { testingCardAddEffect } from "hornbeam-common/lib/app/cards.testing";
+import { testingCommentAddEffect } from "hornbeam-common/lib/app/comments.testing";
+import { testingProjectAddEffect } from "hornbeam-common/lib/app/projects.testing";
 
 const CATEGORY_1_ID = "01921902-0000-7c1a-a1c3-000000000001";
 const CARD_1_ID = "01921902-0000-7c1a-a1c3-000000001001";
@@ -22,31 +22,31 @@ export function createCategoryRepositoryTests(
   suite("fetchByCardId()", () => {
     testRepository("can fetch comments for a card", async (repository) => {
       const cardRepository = await repository.cardRepository();
-      await cardRepository.add(testingCardAddMutation({
+      await cardRepository.add(testingCardAddEffect({
         categoryId: CATEGORY_1_ID,
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await cardRepository.add(testingCardAddMutation({
+      await cardRepository.add(testingCardAddEffect({
         categoryId: CATEGORY_1_ID,
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
       }));
 
       const commentRepository = await repository.commentRepository();
-      await commentRepository.add(testingCommentAddMutation({
+      await commentRepository.add(testingCommentAddEffect({
         cardId: CARD_1_ID,
         id: COMMENT_1_ID,
         projectId: PROJECT_1_ID,
         text: "<comment 1a>",
       }));
-      await commentRepository.add(testingCommentAddMutation({
+      await commentRepository.add(testingCommentAddEffect({
         cardId: CARD_1_ID,
         id: COMMENT_2_ID,
         projectId: PROJECT_1_ID,
         text: "<comment 1b>",
       }));
-      await commentRepository.add(testingCommentAddMutation({
+      await commentRepository.add(testingCommentAddEffect({
         cardId: CARD_2_ID,
         id: COMMENT_3_ID,
         projectId: PROJECT_1_ID,
@@ -71,14 +71,14 @@ export function createCategoryRepositoryTests(
 
     testRepository("cannot fetch comments for card in different repository", async (repository) => {
       const cardRepository = await repository.cardRepository();
-      await cardRepository.add(testingCardAddMutation({
+      await cardRepository.add(testingCardAddEffect({
         categoryId: CATEGORY_1_ID,
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
 
       const commentRepository = await repository.commentRepository();
-      await commentRepository.add(testingCommentAddMutation({
+      await commentRepository.add(testingCommentAddEffect({
         cardId: CARD_1_ID,
         id: COMMENT_1_ID,
         projectId: PROJECT_1_ID,
@@ -98,15 +98,15 @@ export function createCategoryRepositoryTests(
       await using fixtures = await createFixtures();
 
       const projectRepository = await fixtures.projectRepository();
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_1_ID,
       }));
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_2_ID,
       }));
 
       const categoryRepository = await fixtures.categoryRepository();
-      await categoryRepository.add(categoriesTesting.testingCategoryAddMutation({
+      await categoryRepository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_1_ID,
         projectId: PROJECT_1_ID,
       }));

@@ -1,6 +1,3 @@
-import { Instant } from "@js-joda/core";
-
-import { generateId } from "hornbeam-common/lib/app/ids";
 import { appMutations } from "hornbeam-common/lib/app/snapshots";
 import { allColorsQuery, availableCategoriesQuery } from "hornbeam-common/lib/queries";
 import Boundary from "../Boundary";
@@ -30,8 +27,6 @@ export default function CardAddFormBoundary(props: CardAddFormBoundaryProps) {
           onCardAdd={async ({categoryId, parentCardId, text}: ValidCardFormValues) => {
             await mutate(appMutations.cardAdd({
               categoryId,
-              createdAt: Instant.now(),
-              id: generateId(),
               parentCardId,
               projectId,
               text,

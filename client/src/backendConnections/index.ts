@@ -182,6 +182,10 @@ export class BackendSubscriptions {
       return;
     }
 
+    if (subscriptions.length === 0) {
+      return;
+    }
+
     const combinedQueries: AppQueries = {};
     let queryIndex = 0;
     for (const subscription of subscriptions) {
@@ -236,7 +240,7 @@ export interface BackendConnection {
   setTimeTravelSnapshotIndex: ((newSnapshotIndex: number | null) => void) | null;
 }
 
-export type Mutate = (mutation: AppMutation) => Promise<void>;
+export type Mutate = <TEffect>(mutation: AppMutation<TEffect>) => Promise<TEffect>;
 
 const BackendConnectionContext = React.createContext<BackendConnection | null>(null);
 

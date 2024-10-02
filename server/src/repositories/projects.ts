@@ -1,9 +1,10 @@
-import { Project, ProjectAddMutation } from "hornbeam-common/lib/app/projects";
+import { Project, ProjectAddEffect } from "hornbeam-common/lib/app/projects";
 import { AppSnapshotRef } from "./snapshotRef";
 import { Database } from "../database";
+import { appEffects } from "hornbeam-common/lib/app/snapshots";
 
 export interface ProjectRepository {
-  add: (mutation: ProjectAddMutation) => Promise<void>;
+  add: (effect: ProjectAddEffect) => Promise<void>;
   fetchAll: () => Promise<ReadonlyArray<Project>>;
 }
 
@@ -14,11 +15,8 @@ export class ProjectRepositoryInMemory implements ProjectRepository {
     this.snapshot = snapshot;
   }
 
-  public async add(mutation: ProjectAddMutation): Promise<void> {
-    this.snapshot.mutate({
-      type: "projectAdd",
-      projectAdd: mutation,
-    });
+  public async add(effect: ProjectAddEffect): Promise<void> {
+    this.snapshot.applyEffect(appEffects.projectAdd(effect));
   }
 
   public async fetchAll(): Promise<ReadonlyArray<Project>> {
@@ -33,7 +31,7 @@ export class ProjectRepositoryDatabase implements ProjectRepository {
     this.database = database;
   }
 
-  public async add(mutation: ProjectAddMutation): Promise<void> {
+  public async add(mutation: ProjectAddEffect): Promise<void> {
     await this.database.insertInto("projects")
       .values({
         id: mutation.id,

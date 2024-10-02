@@ -2,7 +2,7 @@ import { Transaction } from "kysely";
 import { uuidv7 } from "uuidv7";
 import { Database } from "./database";
 import { DB } from "./database/types";
-import { AppMutation } from "hornbeam-common/lib/app/snapshots";
+import { AppEffect, AppMutation, appMutationToAppEffect } from "hornbeam-common/lib/app/snapshots";
 import { MutationLogRepositoryDatabase } from "./repositories/mutationLog";
 import { CategoryRepositoryDatabase } from "./repositories/categories";
 import { CommentRepositoryDatabase } from "./repositories/comments";
@@ -27,6 +27,11 @@ export class App {
       return f(appTransaction);
     });
   }
+}
+
+interface MutateResult {
+  snapshotIndex: number;
+  effect: AppEffect;
 }
 
 class AppTransaction {
@@ -112,28 +117,38 @@ class AppTransaction {
   }
 
   public async mutate(
-    mutation: AppMutation,
+    mutation: AppMutation<unknown>,
+  ): Promise<MutateResult> {
+    const effect = appMutationToAppEffect(mutation);
+    return {
+      effect,
+      snapshotIndex: await this.applyEffect(effect),
+    };
+  }
+
+  public async applyEffect(
+    effect: AppEffect,
   ): Promise<number> {
     const mutationLogRepository = new MutationLogRepositoryDatabase(this.transaction);
-    const index = await mutationLogRepository.add(uuidv7(), mutation);
+    const index = await mutationLogRepository.add(uuidv7(), effect);
 
-    await this.applyMutation(mutation);
+    await this.playEffect(effect);
 
     return index;
   }
 
-  private async applyMutation(
-    mutation: AppMutation,
+  private async playEffect(
+    effect: AppEffect,
   ): Promise<void> {
-    switch (mutation.type) {
+    switch (effect.type) {
       case "cardAdd": {
         const cardRepository = new CardRepositoryDatabase(this.transaction);
-        await cardRepository.add(mutation.cardAdd);
+        await cardRepository.add(effect.value);
         return;
       }
       case "cardEdit": {
         const cardRepository = new CardRepositoryDatabase(this.transaction);
-        await cardRepository.update(mutation.cardEdit);
+        await cardRepository.update(effect.value);
         return;
       }
       case "cardMove": {
@@ -147,26 +162,26 @@ class AppTransaction {
       }
       case "categoryAdd": {
         const categoryRepository = new CategoryRepositoryDatabase(this.transaction);
-        await categoryRepository.add(mutation.categoryAdd);
+        await categoryRepository.add(effect.value);
         return;
       }
       case "categoryReorder": {
         const categoryRepository = new CategoryRepositoryDatabase(this.transaction);
-        await categoryRepository.reorder(mutation.categoryReorder);
+        await categoryRepository.reorder(effect.value);
         return;
       }
       case "commentAdd": {
         const commentRepository = new CommentRepositoryDatabase(this.transaction);
-        await commentRepository.add(mutation.commentAdd);
+        await commentRepository.add(effect.value);
         return;
       }
       case "projectAdd": {
         const projectRepository = new ProjectRepositoryDatabase(this.transaction);
-        await projectRepository.add(mutation.projectAdd);
+        await projectRepository.add(effect.value);
         return;
       }
       default: {
-        return handleNever(mutation, undefined);
+        return handleNever(effect, undefined);
       }
     }
   }

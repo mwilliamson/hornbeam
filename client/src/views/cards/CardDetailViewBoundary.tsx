@@ -1,6 +1,4 @@
-import { Instant } from "@js-joda/core";
 import { BoardId } from "hornbeam-common/lib/app/boards";
-import { generateId } from "hornbeam-common/lib/app/ids";
 import { appMutations } from "hornbeam-common/lib/app/snapshots";
 import { allCategoriesQuery, allColorsQuery, cardChildCountQuery, cardHistoryQuery, cardQuery, parentCardQuery, searchCardsQuery } from "hornbeam-common/lib/queries";
 import Boundary from "../Boundary";
@@ -51,25 +49,27 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
             searchCards: searchTerm => query(searchCardsQuery({projectId, searchTerm})),
           }}
           onAddChildClick={() => onCardAddClick({parentCard: card})}
-          onCardEdit={(mutation) => mutate(appMutations.cardEdit({
-            ...mutation,
-            createdAt: Instant.now(),
-            id: card.id,
-            projectId,
-          }))}
-          onCardMove={(direction) => mutate(appMutations.cardMove({
-            createdAt: Instant.now(),
-            direction,
-            id: card.id,
-            projectId,
-          }))}
-          onCommentAdd={(text) => mutate(appMutations.commentAdd({
-            cardId: card.id,
-            createdAt: Instant.now(),
-            id: generateId(),
-            projectId,
-            text,
-          }))}
+          onCardEdit={async (mutation) => {
+            await mutate(appMutations.cardEdit({
+              ...mutation,
+              id: card.id,
+              projectId,
+            }));
+          }}
+          onCardMove={async (direction) => {
+            await mutate(appMutations.cardMove({
+              direction,
+              id: card.id,
+              projectId,
+            }));
+          }}
+          onCommentAdd={async (text) => {
+            await mutate(appMutations.commentAdd({
+              cardId: card.id,
+              projectId,
+              text,
+            }));
+          }}
           onBoardOpen={onBoardOpen}
           parentCard={parentCard}
           selectedBoardId={selectedBoardId}

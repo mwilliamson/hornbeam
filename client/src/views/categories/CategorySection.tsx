@@ -6,7 +6,7 @@ import CategoryListView from "./CategoryListView";
 interface CategorySectionProps {
   categories: ReadonlyArray<Category>;
   allColors: ColorSet;
-  onCategoryAdd: (mutation: Omit<CategoryAddMutation, "createdAt" | "id" | "projectId">) => Promise<void>;
+  onCategoryAdd: (mutation: Omit<CategoryAddMutation, "projectId">) => Promise<void>;
   onReorder: (categoryIds: ReadonlyArray<string>) => Promise<void>;
 }
 

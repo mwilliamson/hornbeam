@@ -18,7 +18,7 @@ interface AddCategoryState {
 
 interface AddCategorySectionProps {
   allColors: ColorSet;
-  onCategoryAdd: (mutation: Omit<CategoryAddMutation, "createdAt" | "id" | "projectId">) => Promise<void>;
+  onCategoryAdd: (mutation: Omit<CategoryAddMutation, "projectId">) => Promise<void>;
 }
 
 export default function AddCategorySection(props: AddCategorySectionProps) {

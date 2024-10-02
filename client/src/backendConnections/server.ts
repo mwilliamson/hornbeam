@@ -4,9 +4,8 @@ import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { CategorySet, CategorySetInMemory } from "hornbeam-common/lib/app/categories";
 import { ColorSetInMemory, PresetColor } from "hornbeam-common/lib/app/colors";
-import { AppMutation, AppUpdate } from "hornbeam-common/lib/app/snapshots";
+import { AppMutation } from "hornbeam-common/lib/app/snapshots";
 import { QueryRequestBody, QueryResponseBody, UpdateRequestBody, UpdateResponseBody } from "hornbeam-common/lib/serialization/serverApi";
-import { uuidv7 } from "uuidv7";
 import { assertNever } from "hornbeam-common/lib/util/assertNever";
 
 export function connectServer(uri: string): BackendConnection {
@@ -221,23 +220,21 @@ export function connectServer(uri: string): BackendConnection {
     return results;
   };
 
-  const mutate = async (mutation: AppMutation): Promise<void> => {
+  const mutate = async <TEffect>(mutation: AppMutation<TEffect>): Promise<TEffect> => {
     // TODO: send active queries as part of request?
 
-    const updateId = uuidv7();
+    const response = await fetchJson("update", UpdateRequestBody.encode({
+      mutation
+    }));
 
-    const update: AppUpdate = {
-      mutation,
-      updateId,
-    };
-
-    const response = await fetchJson("update", UpdateRequestBody.encode({update}));
-
-    const {snapshotIndex} = deserialize(UpdateResponseBody, response);
+    const {effect, snapshotIndex} = deserialize(UpdateResponseBody, response);
 
     await subscriptions.onLastUpdate({
       snapshotIndex,
     });
+
+    // TODO: restore type safety
+    return effect.value as TEffect;
   };
 
   const fetchJson = async (path: string, body: unknown) => {
@@ -253,7 +250,7 @@ export function connectServer(uri: string): BackendConnection {
       throw new Error(`Unexpected status code from server: ${response.status}`);
     }
 
-    return response.json();
+    return await response.json();
   };
 
   const executeQuery = async <R>(query: AppQuery<R>): Promise<R> => {

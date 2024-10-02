@@ -5,7 +5,7 @@ import { CategoryRepository } from "./categories";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
-import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
+import { testingProjectAddEffect } from "hornbeam-common/lib/app/projects.testing";
 
 const CATEGORY_1_ID = "0191be9e-f6df-7507-9e6b-000000000001";
 const CATEGORY_2_ID = "0191be9e-f6df-7507-9e6b-000000000002";
@@ -25,14 +25,14 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("can fetch categories after they're added", async (repository) => {
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         color: {presetColorId: presetColorRed.id},
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         color: {presetColorId: presetColorGreen.id},
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
@@ -56,13 +56,13 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("categories are fetched in order they're added", async (repository) => {
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
         projectId: PROJECT_1_ID,
@@ -77,14 +77,14 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("categories from other project are not fetched", async (repository) => {
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         color: {presetColorId: presetColorRed.id},
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         color: {presetColorId: presetColorGreen.id},
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
@@ -103,25 +103,25 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("categories can be reordered", async (repository) => {
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_3_ID,
         name: "<category 3 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.reorder(categoriesTesting.testingCategoryReorderMutation({
+      await repository.reorder(categoriesTesting.testingCategoryReorderEffect({
         ids: [CATEGORY_2_ID, CATEGORY_1_ID, CATEGORY_3_ID],
         projectId: PROJECT_1_ID,
       }));
@@ -136,29 +136,29 @@ export function createCategoryRepositoryTests(
     });
 
     testRepository("reordering project's categories does not affect other projects", async (repository) => {
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_1_ID,
         name: "<category 1 name>",
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_2_ID,
         name: "<category 2 name>",
         projectId: PROJECT_1_ID,
       }));
 
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_3_ID,
         name: "<category 3 name>",
         projectId: PROJECT_2_ID,
       }));
-      await repository.add(categoriesTesting.testingCategoryAddMutation({
+      await repository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_4_ID,
         name: "<category 4 name>",
         projectId: PROJECT_2_ID,
       }));
 
-      await repository.reorder(categoriesTesting.testingCategoryReorderMutation({
+      await repository.reorder(categoriesTesting.testingCategoryReorderEffect({
         ids: [CATEGORY_2_ID, CATEGORY_4_ID, CATEGORY_1_ID, CATEGORY_3_ID],
         projectId: PROJECT_1_ID,
       }));
@@ -184,10 +184,10 @@ export function createCategoryRepositoryTests(
       await using fixtures = await createFixtures();
 
       const projectRepository = await fixtures.projectRepository();
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_1_ID,
       }));
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_2_ID,
       }));
 

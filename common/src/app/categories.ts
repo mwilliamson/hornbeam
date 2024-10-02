@@ -30,26 +30,32 @@ export function categoryBackgroundColor(
 }
 
 export interface CategoryAddMutation {
-  createdAt: Instant;
   color: ColorRef;
-  id: string;
   name: string;
   projectId: string;
 }
 
-export function createCategory(request: CategoryAddMutation): Category {
+export interface CategoryAddEffect extends CategoryAddMutation {
+  createdAt: Instant;
+  id: string;
+}
+
+export function createCategory(effect: CategoryAddEffect): Category {
   return {
-    color: request.color,
-    id: request.id,
-    name: request.name,
-    projectId: request.projectId,
+    color: effect.color,
+    id: effect.id,
+    name: effect.name,
+    projectId: effect.projectId,
   };
 }
 
 export interface CategoryReorderMutation {
-  createdAt: Instant;
   ids: ReadonlyArray<string>;
   projectId: string;
+}
+
+export interface CategoryReorderEffect extends CategoryReorderMutation {
+  createdAt: Instant;
 }
 
 export interface CategorySet {
@@ -69,16 +75,16 @@ export class CategorySetInMemory implements CategorySet {
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }
 
-  public categoryAdd(request: CategoryAddMutation): CategorySetInMemory {
-    const category = createCategory(request);
+  public categoryAdd(effect: CategoryAddEffect): CategorySetInMemory {
+    const category = createCategory(effect);
     return new CategorySetInMemory([...this.categories, category]);
   }
 
-  public categoryReorder(request: CategoryReorderMutation): CategorySetInMemory {
+  public categoryReorder(effect: CategoryReorderEffect): CategorySetInMemory {
     const newCategories = reorder(
       this.categories,
       category => category.id,
-      request.ids,
+      effect.ids,
     );
 
     return new CategorySetInMemory(newCategories);

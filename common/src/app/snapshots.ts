@@ -1,10 +1,11 @@
 import { Instant } from "@js-joda/core";
-import { assertNever, handleNever } from "../util/assertNever";
-import { Card, CardAddMutation, CardEditMutation, CardMoveMutation, CardMoveToAfterMutation, CardMoveToBeforeMutation, CardSet, createCard, updateCard } from "./cards";
-import { Category, CategoryAddMutation, CategoryReorderMutation, CategorySet, CategorySetInMemory } from "./categories";
+import { handleNever } from "../util/assertNever";
+import { Card, CardAddEffect, CardAddMutation, CardEditEffect, CardEditMutation, CardMoveEffect, CardMoveMutation, CardMoveToAfterEffect, CardMoveToAfterMutation, CardMoveToBeforeEffect, CardMoveToBeforeMutation, CardSet, createCard, updateCard } from "./cards";
+import { Category, CategoryAddEffect, CategoryAddMutation, CategoryReorderEffect, CategoryReorderMutation, CategorySet, CategorySetInMemory } from "./categories";
 import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
-import { Comment, CommentAddMutation, CommentSet, createComment } from "./comments";
-import { createProject, Project, ProjectAddMutation } from "./projects";
+import { Comment, CommentAddEffect, CommentAddMutation, CommentSet, createComment } from "./comments";
+import { createProject, Project, ProjectAddEffect, ProjectAddMutation } from "./projects";
+import { generateId } from "./ids";
 
 export class AppSnapshot {
   private readonly projects: ReadonlyArray<Project>;
@@ -18,11 +19,11 @@ export class AppSnapshot {
     this.projectContents = projectContents;
   }
 
-  public projectAdd(mutation: ProjectAddMutation): AppSnapshot {
+  public projectAdd(effect: ProjectAddEffect): AppSnapshot {
     const projectContents = new Map(this.projectContents);
-    projectContents.set(mutation.id, initialProjectContentsSnapshot());
+    projectContents.set(effect.id, initialProjectContentsSnapshot());
     return new AppSnapshot(
-      [...this.projects, createProject(mutation)],
+      [...this.projects, createProject(effect)],
       projectContents,
     );
   }
@@ -41,13 +42,13 @@ export class AppSnapshot {
   }
 
   public mutateProjectContents(
-    mutation: ProjectContentsMutation
+    effect: ProjectContentsEffect,
   ): AppSnapshot {
-    const projectId = projectContentsMutationProjectId(mutation);
+    const projectId = projectContentsEffectProjectId(effect);
 
     return this.updateProjectContents(
       projectId,
-      projectContents => applyProjectContentsMutation(projectContents, mutation),
+      projectContents => applyProjectContentsEffect(projectContents, effect),
     );
   }
 
@@ -68,22 +69,31 @@ export function initialAppSnapshot(): AppSnapshot {
 
 export interface AppUpdate {
   updateId: string;
-  mutation: AppMutation;
+  // TODO: rename to effect
+  mutation: AppEffect;
 }
 
-export type AppMutation =
-  | ProjectContentsMutation
-  | {type: "projectAdd", projectAdd: ProjectAddMutation};
+export type AppMutation<TEffect> =
+  | ProjectContentsMutation<TEffect>
+  | {
+    type: "projectAdd",
+    proof: (effect: ProjectAddEffect) => TEffect,
+    value: ProjectAddMutation,
+  };
 
-export function applyAppMutation(
+export type AppEffect =
+  | ProjectContentsEffect
+  | {type: "projectAdd", value: ProjectAddEffect};
+
+export function applyAppEffect(
   snapshot: AppSnapshot,
-  mutation: AppMutation,
+  effect: AppEffect,
 ): AppSnapshot {
-  switch (mutation.type) {
+  switch (effect.type) {
     case "projectAdd":
-      return snapshot.projectAdd(mutation.projectAdd);
+      return snapshot.projectAdd(effect.value);
     default:
-      return snapshot.mutateProjectContents(mutation);
+      return snapshot.mutateProjectContents(effect);
   }
 }
 
@@ -108,7 +118,7 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     this.comments = comments;
   }
 
-  public cardAdd(mutation: CardAddMutation): ProjectContentsSnapshot {
+  public cardAdd(mutation: CardAddEffect): ProjectContentsSnapshot {
     const card = createCard(mutation, this.nextCardNumber);
     return new ProjectContentsSnapshot(
       [...this.cards, card],
@@ -119,7 +129,7 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     );
   }
 
-  public cardEdit(request: CardEditMutation): ProjectContentsSnapshot {
+  public cardEdit(request: CardEditEffect): ProjectContentsSnapshot {
     return new ProjectContentsSnapshot(
       this.cards.map(card => {
         if (card.id !== request.id) {
@@ -135,8 +145,8 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     );
   }
 
-  public cardMove(request: CardMoveMutation): ProjectContentsSnapshot {
-    const card = this.findCardById(request.id);
+  public cardMove(effect: CardMoveEffect): ProjectContentsSnapshot {
+    const card = this.findCardById(effect.id);
 
     if (card === null) {
       return this;
@@ -149,7 +159,7 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
 
     let swapWithCard: Card;
 
-    switch (request.direction) {
+    switch (effect.direction) {
       case "up":
         if (siblingIndex === 0) {
           return this;
@@ -163,7 +173,7 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
         swapWithCard = siblingCards[siblingIndex + 1];
         break;
       default:
-        return handleNever(request.direction, this);
+        return handleNever(effect.direction, this);
     }
 
     return new ProjectContentsSnapshot(
@@ -183,31 +193,30 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     );
   }
 
-  public cardMoveToAfter(request: CardMoveToAfterMutation): ProjectContentsSnapshot {
-    if (request.afterCardId === request.moveCardId) {
+  public cardMoveToAfter(effect: CardMoveToAfterEffect): ProjectContentsSnapshot {
+    if (effect.afterCardId === effect.moveCardId) {
       return this;
     }
 
-    const afterCard = this.cards.find(card => card.id === request.afterCardId);
+    const afterCard = this.cards.find(card => card.id === effect.afterCardId);
     if (afterCard === undefined) {
       return this;
     }
 
-    const movedCard = this.cards.find(card => card.id === request.moveCardId);
+    const movedCard = this.cards.find(card => card.id === effect.moveCardId);
     if (movedCard === undefined) {
       return this;
     }
 
     return new ProjectContentsSnapshot(
       this.cards.flatMap(card => {
-        if (card.id === request.moveCardId) {
+        if (card.id === effect.moveCardId) {
           return [];
-        } else if (card.id === request.afterCardId) {
+        } else if (card.id === effect.afterCardId) {
           return [
             card,
             updateCard(movedCard, {
-              parentCardId: request.parentCardId,
-              projectId: request.projectId,
+              parentCardId: effect.parentCardId,
             }),
           ];
         } else {
@@ -221,30 +230,29 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     );
   }
 
-  public cardMoveToBefore(request: CardMoveToBeforeMutation): ProjectContentsSnapshot {
-    if (request.beforeCardId === request.moveCardId) {
+  public cardMoveToBefore(effect: CardMoveToBeforeEffect): ProjectContentsSnapshot {
+    if (effect.beforeCardId === effect.moveCardId) {
       return this;
     }
 
-    const beforeCard = this.cards.find(card => card.id === request.beforeCardId);
+    const beforeCard = this.cards.find(card => card.id === effect.beforeCardId);
     if (beforeCard === undefined) {
       return this;
     }
 
-    const movedCard = this.cards.find(card => card.id === request.moveCardId);
+    const movedCard = this.cards.find(card => card.id === effect.moveCardId);
     if (movedCard === undefined) {
       return this;
     }
 
     return new ProjectContentsSnapshot(
       this.cards.flatMap(card => {
-        if (card.id === request.moveCardId) {
+        if (card.id === effect.moveCardId) {
           return [];
-        } else if (card.id === request.beforeCardId) {
+        } else if (card.id === effect.beforeCardId) {
           return [
             updateCard(movedCard, {
-              parentCardId: request.parentCardId,
-              projectId: request.projectId,
+              parentCardId: effect.parentCardId,
             }),
             card,
           ];
@@ -288,21 +296,21 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     return this.allCategories().find(category => category.id == categoryId) ?? null;
   }
 
-  public categoryAdd(request: CategoryAddMutation): ProjectContentsSnapshot {
+  public categoryAdd(effect: CategoryAddEffect): ProjectContentsSnapshot {
     return new ProjectContentsSnapshot(
       this.cards,
       this.nextCardNumber,
-      this.categories.categoryAdd(request),
+      this.categories.categoryAdd(effect),
       this.colors,
       this.comments,
     );
   }
 
-  public categoryReorder(request: CategoryReorderMutation): ProjectContentsSnapshot {
+  public categoryReorder(effect: CategoryReorderEffect): ProjectContentsSnapshot {
     return new ProjectContentsSnapshot(
       this.cards,
       this.nextCardNumber,
-      this.categories.categoryReorder(request),
+      this.categories.categoryReorder(effect),
       this.colors,
       this.comments,
     );
@@ -324,8 +332,8 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     return this.colors.findPresetColorById(presetColorId);
   }
 
-  public commentAdd(request: CommentAddMutation): ProjectContentsSnapshot {
-    const comment = createComment(request);
+  public commentAdd(effect: CommentAddEffect): ProjectContentsSnapshot {
+    const comment = createComment(effect);
     return new ProjectContentsSnapshot(
       this.cards,
       this.nextCardNumber,
@@ -350,119 +358,261 @@ export function initialProjectContentsSnapshot(): ProjectContentsSnapshot {
   );
 }
 
-export type ProjectContentsMutation =
-  | {type: "cardAdd", cardAdd: CardAddMutation}
-  | {type: "cardEdit", cardEdit: CardEditMutation}
-  | {type: "cardMove", cardMove: CardMoveMutation}
-  | {type: "cardMoveToAfter", cardMoveToAfter: CardMoveToAfterMutation}
-  | {type: "cardMoveToBefore", cardMoveToBefore: CardMoveToBeforeMutation}
-  | {type: "categoryAdd", categoryAdd: CategoryAddMutation}
-  | {type: "categoryReorder", categoryReorder: CategoryReorderMutation}
-  | {type: "commentAdd", commentAdd: CommentAddMutation};
+export type ProjectContentsMutation<TEffect> =
+  | {
+    type: "cardAdd",
+    proof: (effect: CardAddEffect) => TEffect,
+    value: CardAddMutation,
+  }
+  | {
+    type: "cardEdit",
+    proof: (effect: CardEditEffect) => TEffect,
+    value: CardEditMutation,
+  }
+  | {
+    type: "cardMove",
+    proof: (effect: CardMoveEffect) => TEffect,
+    value: CardMoveMutation,
+  }
+  | {
+    type: "cardMoveToAfter",
+    proof: (effect: CardMoveToAfterEffect) => TEffect,
+    value: CardMoveToAfterMutation,
+  }
+  | {
+    type: "cardMoveToBefore",
+    proof: (effect: CardMoveToBeforeEffect) => TEffect,
+    value: CardMoveToBeforeMutation,
+  }
+  | {
+    type: "categoryAdd",
+    proof: (effect: CategoryAddEffect) => TEffect,
+    value: CategoryAddMutation,
+  }
+  | {
+    type: "categoryReorder",
+    proof: (effect: CategoryReorderEffect) => TEffect,
+    value: CategoryReorderMutation,
+  }
+  | {
+    type: "commentAdd",
+    proof: (effect: CommentAddEffect) => TEffect,
+    value: CommentAddMutation
+  };
 
 export const appMutations = {
-  cardAdd(mutation: CardAddMutation): ProjectContentsMutation {
-    return {type: "cardAdd", cardAdd: mutation};
+  cardAdd(mutation: CardAddMutation): ProjectContentsMutation<CardAddEffect> {
+    return {type: "cardAdd", proof, value: mutation};
   },
 
-  cardEdit(mutation: CardEditMutation): ProjectContentsMutation {
-    return {type: "cardEdit", cardEdit: mutation};
+  cardEdit(mutation: CardEditMutation): ProjectContentsMutation<CardEditEffect> {
+    return {type: "cardEdit", proof, value: mutation};
   },
 
-  cardMove(mutation: CardMoveMutation): ProjectContentsMutation {
-    return {type: "cardMove", cardMove: mutation};
+  cardMove(mutation: CardMoveMutation): ProjectContentsMutation<CardMoveEffect> {
+    return {type: "cardMove", proof, value: mutation};
   },
 
-  cardMoveToAfter(mutation: CardMoveToAfterMutation): ProjectContentsMutation {
-    return {type: "cardMoveToAfter", cardMoveToAfter: mutation};
+  cardMoveToAfter(mutation: CardMoveToAfterMutation): ProjectContentsMutation<CardMoveToAfterEffect> {
+    return {type: "cardMoveToAfter", proof, value: mutation};
   },
 
-  cardMoveToBefore(mutation: CardMoveToBeforeMutation): ProjectContentsMutation {
-    return {type: "cardMoveToBefore", cardMoveToBefore: mutation};
+  cardMoveToBefore(mutation: CardMoveToBeforeMutation): ProjectContentsMutation<CardMoveToBeforeEffect> {
+    return {type: "cardMoveToBefore", proof, value: mutation};
   },
 
-  categoryAdd(mutation: CategoryAddMutation): ProjectContentsMutation {
-    return {type: "categoryAdd", categoryAdd: mutation};
+  categoryAdd(mutation: CategoryAddMutation): ProjectContentsMutation<CategoryAddEffect> {
+    return {type: "categoryAdd", proof, value: mutation};
   },
 
-  categoryReorder(mutation: CategoryReorderMutation): ProjectContentsMutation {
-    return {type: "categoryReorder", categoryReorder: mutation};
+  categoryReorder(mutation: CategoryReorderMutation): ProjectContentsMutation<CategoryReorderEffect> {
+    return {type: "categoryReorder", proof, value: mutation};
   },
 
-  commentAdd(mutation: CommentAddMutation): ProjectContentsMutation {
-    return {type: "commentAdd", commentAdd: mutation};
+  commentAdd(mutation: CommentAddMutation): ProjectContentsMutation<CommentAddEffect> {
+    return {type: "commentAdd", proof, value: mutation};
   },
 
-  projectAdd(mutation: ProjectAddMutation): AppMutation {
-    return {type: "projectAdd", projectAdd: mutation};
+  projectAdd(mutation: ProjectAddMutation): AppMutation<ProjectAddEffect> {
+    return {type: "projectAdd", proof, value: mutation};
   },
 };
 
-export function projectContentsMutationCreatedAt(mutation: ProjectContentsMutation): Instant {
-  switch (mutation.type) {
-    case "cardAdd":
-      return mutation.cardAdd.createdAt;
-    case "cardEdit":
-      return mutation.cardEdit.createdAt;
-    case "cardMove":
-      return mutation.cardMove.createdAt;
-    case "cardMoveToAfter":
-      return mutation.cardMoveToAfter.createdAt;
-    case "cardMoveToBefore":
-      return mutation.cardMoveToBefore.createdAt;
-    case "categoryAdd":
-      return mutation.categoryAdd.createdAt;
-    case "categoryReorder":
-      return mutation.categoryReorder.createdAt;
-    case "commentAdd":
-      return mutation.commentAdd.createdAt;
-    default:
-      return handleNever(mutation, Instant.now());
-  }
+export type ProjectContentsEffect =
+  | {type: "cardAdd", value: CardAddEffect}
+  | {type: "cardEdit", value: CardEditEffect}
+  | {type: "cardMove", value: CardMoveEffect}
+  | {type: "cardMoveToAfter", value: CardMoveToAfterEffect}
+  | {type: "cardMoveToBefore", value: CardMoveToBeforeEffect}
+  | {type: "categoryAdd", value: CategoryAddEffect}
+  | {type: "categoryReorder", value: CategoryReorderEffect}
+  | {type: "commentAdd", value: CommentAddEffect};
+
+export const appEffects = {
+  cardAdd(effect: CardAddEffect): ProjectContentsEffect {
+    return {type: "cardAdd", value: effect};
+  },
+
+  cardEdit(effect: CardEditEffect): ProjectContentsEffect {
+    return {type: "cardEdit", value: effect};
+  },
+
+  cardMove(effect: CardMoveEffect): ProjectContentsEffect {
+    return {type: "cardMove", value: effect};
+  },
+
+  cardMoveToAfter(effect: CardMoveToAfterEffect): ProjectContentsEffect {
+    return {type: "cardMoveToAfter", value: effect};
+  },
+
+  cardMoveToBefore(effect: CardMoveToBeforeEffect): ProjectContentsEffect {
+    return {type: "cardMoveToBefore", value: effect};
+  },
+
+  categoryAdd(effect: CategoryAddEffect): ProjectContentsEffect {
+    return {type: "categoryAdd", value: effect};
+  },
+
+  categoryReorder(effect: CategoryReorderEffect): ProjectContentsEffect {
+    return {type: "categoryReorder", value: effect};
+  },
+
+  commentAdd(effect: CommentAddEffect): ProjectContentsEffect {
+    return {type: "commentAdd", value: effect};
+  },
+
+  projectAdd(effect: ProjectAddEffect): AppEffect {
+    return {type: "projectAdd", value: effect};
+  },
+};
+
+export function projectContentsEffectCreatedAt(effect: ProjectContentsEffect): Instant {
+  return effect.value.createdAt;
 }
 
-function projectContentsMutationProjectId(mutation: ProjectContentsMutation): string {
-  switch (mutation.type) {
-    case "cardAdd":
-      return mutation.cardAdd.projectId;
-    case "cardEdit":
-      return mutation.cardEdit.projectId;
-    case "cardMove":
-      return mutation.cardMove.projectId;
-    case "cardMoveToAfter":
-      return mutation.cardMoveToAfter.projectId;
-    case "cardMoveToBefore":
-      return mutation.cardMoveToBefore.projectId;
-    case "categoryAdd":
-      return mutation.categoryAdd.projectId;
-    case "categoryReorder":
-      return mutation.categoryReorder.projectId;
-    case "commentAdd":
-      return mutation.commentAdd.projectId;
-    default:
-      return assertNever(mutation);
-  }
+function projectContentsEffectProjectId(effect: ProjectContentsEffect): string {
+  return effect.value.projectId;
 }
 
-function applyProjectContentsMutation(snapshot: ProjectContentsSnapshot, mutation: ProjectContentsMutation): ProjectContentsSnapshot {
+function applyProjectContentsEffect(
+  snapshot: ProjectContentsSnapshot,
+  mutation: ProjectContentsEffect,
+): ProjectContentsSnapshot {
   switch (mutation.type) {
     case "cardAdd":
-      return snapshot.cardAdd(mutation.cardAdd);
+      return snapshot.cardAdd(mutation.value);
     case "cardEdit":
-      return snapshot.cardEdit(mutation.cardEdit);
+      return snapshot.cardEdit(mutation.value);
     case "cardMove":
-      return snapshot.cardMove(mutation.cardMove);
+      return snapshot.cardMove(mutation.value);
     case "cardMoveToAfter":
-      return snapshot.cardMoveToAfter(mutation.cardMoveToAfter);
+      return snapshot.cardMoveToAfter(mutation.value);
     case "cardMoveToBefore":
-      return snapshot.cardMoveToBefore(mutation.cardMoveToBefore);
+      return snapshot.cardMoveToBefore(mutation.value);
     case "categoryAdd":
-      return snapshot.categoryAdd(mutation.categoryAdd);
+      return snapshot.categoryAdd(mutation.value);
     case "categoryReorder":
-      return snapshot.categoryReorder(mutation.categoryReorder);
+      return snapshot.categoryReorder(mutation.value);
     case "commentAdd":
-      return snapshot.commentAdd(mutation.commentAdd);
+      return snapshot.commentAdd(mutation.value);
     default:
       return handleNever(mutation, snapshot);
   }
+}
+
+export function appMutationToEffect<TEffect>(mutation: AppMutation<TEffect>): TEffect {
+  switch (mutation.type) {
+    case "cardAdd":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+        id: generateId(),
+      });
+
+    case "cardEdit":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+      });
+
+    case "cardMove":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+      });
+
+    case "cardMoveToAfter":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+      });
+
+    case "cardMoveToBefore":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+      });
+
+    case "categoryAdd":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+        id: generateId(),
+      });
+
+    case "categoryReorder":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+      });
+
+    case "commentAdd":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+        id: generateId(),
+      });
+
+    case "projectAdd":
+      return mutation.proof({
+        ...mutation.value,
+        createdAt: Instant.now(),
+        id: generateId(),
+      });
+  }
+}
+
+export function appMutationToAppEffect<TEffect>(mutation: AppMutation<TEffect>): AppEffect {
+  switch (mutation.type) {
+    case "cardAdd":
+      return appEffects.cardAdd(appMutationToEffect(appMutations.cardAdd(mutation.value)));
+
+    case "cardEdit":
+      return appEffects.cardEdit(appMutationToEffect(appMutations.cardEdit(mutation.value)));
+
+    case "cardMove":
+      return appEffects.cardMove(appMutationToEffect(appMutations.cardMove(mutation.value)));
+
+    case "cardMoveToAfter":
+      return appEffects.cardMoveToAfter(appMutationToEffect(appMutations.cardMoveToAfter(mutation.value)));
+
+    case "cardMoveToBefore":
+      return appEffects.cardMoveToBefore(appMutationToEffect(appMutations.cardMoveToBefore(mutation.value)));
+
+    case "categoryAdd":
+      return appEffects.categoryAdd(appMutationToEffect(appMutations.categoryAdd(mutation.value)));
+
+    case "categoryReorder":
+      return appEffects.categoryReorder(appMutationToEffect(appMutations.categoryReorder(mutation.value)));
+
+    case "commentAdd":
+      return appEffects.commentAdd(appMutationToEffect(appMutations.commentAdd(mutation.value)));
+
+    case "projectAdd":
+      return appEffects.projectAdd(appMutationToEffect(appMutations.projectAdd(mutation.value)));
+  }
+}
+
+function proof<T>(value: T): T {
+  return value;
 }

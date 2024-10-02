@@ -1,10 +1,11 @@
-import { Category, CategoryAddMutation, CategoryReorderMutation } from "hornbeam-common/lib/app/categories";
+import { Category, CategoryAddEffect, CategoryReorderEffect } from "hornbeam-common/lib/app/categories";
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
+import { appEffects } from "hornbeam-common/lib/app/snapshots";
 
 export interface CategoryRepository {
-  add: (mutation: CategoryAddMutation) => Promise<void>;
-  reorder: (mutation: CategoryReorderMutation) => Promise<void>;
+  add: (effect: CategoryAddEffect) => Promise<void>;
+  reorder: (effect: CategoryReorderEffect) => Promise<void>;
   fetchAllByProjectId: (projectId: string) => Promise<ReadonlyArray<Category>>;
 }
 
@@ -15,18 +16,12 @@ export class CategoryRepositoryInMemory implements CategoryRepository {
     this.snapshot = snapshot;
   }
 
-  async add(mutation: CategoryAddMutation): Promise<void> {
-    this.snapshot.mutate({
-      type: "categoryAdd",
-      categoryAdd: mutation,
-    });
+  async add(effect: CategoryAddEffect): Promise<void> {
+    this.snapshot.applyEffect(appEffects.categoryAdd(effect));
   }
 
-  async reorder(mutation: CategoryReorderMutation): Promise<void> {
-    this.snapshot.mutate({
-      type: "categoryReorder",
-      categoryReorder: mutation,
-    });
+  async reorder(effect: CategoryReorderEffect): Promise<void> {
+    this.snapshot.applyEffect(appEffects.categoryReorder(effect));
   }
 
   async fetchAllByProjectId(projectId: string): Promise<ReadonlyArray<Category>> {
@@ -41,11 +36,11 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
     this.database = database;
   }
 
-  async add(mutation: CategoryAddMutation): Promise<void> {
+  async add(effect: CategoryAddEffect): Promise<void> {
     await this.database.insertInto("categories")
       .values((eb) => ({
-        createdAt: new Date(mutation.createdAt.toEpochMilli()),
-        id: mutation.id,
+        createdAt: new Date(effect.createdAt.toEpochMilli()),
+        id: effect.id,
         index: eb.selectFrom("categories")
           .select(
             eb.fn.coalesce(
@@ -53,15 +48,15 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
               eb.lit(0)
             ).as("index")
           )
-          .where("categories.projectId", "=", mutation.projectId),
-        name: mutation.name,
-        presetColorId: mutation.color.presetColorId,
-        projectId: mutation.projectId,
+          .where("categories.projectId", "=", effect.projectId),
+        name: effect.name,
+        presetColorId: effect.color.presetColorId,
+        projectId: effect.projectId,
       }))
       .execute();
   }
 
-  async reorder(mutation: CategoryReorderMutation): Promise<void> {
+  async reorder(effect: CategoryReorderEffect): Promise<void> {
     // TODO: handle missing IDs
 
     // Renumber the indexes to negative values to avoid violating the unique
@@ -70,14 +65,14 @@ export class CategoryRepositoryDatabase implements CategoryRepository {
       .set((eb) => ({
         index: eb.neg(eb.ref("categories.index"))
       }))
-      .where("projectId", "=", mutation.projectId)
+      .where("projectId", "=", effect.projectId)
       .execute();
 
     await this.database.updateTable("categories")
       .set((eb) => ({
-        index: eb.fn<number>("array_position", [eb.val(mutation.ids), eb.ref("categories.id")])
+        index: eb.fn<number>("array_position", [eb.val(effect.ids), eb.ref("categories.id")])
       }))
-      .where("projectId", "=", mutation.projectId)
+      .where("projectId", "=", effect.projectId)
       .execute();
   }
 

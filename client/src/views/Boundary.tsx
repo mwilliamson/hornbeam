@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { AppMutation } from "hornbeam-common/lib/app/snapshots";
-import { useBackendConnection } from "../backendConnections";
+import { Mutate, useBackendConnection } from "../backendConnections";
 import { AppQuery, AppQueries, AppQueriesResult } from "hornbeam-common/lib/queries";
 import Spinner from "./widgets/Spinner";
 import { isEqual } from "lodash";
@@ -16,7 +15,7 @@ interface BoundaryProps<TQueries extends AppQueries> {
   queries: TQueries,
   render: (
     queryData: AppQueriesResult<TQueries>,
-    mutate: (mutation: AppMutation) => Promise<void>,
+    mutate: Mutate,
     query: <R>(query: AppQuery<R>) => Promise<R>,
   ) => React.ReactNode;
 }

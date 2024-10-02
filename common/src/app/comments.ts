@@ -9,13 +9,16 @@ export interface Comment {
 
 export interface CommentAddMutation {
   cardId: string;
-  createdAt: Instant;
-  id: string;
   projectId: string,
   text: string;
 }
 
-export function createComment(request: CommentAddMutation): Comment {
+export interface CommentAddEffect extends CommentAddMutation {
+  createdAt: Instant;
+  id: string;
+}
+
+export function createComment(request: CommentAddEffect): Comment {
   return {
     cardId: request.cardId,
     createdAt: request.createdAt,

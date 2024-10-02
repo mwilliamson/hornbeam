@@ -1,6 +1,6 @@
 import { assertThat, containsExactly, hasProperties } from "@mwilliamson/precisely";
 import { suite, test } from "mocha";
-import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
+import { testingProjectAddEffect } from "hornbeam-common/lib/app/projects.testing";
 import { ProjectRepository } from "./projects";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
@@ -19,12 +19,12 @@ export function createProjectRepositoryTests(
     });
 
     testRepository("can fetch projects after they're added", async (repository) => {
-      await repository.add(testingProjectAddMutation({
+      await repository.add(testingProjectAddEffect({
         id: PROJECT_1_ID,
         name: "<project 1 name>",
       }));
 
-      await repository.add(testingProjectAddMutation({
+      await repository.add(testingProjectAddEffect({
         id: PROJECT_2_ID,
         name: "<project 2 name>",
       }));

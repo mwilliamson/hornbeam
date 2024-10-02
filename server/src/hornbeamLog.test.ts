@@ -18,7 +18,7 @@ fileSuite(__filename, () => {
       // TODO: add support for all mutations
       if (appUpdate.mutation.type !== "cardMove") {
         await app.transaction(async transaction => {
-          await transaction.mutate(appUpdate.mutation);
+          await transaction.applyEffect(appUpdate.mutation);
         });
       }
     }

@@ -1,5 +1,5 @@
 import * as t from "io-ts";
-import { SerializedAppUpdate } from "./app";
+import { SerializedAppEffect, SerializedAppMutation } from "./app";
 import { ServerQuery } from "./serverQueries";
 
 export const QueryRequestBody = t.type({
@@ -12,9 +12,10 @@ export const QueryResponseBody = t.type({
 }, "QueryResponseBody");
 
 export const UpdateRequestBody = t.type({
-  update: SerializedAppUpdate,
+  mutation: SerializedAppMutation,
 }, "UpdateRequestBody");
 
 export const UpdateResponseBody = t.readonly(t.type({
+  effect: SerializedAppEffect,
   snapshotIndex: t.number,
 }, "UpdateResponseBody"));

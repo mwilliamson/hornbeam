@@ -63,14 +63,16 @@ export async function startServer({databaseUrl, port}: ServerOptions): Promise<S
       return reply.code(400);
     }
 
-    const update = bodyResult.right.update;
+    const mutation = bodyResult.right.mutation;
 
-    const index = await app.transaction(async transaction => {
-      return await transaction.mutate(update.mutation);
+    const mutateResult = await app.transaction(async transaction => {
+      // TODO: build proof properly?
+      return await transaction.mutate({...mutation, proof: (x: unknown) => x as never});
     });
 
     return UpdateResponseBody.encode({
-      snapshotIndex: index,
+      effect: mutateResult.effect,
+      snapshotIndex: mutateResult.snapshotIndex,
     });
   });
 

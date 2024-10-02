@@ -1,4 +1,3 @@
-import { Instant } from "@js-joda/core";
 import { BoardId } from "hornbeam-common/lib/app/boards";
 import { Card } from "hornbeam-common/lib/app/cards";
 import { CardStatus } from "hornbeam-common/lib/app/cardStatuses";
@@ -48,14 +47,12 @@ export default function CardsViewBoundary(props: CardsViewBoundaryProps) {
           onCardMoveToAfter={async (mutation) => {
             await mutate(appMutations.cardMoveToAfter({
               ...mutation,
-              createdAt: Instant.now(),
               projectId,
             }));
           }}
           onCardMoveToBefore={async (mutation) => {
             await mutate(appMutations.cardMoveToBefore({
               ...mutation,
-              createdAt: Instant.now(),
               projectId,
             }));
           }}

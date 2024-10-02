@@ -33,7 +33,7 @@ interface CardDetailViewProps {
   cardHistory: CardHistory,
   cardSearcher: CardSearcher,
   onAddChildClick: () => void;
-  onCardEdit: (mutation: Omit<CardEditMutation, "createdAt" | "id" | "projectId">) => Promise<void>;
+  onCardEdit: (mutation: Omit<CardEditMutation, "id" | "projectId">) => Promise<void>;
   onCardMove: (direction: "up" | "down") => Promise<void>;
   onCommentAdd: (text: string) => Promise<void>;
   onBoardOpen: (boardId: BoardId) => void;

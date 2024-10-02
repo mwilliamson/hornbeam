@@ -36,29 +36,33 @@ export function generateCardHistory(card: Card, appSnapshot: CommentSet): CardHi
 
 export interface CardAddMutation {
   categoryId: string;
-  createdAt: Instant;
-  id: string;
   parentCardId: string | null;
   projectId: string;
   text: string;
 }
 
-export function createCard(request: CardAddMutation, cardNumber: number): Card {
+export interface CardAddEffect extends CardAddMutation {
+  createdAt: Instant;
+  id: string;
+}
+
+export function createCard(effect: CardAddEffect, cardNumber: number): Card {
+  // TODO: store number on effect?
   return {
-    categoryId: request.categoryId,
-    createdAt: request.createdAt,
-    id: request.id,
+    categoryId: effect.categoryId,
+    createdAt: effect.createdAt,
+    id: effect.id,
     isSubboardRoot: false,
     number: cardNumber,
-    parentCardId: request.parentCardId,
+    parentCardId: effect.parentCardId,
     status: CardStatus.None,
-    text: request.text,
+    text: effect.text,
   };
 }
 
+// TODO: extract separate edits field
 export interface CardEditMutation {
   categoryId?: string;
-  createdAt: Instant;
   id: string;
   isSubboardRoot?: boolean;
   parentCardId?: string | null;
@@ -67,40 +71,53 @@ export interface CardEditMutation {
   text?: string;
 }
 
-export function updateCard(card: Card, request: Omit<CardEditMutation, "createdAt" | "id">): Card {
+export interface CardEditEffect extends CardEditMutation {
+  createdAt: Instant;
+}
+
+export function updateCard(card: Card, mutation: Omit<CardEditMutation, "id" | "projectId">): Card {
   return {
-    categoryId: request.categoryId === undefined ? card.categoryId : request.categoryId,
+    categoryId: mutation.categoryId === undefined ? card.categoryId : mutation.categoryId,
     createdAt: card.createdAt,
     id: card.id,
-    isSubboardRoot: request.isSubboardRoot === undefined ? card.isSubboardRoot : request.isSubboardRoot,
+    isSubboardRoot: mutation.isSubboardRoot === undefined ? card.isSubboardRoot : mutation.isSubboardRoot,
     number: card.number,
-    parentCardId: request.parentCardId === undefined ? card.parentCardId : request.parentCardId,
-    status: request.status === undefined ? card.status : request.status,
-    text: request.text === undefined ? card.text : request.text,
+    parentCardId: mutation.parentCardId === undefined ? card.parentCardId : mutation.parentCardId,
+    status: mutation.status === undefined ? card.status : mutation.status,
+    text: mutation.text === undefined ? card.text : mutation.text,
   };
 }
 
 export interface CardMoveMutation {
-  createdAt: Instant;
   direction: "up" | "down";
   id: string;
   projectId: string;
 }
 
+export interface CardMoveEffect extends CardMoveMutation {
+  createdAt: Instant;
+}
+
 export interface CardMoveToBeforeMutation {
   beforeCardId: string;
-  createdAt: Instant;
   moveCardId: string;
   parentCardId: string | null;
   projectId: string;
 }
 
+export interface CardMoveToBeforeEffect extends CardMoveToBeforeMutation {
+  createdAt: Instant;
+}
+
 export interface CardMoveToAfterMutation {
   afterCardId: string;
-  createdAt: Instant;
   moveCardId: string;
   parentCardId: string | null;
   projectId: string;
+}
+
+export interface CardMoveToAfterEffect extends CardMoveToAfterMutation {
+  createdAt: Instant;
 }
 
 export function validateCardText(elementId: string, text: string): ValidationResult<string> {

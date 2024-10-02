@@ -4,9 +4,9 @@ import { suite, test } from "mocha";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
-import { testingCardAddMutation } from "hornbeam-common/lib/app/cards.testing";
-import { testingCommentAddMutation } from "hornbeam-common/lib/app/comments.testing";
-import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
+import { testingCardAddEffect } from "hornbeam-common/lib/app/cards.testing";
+import { testingCommentAddEffect } from "hornbeam-common/lib/app/comments.testing";
+import { testingProjectAddEffect } from "hornbeam-common/lib/app/projects.testing";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -18,13 +18,13 @@ export function createCardHistoryFetcherTests(
 ): void {
   testFetcher("card initially has created at entry", async (fixtures) => {
     const cardRepository = await fixtures.cardRepository();
-    await cardRepository.add(testingCardAddMutation({
+    await cardRepository.add(testingCardAddEffect({
       categoryId: CATEGORY_1_ID,
       createdAt: Instant.ofEpochSecond(1713386548),
       id: CARD_1_ID,
       projectId: PROJECT_1_ID,
     }));
-    await cardRepository.add(testingCardAddMutation({
+    await cardRepository.add(testingCardAddEffect({
       categoryId: CATEGORY_1_ID,
       createdAt: Instant.ofEpochSecond(1713386549),
       id: CARD_2_ID,
@@ -47,14 +47,14 @@ export function createCardHistoryFetcherTests(
 
   testFetcher("card history includes comments", async (fixtures) => {
     const cardRepository = await fixtures.cardRepository();
-    await cardRepository.add(testingCardAddMutation({
+    await cardRepository.add(testingCardAddEffect({
       categoryId: CATEGORY_1_ID,
       id: CARD_1_ID,
       projectId: PROJECT_1_ID,
     }));
 
     const commentRepository = await fixtures.commentRepository();
-    await commentRepository.add(testingCommentAddMutation({
+    await commentRepository.add(testingCommentAddEffect({
       cardId: CARD_1_ID,
       createdAt: Instant.ofEpochSecond(1713386548),
       projectId: PROJECT_1_ID,
@@ -86,12 +86,12 @@ export function createCardHistoryFetcherTests(
       await using fixtures = await createFixtures();
 
       const projectRepository = await fixtures.projectRepository();
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_1_ID,
       }));
 
       const categoryRepository = await fixtures.categoryRepository();
-      await categoryRepository.add(categoriesTesting.testingCategoryAddMutation({
+      await categoryRepository.add(categoriesTesting.testingCategoryAddEffect({
         id: CATEGORY_1_ID,
         projectId: PROJECT_1_ID,
       }));

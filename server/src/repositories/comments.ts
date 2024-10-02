@@ -1,7 +1,8 @@
 import { Instant } from "@js-joda/core";
-import { Comment, CommentAddMutation } from "hornbeam-common/lib/app/comments";
+import { Comment, CommentAddEffect } from "hornbeam-common/lib/app/comments";
 import { Database } from "../database";
 import { AppSnapshotRef } from "./snapshotRef";
+import { appEffects } from "hornbeam-common/lib/app/snapshots";
 
 interface CardCommentQuery {
   cardId: string;
@@ -9,7 +10,7 @@ interface CardCommentQuery {
 }
 
 export interface CommentRepository {
-  add: (mutation: CommentAddMutation) => Promise<void>;
+  add: (effect: CommentAddEffect) => Promise<void>;
   fetchCardComments: (query: CardCommentQuery) => Promise<ReadonlyArray<Comment>>;
 }
 
@@ -20,11 +21,8 @@ export class CommentRepositoryInMemory implements CommentRepository {
     this.snapshot = snapshot;
   }
 
-  async add(mutation: CommentAddMutation): Promise<void> {
-    this.snapshot.mutate({
-      type: "commentAdd",
-      commentAdd: mutation,
-    });
+  async add(effect: CommentAddEffect): Promise<void> {
+    this.snapshot.applyEffect(appEffects.commentAdd(effect));
   }
 
   async fetchCardComments(query: CardCommentQuery): Promise<ReadonlyArray<Comment>> {
@@ -41,13 +39,13 @@ export class CommentRepositoryDatabase implements CommentRepository {
     this.database = database;
   }
 
-  async add(mutation: CommentAddMutation): Promise<void> {
+  async add(effect: CommentAddEffect): Promise<void> {
     await this.database.insertInto("comments")
       .values({
-        cardId: mutation.cardId,
-        createdAt: new Date(mutation.createdAt.toEpochMilli()),
-        id: mutation.id,
-        text: mutation.text,
+        cardId: effect.cardId,
+        createdAt: new Date(effect.createdAt.toEpochMilli()),
+        id: effect.id,
+        text: effect.text,
       })
       .execute();
   }

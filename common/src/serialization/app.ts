@@ -10,16 +10,21 @@ import { SerializedColorRef } from "./colors";
 
 const SerializedCardAddMutation = t.type({
   categoryId: t.string,
-  createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
-  id: t.string,
   parentCardId: t.union([t.string, t.null]),
   projectId: t.string,
   text: t.string,
 }, "SerializedCardAddMutation");
 
-const SerializedCardEditMutation = t.intersection([
+const SerializedCardAddEffect = t.intersection([
+  SerializedCardAddMutation,
   t.type({
     createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
+    id: t.string,
+  }),
+], "SerializedCardAddMutation");
+
+const SerializedCardEditMutation = t.intersection([
+  t.type({
     id: t.string,
     projectId: t.string,
   }),
@@ -32,76 +37,142 @@ const SerializedCardEditMutation = t.intersection([
   }),
 ], "SerializedCardEditMutation");
 
+const SerializedCardEditEffect = t.intersection([
+  SerializedCardEditMutation,
+  t.type({
+    createdAt: t2.withDefault(t2.instant, Instant.ofEpochMilli(1713386548306)),
+    id: t.string,
+  }),
+], "SerializedCardEditEffect");
+
 const SerializedCardMoveMutation = t.type({
-  createdAt: t2.instant,
   direction: t.keyof({"down": null, "up": null}),
   id: t.string,
   projectId: t.string,
 }, "SerializedCardMoveMutation");
 
+const SerializedCardMoveEffect = t.intersection([
+  SerializedCardMoveMutation,
+  t.type({
+    createdAt: t2.instant,
+  }),
+], "SerializedCardMoveEffect");
+
 const SerializedCardMoveToAfterMutation = t.type({
-  createdAt: t2.instant,
   afterCardId: t.string,
   moveCardId: t.string,
   parentCardId: t.union([t.string, t.null]),
   projectId: t.string,
 }, "SerializedCardMoveToAfterMutation");
 
+const SerializedCardMoveToAfterEffect = t.intersection([
+  SerializedCardMoveToAfterMutation,
+  t.type({
+    createdAt: t2.instant,
+  }),
+], "SerializedCardMoveToAfterEffect");
+
 const SerializedCardMoveToBeforeMutation = t.type({
-  createdAt: t2.instant,
   beforeCardId: t.string,
   moveCardId: t.string,
   parentCardId: t.union([t.string, t.null]),
   projectId: t.string,
 }, "SerializedCardMoveToBeforeMutation");
 
+const SerializedCardMoveToBeforeEffect = t.intersection([
+  SerializedCardMoveToBeforeMutation,
+  t.type({
+    createdAt: t2.instant,
+  }),
+], "SerializedCardMoveToBeforeEffect");
+
 const SerializedCategoryAddMutation = t.type({
-  createdAt: t2.instant,
   color: SerializedColorRef,
-  id: t.string,
   name: t.string,
   projectId: t.string,
 }, "SerializedCategoryAddMutation");
 
+const SerializedCategoryAddEffect = t.intersection([
+  SerializedCategoryAddMutation,
+  t.type({
+    createdAt: t2.instant,
+    id: t.string,
+  }),
+], "SerializedCategoryAddEffect");
+
 const SerializedCategoryReorderMutation = t.type({
-  createdAt: t2.instant,
   ids: t.readonlyArray(t.string),
   projectId: t.string,
 }, "SerializedCategoryReorderMutation");
 
+const SerializedCategoryReorderEffect = t.intersection([
+  SerializedCategoryReorderMutation,
+  t.type({
+    createdAt: t2.instant,
+  }),
+], "SerializedCategoryReorderEffect");
+
 const SerializedCommentAddMutation = t.type({
   cardId: t.string,
-  createdAt: t2.instant,
-  id: t.string,
   projectId: t.string,
   text: t.string,
 }, "SerializedCommentAddMutation");
 
+const SerializedCommentAddEffect = t.intersection([
+  SerializedCommentAddMutation,
+  t.type({
+    createdAt: t2.instant,
+    id: t.string,
+  }),
+], "SerializedCommentAddEffect");
+
 export const SerializedProjectContentsMutation = t.union([
-  t.type({type: t.literal("cardAdd"), cardAdd: SerializedCardAddMutation}),
-  t.type({type: t.literal("cardEdit"), cardEdit: SerializedCardEditMutation}),
-  t.type({type: t.literal("cardMove"), cardMove: SerializedCardMoveMutation}),
-  t.type({type: t.literal("cardMoveToAfter"), cardMoveToAfter: SerializedCardMoveToAfterMutation}),
-  t.type({type: t.literal("cardMoveToBefore"), cardMoveToBefore: SerializedCardMoveToBeforeMutation}),
-  t.type({type: t.literal("categoryAdd"), categoryAdd: SerializedCategoryAddMutation}),
-  t.type({type: t.literal("categoryReorder"), categoryReorder: SerializedCategoryReorderMutation}),
-  t.type({type: t.literal("commentAdd"), commentAdd: SerializedCommentAddMutation}),
+  t.type({type: t.literal("cardAdd"), value: SerializedCardAddMutation}),
+  t.type({type: t.literal("cardEdit"), value: SerializedCardEditMutation}),
+  t.type({type: t.literal("cardMove"), value: SerializedCardMoveMutation}),
+  t.type({type: t.literal("cardMoveToAfter"), value: SerializedCardMoveToAfterMutation}),
+  t.type({type: t.literal("cardMoveToBefore"), value: SerializedCardMoveToBeforeMutation}),
+  t.type({type: t.literal("categoryAdd"), value: SerializedCategoryAddMutation}),
+  t.type({type: t.literal("categoryReorder"), value: SerializedCategoryReorderMutation}),
+  t.type({type: t.literal("commentAdd"), value: SerializedCommentAddMutation}),
+]);
+
+export const SerializedProjectContentsEffect = t.union([
+  t.type({type: t.literal("cardAdd"), value: SerializedCardAddEffect}),
+  t.type({type: t.literal("cardEdit"), value: SerializedCardEditEffect}),
+  t.type({type: t.literal("cardMove"), value: SerializedCardMoveEffect}),
+  t.type({type: t.literal("cardMoveToAfter"), value: SerializedCardMoveToAfterEffect}),
+  t.type({type: t.literal("cardMoveToBefore"), value: SerializedCardMoveToBeforeEffect}),
+  t.type({type: t.literal("categoryAdd"), value: SerializedCategoryAddEffect}),
+  t.type({type: t.literal("categoryReorder"), value: SerializedCategoryReorderEffect}),
+  t.type({type: t.literal("commentAdd"), value: SerializedCommentAddEffect}),
 ]);
 
 export const SerializedProjectAddMutation = t.type({
-  createdAt: t2.instant,
-  id: t.string,
   name: t.string,
-});
+}, "SerializedProjectAddMutation");
+
+export const SerializedProjectAddEffect = t.intersection([
+  SerializedProjectAddMutation,
+  t.type({
+    createdAt: t2.instant,
+    id: t.string,
+  })
+], "SerializedProjectAddEffect");
 
 export const SerializedAppMutation = t.union([
-  t.type({type: t.literal("projectAdd"), projectAdd: SerializedProjectAddMutation}),
+  t.type({type: t.literal("projectAdd"), value: SerializedProjectAddMutation}),
   SerializedProjectContentsMutation,
+]);
+
+export const SerializedAppEffect = t.union([
+  t.type({type: t.literal("projectAdd"), value: SerializedProjectAddEffect}),
+  SerializedProjectContentsEffect,
 ]);
 
 export const SerializedAppUpdate = t.type({
   updateId: t.string,
-  mutation: SerializedAppMutation,
+  mutation: SerializedAppEffect,
 }, "SerializedAppUpdate");
 
 export function serializeAppUpdate(update: AppUpdate): t.OutputOf<typeof SerializedAppUpdate> {

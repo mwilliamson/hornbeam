@@ -1,7 +1,7 @@
 import { uuidv7 } from "uuidv7";
 
 import { AppState, applyAppUpdate } from "hornbeam-common/lib/app";
-import { AppMutation, AppUpdate } from "hornbeam-common/lib/app/snapshots";
+import { AppMutation, appMutationToAppEffect, AppUpdate } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { BackendConnection, BackendSubscriptions } from ".";
 import { mapValues } from "lodash";
@@ -29,14 +29,19 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     };
   };
 
-  const mutate = async (mutation: AppMutation) => {
+  const mutate = async <TEffect>(mutation: AppMutation<TEffect>): Promise<TEffect> => {
+    const effect = appMutationToAppEffect(mutation);
+
     const update: AppUpdate = {
-      mutation,
+      mutation: effect,
       updateId: uuidv7(),
     };
 
     appState = applyAppUpdate(appState, update);
     await subscriptions.onLastUpdate(generateLastUpdate());
+
+    // TODO: restore type safety
+    return effect.value as TEffect;
   };
 
   let timeTravelSnapshotIndex: number | null = null;

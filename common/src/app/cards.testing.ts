@@ -1,5 +1,5 @@
 import { Instant } from "@js-joda/core";
-import { CardAddMutation, CardEditMutation } from "./cards";
+import { CardAddEffect, CardAddMutation, CardEditEffect, CardEditMutation } from "./cards";
 
 const defaultCardAddId = "0191beb2-0000-7ccf-a72c-999999999999";
 const defaultCardAddCategoryId = "0191beb2-0001-7ccf-a72c-999999999999";
@@ -10,8 +10,6 @@ const defaultCreatedAt = Instant.ofEpochSecond(1724429942);
 export function testingCardAddMutation(mutation: Partial<CardAddMutation>): CardAddMutation {
   return {
     categoryId: defaultCardAddCategoryId,
-    createdAt: defaultCreatedAt,
-    id: defaultCardAddId,
     parentCardId: null,
     projectId: defaultCardAddProjectId,
     text: "<default test text>",
@@ -19,11 +17,31 @@ export function testingCardAddMutation(mutation: Partial<CardAddMutation>): Card
   };
 }
 
+export function testingCardAddEffect(effect: Partial<CardAddEffect>): CardAddEffect {
+  return {
+    categoryId: defaultCardAddCategoryId,
+    createdAt: defaultCreatedAt,
+    id: defaultCardAddId,
+    parentCardId: null,
+    projectId: defaultCardAddProjectId,
+    text: "<default test text>",
+    ...effect,
+  };
+}
+
 export function testingCardEditMutation(mutation: Partial<CardEditMutation>): CardEditMutation {
+  return {
+    id: defaultCardAddId,
+    projectId: defaultCardEditProjectId,
+    ...mutation,
+  };
+}
+
+export function testingCardEditEffect(effect: Partial<CardEditEffect>): CardEditEffect {
   return {
     createdAt: defaultCreatedAt,
     id: defaultCardAddId,
     projectId: defaultCardEditProjectId,
-    ...mutation,
+    ...effect,
   };
 }

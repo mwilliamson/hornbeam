@@ -1,16 +1,18 @@
-import { AppMutation } from "hornbeam-common/lib/app/snapshots";
-import { SerializedAppMutation, SerializedProjectContentsMutation } from "hornbeam-common/lib/serialization/app";
+import { AppEffect } from "hornbeam-common/lib/app/snapshots";
+import { SerializedAppEffect } from "hornbeam-common/lib/serialization/app";
 import { Database } from "../database";
 import { JsonValue } from "../database/types";
 import { deserialize } from "hornbeam-common/lib/serialization/deserialize";
 
+// TODO: rename mutation to effect
+
 interface LoggedMutation {
   id: string;
-  mutation: AppMutation;
+  mutation: AppEffect;
 }
 
 export interface MutationLogRepository {
-  add: (id: string, mutation: AppMutation) => Promise<number>;
+  add: (id: string, mutation: AppEffect) => Promise<number>;
   fetchLatestIndex: () => Promise<number>;
   fetchAll: () => Promise<ReadonlyArray<LoggedMutation>>;
 }
@@ -18,7 +20,7 @@ export interface MutationLogRepository {
 export class MutationLogRepositoryInMemory implements MutationLogRepository {
   private readonly mutations: Array<LoggedMutation> = [];
 
-  async add(id: string, mutation: AppMutation): Promise<number> {
+  async add(id: string, mutation: AppEffect): Promise<number> {
     this.mutations.push({id, mutation});
 
     return this.mutations.length;
@@ -40,7 +42,7 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
     this.database = database;
   }
 
-  async add(id: string, mutation: AppMutation): Promise<number> {
+  async add(id: string, mutation: AppEffect): Promise<number> {
     const row = await this.database.insertInto("mutationLog")
       .values((eb) => ({
         id: id,
@@ -51,7 +53,7 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
               eb.lit(1)
             ).as("index")
           ),
-        mutation: SerializedAppMutation.encode(mutation) as JsonValue,
+        mutation: SerializedAppEffect.encode(mutation) as JsonValue,
       }))
       .returning("index")
       .executeTakeFirstOrThrow();
@@ -75,7 +77,7 @@ export class MutationLogRepositoryDatabase implements MutationLogRepository {
 
     return mutationRows.map(mutationRow => ({
       id: mutationRow.id,
-      mutation: deserialize(SerializedProjectContentsMutation, mutationRow.mutation),
+      mutation: deserialize(SerializedAppEffect, mutationRow.mutation),
     }));
   }
 }

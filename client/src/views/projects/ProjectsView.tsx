@@ -9,7 +9,7 @@ import LinkButton from "../widgets/LinkButton";
 
 interface ProjectsViewProps {
   projects: ReadonlyArray<Project>;
-  onProjectAdd: (mutation: Omit<ProjectAddMutation, "createdAt" | "id">) => Promise<void>;
+  onProjectAdd: (mutation: ProjectAddMutation) => Promise<void>;
   onProjectSelect: (projectId: string) => void;
 }
 
@@ -54,7 +54,7 @@ export function ProjectsView(props: ProjectsViewProps) {
 
 interface ProjectAddFormProps {
   onClose: () => void;
-  onProjectAdd: (mutation: Omit<ProjectAddMutation, "createdAt" | "id">) => Promise<void>;
+  onProjectAdd: (mutation: ProjectAddMutation) => Promise<void>;
 }
 
 function ProjectAddForm(props: ProjectAddFormProps) {

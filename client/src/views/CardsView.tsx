@@ -17,8 +17,8 @@ interface CardsViewProps {
   allColors: ColorSet;
   cardTrees: ReadonlyArray<CardTree>;
   cardSelectedId: string | null;
-  onCardMoveToAfter: (mutation: Omit<CardMoveToAfterMutation, "createdAt" | "projectId">) => void;
-  onCardMoveToBefore: (mutation: Omit<CardMoveToBeforeMutation, "createdAt" | "projectId">) => void;
+  onCardMoveToAfter: (mutation: Omit<CardMoveToAfterMutation, "projectId">) => void;
+  onCardMoveToBefore: (mutation: Omit<CardMoveToBeforeMutation, "projectId">) => void;
   onCardSelect: (cardId: string | null) => void;
   onCardAddChildClick: (card: Card) => void;
   onBoardOpen: (boardId: BoardId) => void;

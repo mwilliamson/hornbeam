@@ -6,14 +6,17 @@ export interface Project {
 }
 
 export interface ProjectAddMutation {
-  createdAt: Instant;
-  id: string;
   name: string;
 }
 
-export function createProject(mutation: ProjectAddMutation): Project {
+export interface ProjectAddEffect extends ProjectAddMutation {
+  createdAt: Instant;
+  id: string;
+}
+
+export function createProject(effect: ProjectAddEffect): Project {
   return {
-    id: mutation.id,
-    name: mutation.name,
+    id: effect.id,
+    name: effect.name,
   };
 }

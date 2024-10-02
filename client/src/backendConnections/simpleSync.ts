@@ -3,11 +3,11 @@ import * as simpleSync from "simple-sync/lib/client";
 import { uuidv7 } from "uuidv7";
 
 import { applyAppUpdate, initialAppState } from "hornbeam-common/lib/app";
-import { AppMutation, AppUpdate } from "hornbeam-common/lib/app/snapshots";
+import { AppMutation, appMutationToAppEffect, AppUpdate } from "hornbeam-common/lib/app/snapshots";
 import { queryAppState } from "hornbeam-common/lib/appStateToQueryFunction";
 import { deserializeAppUpdate, serializeAppUpdate } from "hornbeam-common/lib/serialization/app";
 import { Deferred, createDeferred } from "hornbeam-common/lib/util/promises";
-import { BackendConnection, BackendSubscriptions } from ".";
+import { BackendConnection, BackendSubscriptions, Mutate } from ".";
 import { handleNever } from "hornbeam-common/lib/util/assertNever";
 import { AppQueries, AppQueriesResult, AppQuery } from "hornbeam-common/lib/queries";
 
@@ -87,7 +87,7 @@ export function connectSimpleSync(
 }
 
 interface RequestSender {
-  mutate: (mutation: AppMutation) => Promise<void>;
+  mutate: Mutate;
   useSendAppUpdate: (sendAppUpdate: ((update: AppUpdate) => void) | null) => void;
   receiveUpdateIds: (updateIds: ReadonlyArray<string>) => void;
 }
@@ -98,21 +98,26 @@ function createRequestSender(): RequestSender {
   let lastUpdateIndex = -1;
 
   return {
-    mutate: async (mutation: AppMutation) => {
+    mutate: async <TEffect>(mutation: AppMutation<TEffect>): Promise<TEffect> => {
       if (sendAppUpdate === null) {
         // TODO: better error?
         throw new Error("Not connected");
       }
 
+      const effect = appMutationToAppEffect(mutation);
+
       const updateId = uuidv7();
       sendAppUpdate({
         updateId,
-        mutation,
+        mutation: effect,
       });
 
       const deferred = createDeferred<void>();
       pendingUpdates.set(updateId, deferred);
-      return deferred.promise;
+      await deferred.promise;
+
+      // TODO: restore type safety
+      return effect.value as TEffect;
     },
 
     useSendAppUpdate: newSendAppUpdate => {

@@ -5,12 +5,12 @@ import { uuidv7 } from "uuidv7";
 import { fileSuite } from "../testing";
 import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
 import { CardRepository } from "./cards";
-import { testingCardAddMutation, testingCardEditMutation } from "hornbeam-common/lib/app/cards.testing";
-import { testingCategoryAddMutation } from "hornbeam-common/lib/app/categories.testing";
-import { CardAddMutation } from "hornbeam-common/lib/app/cards";
+import { testingCardAddEffect, testingCardEditEffect } from "hornbeam-common/lib/app/cards.testing";
+import { testingCategoryAddEffect } from "hornbeam-common/lib/app/categories.testing";
+import { CardAddEffect } from "hornbeam-common/lib/app/cards";
 import { allCardStatuses, CardStatus } from "hornbeam-common/lib/app/cardStatuses";
 import { cardSubboardId, rootBoardId } from "hornbeam-common/lib/app/boards";
-import { testingProjectAddMutation } from "hornbeam-common/lib/app/projects.testing";
+import { testingProjectAddEffect } from "hornbeam-common/lib/app/projects.testing";
 
 const CARD_1_ID = "0191beb5-0000-79e7-8207-000000001001";
 const CARD_2_ID = "0191beb5-0000-79e7-8207-000000001002";
@@ -34,17 +34,17 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when there are cards then returns card with matching project ID", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         projectId: PROJECT_2_ID,
         text: "<card 3 text>",
@@ -67,17 +67,17 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when there are cards then fetchById() returns card with matching ID", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
         text: "<card 3 text>",
@@ -89,7 +89,7 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card does not match project ID then card is not found", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
@@ -111,7 +111,7 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card has no parent then fetchParent() returns null", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         parentCardId: null,
         projectId: PROJECT_1_ID,
@@ -126,12 +126,12 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card is not in project then returns null", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         parentCardId: null,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
@@ -147,26 +147,26 @@ export function createCardsRepositoryTests(
 
     testRepository("when card has parent then fetchParent() returns parent", async (repository) => {
       const parent1Id = CARD_1_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parent1Id,
         projectId: PROJECT_1_ID,
         text: "<parent card 1>",
       }));
       const parent2Id = CARD_2_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parent2Id,
         projectId: PROJECT_1_ID,
         text: "<parent card 2>",
       }));
       const child1Id = CARD_3_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: child1Id,
         parentCardId: parent1Id,
         projectId: PROJECT_1_ID,
         text: "<child card 1>",
       }));
       const child2Id = CARD_4_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: child2Id,
         parentCardId: parent2Id,
         projectId: PROJECT_1_ID,
@@ -194,11 +194,11 @@ export function createCardsRepositoryTests(
 
     testRepository("when parent ID is not in project then count is 0", async (repository) => {
       const parentId = CARD_1_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parentId,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: parentId,
         projectId: PROJECT_1_ID,
@@ -213,29 +213,29 @@ export function createCardsRepositoryTests(
 
     testRepository("can count children of parent", async (repository) => {
       const parent1Id = CARD_1_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parent1Id,
         projectId: PROJECT_1_ID,
       }));
       const parent2Id = CARD_2_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parent2Id,
         projectId: PROJECT_1_ID,
       }));
       const child1Id = CARD_3_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: child1Id,
         parentCardId: parent1Id,
         projectId: PROJECT_1_ID,
       }));
       const child2Id = CARD_4_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: child2Id,
         parentCardId: parent2Id,
         projectId: PROJECT_1_ID,
       }));
       const child3Id = CARD_5_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: child3Id,
         parentCardId: parent2Id,
         projectId: PROJECT_1_ID,
@@ -251,17 +251,17 @@ export function createCardsRepositoryTests(
 
   suite("search", () => {
     testRepository("search finds cards that contain search term in text", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "abcd",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "bc",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
         text: "cd",
@@ -278,7 +278,7 @@ export function createCardsRepositoryTests(
     testRepository("results are limited to 20 cards", async (repository) => {
       for (let i = 0; i< 30; i++) {
         const id = uuidv7();
-        await repository.add(cardAddMutation({
+        await repository.add(cardAddEffect({
           id,
           projectId: PROJECT_1_ID,
           text: "abcd",
@@ -291,12 +291,12 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("results are filtered by project", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "ab",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_2_ID,
         text: "ac",
@@ -312,17 +312,17 @@ export function createCardsRepositoryTests(
 
   suite("numbers", () => {
     testRepository("cards are numbered sequentially", async(repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
         text: "<card 3 text>",
@@ -340,12 +340,12 @@ export function createCardsRepositoryTests(
 
   suite("board card trees", () => {
     testRepository("root board includes cards without parents", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
@@ -370,29 +370,29 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("children are attached to their parent", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 3>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_4_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 4>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_5_ID,
         parentCardId: CARD_2_ID,
         projectId: PROJECT_1_ID,
@@ -432,17 +432,17 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("children of subboard roots are ignored", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
@@ -464,28 +464,28 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("card subboard uses card as root", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 3>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_4_ID,
         parentCardId: CARD_3_ID,
         projectId: PROJECT_1_ID,
@@ -517,32 +517,32 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("cards are filtered by card statuses", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         status: CardStatus.None,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         status: CardStatus.Deleted,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
         text: "<card 3>",
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
         status: CardStatus.Done,
@@ -565,12 +565,12 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("cards are filtered by project", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_2_ID,
         text: "<card 2>",
@@ -601,11 +601,11 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card has no parent then parent of subboard is root board", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
       }));
@@ -619,11 +619,11 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card has parent that is not subboard then parent of subboard is root board", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
@@ -638,16 +638,16 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card is not in project then parent of subboard is root board", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_2_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_2_ID,
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_2_ID,
@@ -662,16 +662,16 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card has parent that is subboard then parent of subboard is parent card board", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
@@ -686,21 +686,21 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card has ancestor that is subboard then ancestor of subboard is parent card board", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         parentCardId: CARD_2_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
@@ -715,26 +715,26 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("when card has multiple ancestors that are subboards then closest ancestor is parent board", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         parentCardId: CARD_2_ID,
         projectId: PROJECT_1_ID,
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_2_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
@@ -751,17 +751,17 @@ export function createCardsRepositoryTests(
 
   suite("field persistence", () => {
     testRepository("text", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2 text>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
         text: "<card 3 text>",
@@ -777,19 +777,19 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("category", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         categoryId: CATEGORY_1_ID,
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         categoryId: CATEGORY_1_ID,
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         categoryId: CATEGORY_2_ID,
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
@@ -806,19 +806,19 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("created at", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         createdAt: Instant.ofEpochSecond(1000),
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         createdAt: Instant.ofEpochSecond(2000),
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         createdAt: Instant.ofEpochSecond(3000),
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
@@ -836,7 +836,7 @@ export function createCardsRepositoryTests(
 
     testRepository("parent card", async (repository) => {
       const parentCard1Id = CARD_1_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parentCard1Id,
         parentCardId: null,
         projectId: PROJECT_1_ID,
@@ -844,7 +844,7 @@ export function createCardsRepositoryTests(
       }));
 
       const parentCard2Id = CARD_2_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: parentCard2Id,
         parentCardId: null,
         projectId: PROJECT_1_ID,
@@ -852,21 +852,21 @@ export function createCardsRepositoryTests(
       }));
 
       const childCard1Id = CARD_3_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: childCard1Id,
         parentCardId: parentCard1Id,
         projectId: PROJECT_1_ID,
         text: "<child card 1>",
       }));
       const childCard2Id = CARD_4_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: childCard2Id,
         parentCardId: parentCard1Id,
         projectId: PROJECT_1_ID,
         text: "<child card 2>",
       }));
       const childCard3Id = CARD_5_ID;
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: childCard3Id,
         parentCardId: parentCard2Id,
         projectId: PROJECT_1_ID,
@@ -887,18 +887,18 @@ export function createCardsRepositoryTests(
 
   suite("field updates", () => {
     testRepository("nothing", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
 
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
@@ -912,20 +912,20 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("category", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         categoryId: CATEGORY_1_ID,
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         categoryId: CATEGORY_2_ID,
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
 
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         categoryId: CATEGORY_3_ID,
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
@@ -940,18 +940,18 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("is subboard root", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
 
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         isSubboardRoot: true,
         projectId: PROJECT_1_ID,
@@ -966,26 +966,26 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("parent", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         parentCardId: null,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         parentCardId: null,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_3_ID,
         parentCardId: null,
         projectId: PROJECT_1_ID,
         text: "<card 3>",
       }));
 
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         parentCardId: CARD_3_ID,
         projectId: PROJECT_1_ID,
@@ -1001,18 +1001,18 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("status", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
 
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         status: CardStatus.Done,
@@ -1027,18 +1027,18 @@ export function createCardsRepositoryTests(
     });
 
     testRepository("text", async (repository) => {
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<card 1>",
       }));
-      await repository.add(cardAddMutation({
+      await repository.add(cardAddEffect({
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
         text: "<card 2>",
       }));
 
-      await repository.update(testingCardEditMutation({
+      await repository.update(testingCardEditEffect({
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
         text: "<updated text>",
@@ -1053,10 +1053,10 @@ export function createCardsRepositoryTests(
     });
   });
 
-  function cardAddMutation(mutation: Partial<CardAddMutation>): CardAddMutation {
-    return testingCardAddMutation({
+  function cardAddEffect(effect: Partial<CardAddEffect>): CardAddEffect {
+    return testingCardAddEffect({
       categoryId: CATEGORY_1_ID,
-      ...mutation,
+      ...effect,
     });
   }
 
@@ -1065,23 +1065,23 @@ export function createCardsRepositoryTests(
       await using fixtures = await createFixtures();
 
       const projectRepository = await fixtures.projectRepository();
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_1_ID,
       }));
-      await projectRepository.add(testingProjectAddMutation({
+      await projectRepository.add(testingProjectAddEffect({
         id: PROJECT_2_ID,
       }));
 
       const categoryRepository = await fixtures.categoryRepository();
-      await categoryRepository.add(testingCategoryAddMutation({
+      await categoryRepository.add(testingCategoryAddEffect({
         id: CATEGORY_1_ID,
         projectId: PROJECT_1_ID,
       }));
-      await categoryRepository.add(testingCategoryAddMutation({
+      await categoryRepository.add(testingCategoryAddEffect({
         id: CATEGORY_2_ID,
         projectId: PROJECT_1_ID,
       }));
-      await categoryRepository.add(testingCategoryAddMutation({
+      await categoryRepository.add(testingCategoryAddEffect({
         id: CATEGORY_3_ID,
         projectId: PROJECT_1_ID,
       }));

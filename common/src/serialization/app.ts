@@ -172,7 +172,7 @@ export const SerializedAppEffect = t.union([
 
 export const SerializedAppUpdate = t.type({
   updateId: t.string,
-  mutation: SerializedAppEffect,
+  effect: SerializedAppEffect,
 }, "SerializedAppUpdate");
 
 export function serializeAppUpdate(update: AppUpdate): t.OutputOf<typeof SerializedAppUpdate> {

@@ -16,9 +16,9 @@ fileSuite(__filename, () => {
       const message = JSON.parse(line);
       const appUpdate = deserializeAppUpdate(message.payload);
       // TODO: add support for all mutations
-      if (appUpdate.mutation.type !== "cardMove") {
+      if (appUpdate.effect.type !== "cardMove") {
         await app.transaction(async transaction => {
-          await transaction.applyEffect(appUpdate.mutation);
+          await transaction.applyEffect(appUpdate.effect);
         });
       }
     }

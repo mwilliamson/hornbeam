@@ -33,7 +33,7 @@ export function connectInMemory(initialState: AppState): BackendConnection {
     const effect = appMutationToAppEffect(mutation);
 
     const update: AppUpdate = {
-      mutation: effect,
+      effect,
       updateId: uuidv7(),
     };
 

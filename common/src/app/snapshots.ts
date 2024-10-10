@@ -69,8 +69,7 @@ export function initialAppSnapshot(): AppSnapshot {
 
 export interface AppUpdate {
   updateId: string;
-  // TODO: rename to effect
-  mutation: AppEffect;
+  effect: AppEffect;
 }
 
 export type AppMutation<TEffect> =

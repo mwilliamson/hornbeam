@@ -23,19 +23,19 @@ const SerializedCardAddEffect = t.intersection([
   }),
 ], "SerializedCardAddMutation");
 
-const SerializedCardEditMutation = t.intersection([
-  t.type({
-    id: t.string,
-    projectId: t.string,
-  }),
-  t.partial({
-    categoryId: t.string,
-    isSubboardRoot: t.boolean,
-    parentCardId: t.union([t.string, t.null]),
-    status: SerializedCardStatus,
-    text: t.string,
-  }),
-], "SerializedCardEditMutation");
+const SerializedCardEdits = t.partial({
+  categoryId: t.string,
+  isSubboardRoot: t.boolean,
+  parentCardId: t.union([t.string, t.null]),
+  status: SerializedCardStatus,
+  text: t.string,
+}, "SerializedCardEdits");
+
+const SerializedCardEditMutation = t.type({
+  edits: SerializedCardEdits,
+  id: t.string,
+  projectId: t.string,
+}, "SerializedCardEditMutation");
 
 const SerializedCardEditEffect = t.intersection([
   SerializedCardEditMutation,

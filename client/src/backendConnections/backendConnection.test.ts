@@ -407,8 +407,8 @@ export function createBackendConnectionTestSuite(
             projectId,
           }));
           await backendConnection.mutate(testingAppMutation.cardEdit({
+            edits: {isSubboardRoot: true},
             id: card1Id,
-            isSubboardRoot: true,
             projectId,
           }));
 
@@ -418,8 +418,8 @@ export function createBackendConnectionTestSuite(
             projectId,
           }));
           await backendConnection.mutate(testingAppMutation.cardEdit({
+            edits: {isSubboardRoot: true},
             id: card2Id,
-            isSubboardRoot: true,
             projectId,
           }));
 

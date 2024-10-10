@@ -130,30 +130,30 @@ export class CardRepositoryDatabase implements CardRepository {
       .where("id", "=", effect.id);
     let queryRequired = false;
 
-    if (effect.categoryId !== undefined) {
+    if (effect.edits.categoryId !== undefined) {
       // TODO: check category is valid
-      query = query.set({categoryId: effect.categoryId});
+      query = query.set({categoryId: effect.edits.categoryId});
       queryRequired = true;
     }
 
-    if (effect.isSubboardRoot !== undefined) {
-      query = query.set({isSubboardRoot: effect.isSubboardRoot});
+    if (effect.edits.isSubboardRoot !== undefined) {
+      query = query.set({isSubboardRoot: effect.edits.isSubboardRoot});
       queryRequired = true;
     }
 
-    if (effect.parentCardId !== undefined) {
+    if (effect.edits.parentCardId !== undefined) {
       // TODO: check parent is valid
-      query = query.set({parentCardId: effect.parentCardId});
+      query = query.set({parentCardId: effect.edits.parentCardId});
       queryRequired = true;
     }
 
-    if (effect.status !== undefined) {
-      query = query.set({status: SerializedCardStatus.encode(effect.status)});
+    if (effect.edits.status !== undefined) {
+      query = query.set({status: SerializedCardStatus.encode(effect.edits.status)});
       queryRequired = true;
     }
 
-    if (effect.text !== undefined) {
-      query = query.set({text: effect.text});
+    if (effect.edits.text !== undefined) {
+      query = query.set({text: effect.edits.text});
       queryRequired = true;
     }
 

@@ -114,8 +114,8 @@ export default function BoardView(props: BoardViewProps) {
         if (viewState.selectedCardId !== null) {
           // TODO: wait
           mutate(appMutations.cardEdit({
+            edits: {status: CardStatus.Deleted},
             id: viewState.selectedCardId,
-            status: CardStatus.Deleted,
             projectId,
           }));
         }

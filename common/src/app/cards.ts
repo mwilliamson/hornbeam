@@ -60,13 +60,16 @@ export function createCard(effect: CardAddEffect, cardNumber: number): Card {
   };
 }
 
-// TODO: extract separate edits field
 export interface CardEditMutation {
-  categoryId?: string;
+  edits: CardEdits;
   id: string;
+  projectId: string;
+}
+
+export interface CardEdits {
+  categoryId?: string;
   isSubboardRoot?: boolean;
   parentCardId?: string | null;
-  projectId: string;
   status?: CardStatus;
   text?: string;
 }
@@ -75,16 +78,16 @@ export interface CardEditEffect extends CardEditMutation {
   createdAt: Instant;
 }
 
-export function updateCard(card: Card, mutation: Omit<CardEditMutation, "id" | "projectId">): Card {
+export function updateCard(card: Card, edits: CardEdits): Card {
   return {
-    categoryId: mutation.categoryId === undefined ? card.categoryId : mutation.categoryId,
+    categoryId: edits.categoryId === undefined ? card.categoryId : edits.categoryId,
     createdAt: card.createdAt,
     id: card.id,
-    isSubboardRoot: mutation.isSubboardRoot === undefined ? card.isSubboardRoot : mutation.isSubboardRoot,
+    isSubboardRoot: edits.isSubboardRoot === undefined ? card.isSubboardRoot : edits.isSubboardRoot,
     number: card.number,
-    parentCardId: mutation.parentCardId === undefined ? card.parentCardId : mutation.parentCardId,
-    status: mutation.status === undefined ? card.status : mutation.status,
-    text: mutation.text === undefined ? card.text : mutation.text,
+    parentCardId: edits.parentCardId === undefined ? card.parentCardId : edits.parentCardId,
+    status: edits.status === undefined ? card.status : edits.status,
+    text: edits.text === undefined ? card.text : edits.text,
   };
 }
 

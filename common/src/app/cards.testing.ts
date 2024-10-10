@@ -31,6 +31,7 @@ export function testingCardAddEffect(effect: Partial<CardAddEffect>): CardAddEff
 
 export function testingCardEditMutation(mutation: Partial<CardEditMutation>): CardEditMutation {
   return {
+    edits: {},
     id: defaultCardAddId,
     projectId: defaultCardEditProjectId,
     ...mutation,
@@ -40,6 +41,7 @@ export function testingCardEditMutation(mutation: Partial<CardEditMutation>): Ca
 export function testingCardEditEffect(effect: Partial<CardEditEffect>): CardEditEffect {
   return {
     createdAt: defaultCreatedAt,
+    edits: {},
     id: defaultCardAddId,
     projectId: defaultCardEditProjectId,
     ...effect,

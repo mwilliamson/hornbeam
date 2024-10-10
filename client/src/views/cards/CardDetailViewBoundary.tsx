@@ -49,9 +49,9 @@ export default function CardDetailViewBoundary(props: CardDetailViewBoundaryProp
             searchCards: searchTerm => query(searchCardsQuery({projectId, searchTerm})),
           }}
           onAddChildClick={() => onCardAddClick({parentCard: card})}
-          onCardEdit={async (mutation) => {
+          onCardEdit={async (edits) => {
             await mutate(appMutations.cardEdit({
-              ...mutation,
+              edits,
               id: card.id,
               projectId,
             }));

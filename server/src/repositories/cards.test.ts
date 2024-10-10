@@ -438,8 +438,8 @@ export function createCardsRepositoryTests(
         text: "<card 1>",
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
       await repository.add(cardAddEffect({
@@ -470,8 +470,8 @@ export function createCardsRepositoryTests(
         text: "<card 1>",
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
       await repository.add(cardAddEffect({
@@ -523,9 +523,9 @@ export function createCardsRepositoryTests(
         text: "<card 1>",
       }));
       await repository.update(testingCardEditEffect({
+        edits: {status: CardStatus.None},
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
-        status: CardStatus.None,
       }));
       await repository.add(cardAddEffect({
         id: CARD_2_ID,
@@ -533,9 +533,9 @@ export function createCardsRepositoryTests(
         text: "<card 2>",
       }));
       await repository.update(testingCardEditEffect({
+        edits: {status: CardStatus.Deleted},
         id: CARD_2_ID,
         projectId: PROJECT_1_ID,
-        status: CardStatus.Deleted,
       }));
       await repository.add(cardAddEffect({
         id: CARD_3_ID,
@@ -543,9 +543,9 @@ export function createCardsRepositoryTests(
         text: "<card 3>",
       }));
       await repository.update(testingCardEditEffect({
+        edits: {status: CardStatus.Done},
         id: CARD_3_ID,
         projectId: PROJECT_1_ID,
-        status: CardStatus.Done,
       }));
 
       const cardTrees = await repository.fetchBoardCardTrees({
@@ -648,8 +648,8 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_2_ID,
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_2_ID,
       }));
 
@@ -672,8 +672,8 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
 
@@ -701,8 +701,8 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
 
@@ -730,13 +730,13 @@ export function createCardsRepositoryTests(
         projectId: PROJECT_1_ID,
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_2_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
 
@@ -926,7 +926,7 @@ export function createCardsRepositoryTests(
       }));
 
       await repository.update(testingCardEditEffect({
-        categoryId: CATEGORY_3_ID,
+        edits: {categoryId: CATEGORY_3_ID},
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
       }));
@@ -952,8 +952,8 @@ export function createCardsRepositoryTests(
       }));
 
       await repository.update(testingCardEditEffect({
+        edits: {isSubboardRoot: true},
         id: CARD_1_ID,
-        isSubboardRoot: true,
         projectId: PROJECT_1_ID,
       }));
 
@@ -986,8 +986,8 @@ export function createCardsRepositoryTests(
       }));
 
       await repository.update(testingCardEditEffect({
+        edits: {parentCardId: CARD_3_ID},
         id: CARD_1_ID,
-        parentCardId: CARD_3_ID,
         projectId: PROJECT_1_ID,
       }));
 
@@ -1013,9 +1013,9 @@ export function createCardsRepositoryTests(
       }));
 
       await repository.update(testingCardEditEffect({
+        edits: {status: CardStatus.Done},
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
-        status: CardStatus.Done,
       }));
 
       const card = await repository.fetchByProjectId(PROJECT_1_ID);
@@ -1039,9 +1039,9 @@ export function createCardsRepositoryTests(
       }));
 
       await repository.update(testingCardEditEffect({
+        edits: {text: "<updated text>"},
         id: CARD_1_ID,
         projectId: PROJECT_1_ID,
-        text: "<updated text>",
       }));
 
       const card = await repository.fetchByProjectId(PROJECT_1_ID);

@@ -129,14 +129,14 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     );
   }
 
-  public cardEdit(request: CardEditEffect): ProjectContentsSnapshot {
+  public cardEdit(effect: CardEditEffect): ProjectContentsSnapshot {
     return new ProjectContentsSnapshot(
       this.cards.map(card => {
-        if (card.id !== request.id) {
+        if (card.id !== effect.id) {
           return card;
         }
 
-        return updateCard(card, request);
+        return updateCard(card, effect.edits);
       }),
       this.nextCardNumber,
       this.categories,

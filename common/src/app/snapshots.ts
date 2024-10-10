@@ -118,8 +118,8 @@ export class ProjectContentsSnapshot implements CardSet, CategorySet, ColorSet, 
     this.comments = comments;
   }
 
-  public cardAdd(mutation: CardAddEffect): ProjectContentsSnapshot {
-    const card = createCard(mutation, this.nextCardNumber);
+  public cardAdd(effect: CardAddEffect): ProjectContentsSnapshot {
+    const card = createCard(effect, this.nextCardNumber);
     return new ProjectContentsSnapshot(
       [...this.cards, card],
       this.nextCardNumber + 1,

@@ -3,7 +3,7 @@ import { uuidv7 } from "uuidv7";
 import { Database } from "./database";
 import { DB } from "./database/types";
 import { AppEffect, AppMutation, appMutationToAppEffect } from "hornbeam-common/lib/app/snapshots";
-import { MutationLogRepositoryDatabase } from "./repositories/mutationLog";
+import { EffectLogRepositoryDatabase } from "./repositories/effectLog";
 import { CategoryRepositoryDatabase } from "./repositories/categories";
 import { CommentRepositoryDatabase } from "./repositories/comments";
 import { ProjectRepositoryDatabase } from "./repositories/projects";
@@ -42,8 +42,8 @@ class AppTransaction {
   }
 
   public async query(serverQueries: ReadonlyArray<ServerQuery>) {
-    const mutationLogRepository = new MutationLogRepositoryDatabase(this.transaction);
-    const latestIndex = await mutationLogRepository.fetchLatestIndex();
+    const effectLogRepository = new EffectLogRepositoryDatabase(this.transaction);
+    const latestIndex = await effectLogRepository.fetchLatestIndex();
     return {
       latestIndex,
       queryResults: await this.executeQueries(serverQueries),
@@ -129,8 +129,8 @@ class AppTransaction {
   public async applyEffect(
     effect: AppEffect,
   ): Promise<number> {
-    const mutationLogRepository = new MutationLogRepositoryDatabase(this.transaction);
-    const index = await mutationLogRepository.add(uuidv7(), effect);
+    const effectLogRepository = new EffectLogRepositoryDatabase(this.transaction);
+    const index = await effectLogRepository.add(uuidv7(), effect);
 
     await this.playEffect(effect);
 

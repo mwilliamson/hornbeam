@@ -48,10 +48,10 @@ export interface Comment {
   text: string;
 }
 
-export interface MutationLog {
+export interface EffectLog {
+  effect: Json;
   id: string;
   index: number;
-  mutation: Json;
 }
 
 export interface Project {
@@ -63,6 +63,6 @@ export interface DB {
   cards: Card;
   categories: Category;
   comments: Comment;
-  mutationLog: MutationLog;
+  effectLog: EffectLog;
   projects: Project;
 }

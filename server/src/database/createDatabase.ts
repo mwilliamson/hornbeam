@@ -48,13 +48,13 @@ export default async function createDatabase(databaseUrl: string) {
 
       CREATE INDEX ix__comments__card_id ON comments(card_id);
 
-      CREATE TABLE mutation_log (
+      CREATE TABLE effect_log (
         id uuid PRIMARY KEY,
         index int NOT NULL,
-        mutation jsonb NOT NULL
+        effect jsonb NOT NULL
       );
 
-      CREATE UNIQUE INDEX ix__mutation_log__index ON mutation_log(index);
+      CREATE UNIQUE INDEX ix__effect_log__index ON effect_log(index);
     `);
   } finally {
     await client.end();

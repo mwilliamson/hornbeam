@@ -9,11 +9,11 @@ import { generateId } from "./ids";
 
 export class AppSnapshot {
   private readonly projects: ReadonlyArray<Project>;
-  private readonly projectContents: Map<string, ProjectContentsSnapshot>;
+  private readonly projectContents: ReadonlyMap<string, ProjectContentsSnapshot>;
 
   constructor(
     projects: ReadonlyArray<Project>,
-    projectContents: Map<string, ProjectContentsSnapshot>,
+    projectContents: ReadonlyMap<string, ProjectContentsSnapshot>,
   ) {
     this.projects = projects;
     this.projectContents = projectContents;

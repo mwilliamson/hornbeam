@@ -11,6 +11,7 @@ import { CardHistoryFetcher } from "./cardHistory";
 import { CommentRepository, CommentRepositoryDatabase, CommentRepositoryInMemory } from "./comments";
 import { EffectLogRepository, EffectLogRepositoryDatabase, EffectLogRepositoryInMemory } from "./effectLog";
 import { ProjectRepository, ProjectRepositoryDatabase, ProjectRepositoryInMemory } from "./projects";
+import { UserRepository, UserRepositoryDatabase, UserRepositoryInMemory } from "./users";
 
 export interface RepositoryFixtures extends AsyncDisposable {
   cardHistoryFetcher: () => Promise<CardHistoryFetcher>;
@@ -19,6 +20,7 @@ export interface RepositoryFixtures extends AsyncDisposable {
   commentRepository: () => Promise<CommentRepository>;
   effectLogRepository: () => Promise<EffectLogRepository>;
   projectRepository: () => Promise<ProjectRepository>;
+  userRepository: () => Promise<UserRepository>;
 }
 
 export function repositoryFixturesInMemory(): RepositoryFixtures {
@@ -44,6 +46,9 @@ export function repositoryFixturesInMemory(): RepositoryFixtures {
     },
     projectRepository: async () => {
       return new ProjectRepositoryInMemory(snapshot);
+    },
+    userRepository: async () => {
+      return new UserRepositoryInMemory(snapshot);
     },
     [Symbol.asyncDispose]: async () => {
     },
@@ -99,6 +104,10 @@ export function repositoryFixturesDatabase(): RepositoryFixtures {
 
     projectRepository: async () => {
       return new ProjectRepositoryDatabase(await getDatabase());
+    },
+
+    userRepository: async () => {
+      return new UserRepositoryDatabase(await getDatabase());
     },
 
     [Symbol.asyncDispose]: async () => {

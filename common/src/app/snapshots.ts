@@ -6,17 +6,21 @@ import { ColorSet, colorSetPresetsOnly, PresetColor } from "./colors";
 import { Comment, CommentAddEffect, CommentAddMutation, CommentSet, createComment } from "./comments";
 import { createProject, Project, ProjectAddEffect, ProjectAddMutation } from "./projects";
 import { generateId } from "./ids";
+import { UserAddEffect, UserAuthDetails } from "./users";
 
 export class AppSnapshot {
   private readonly projects: ReadonlyArray<Project>;
   private readonly projectContents: ReadonlyMap<string, ProjectContentsSnapshot>;
+  private readonly userAuthDetails: ReadonlyMap<string, UserAuthDetails>;
 
   constructor(
     projects: ReadonlyArray<Project>,
     projectContents: ReadonlyMap<string, ProjectContentsSnapshot>,
+    userAuthDetails: ReadonlyMap<string, UserAuthDetails>,
   ) {
     this.projects = projects;
     this.projectContents = projectContents;
+    this.userAuthDetails = userAuthDetails;
   }
 
   public projectAdd(effect: ProjectAddEffect): AppSnapshot {
@@ -25,6 +29,7 @@ export class AppSnapshot {
     return new AppSnapshot(
       [...this.projects, createProject(effect)],
       projectContents,
+      this.userAuthDetails,
     );
   }
 
@@ -59,12 +64,38 @@ export class AppSnapshot {
     const projectContents = new Map(this.projectContents);
     projectContents.set(projectId, f(this.fetchProjectContents(projectId)));
 
-    return new AppSnapshot(this.projects, projectContents);
+    return new AppSnapshot(
+      this.projects,
+      projectContents,
+      this.userAuthDetails,
+    );
+  }
+
+  public userAdd(effect: UserAddEffect): AppSnapshot {
+    const userAuthDetails = new Map(this.userAuthDetails);
+    userAuthDetails.set(effect.emailAddress, {
+      id: effect.id,
+      passwordHash: effect.passwordHash,
+      passwordSalt: effect.passwordSalt,
+    });
+    return new AppSnapshot(
+      this.projects,
+      this.projectContents,
+      userAuthDetails,
+    );
+  }
+
+  public async fetchUserAuthDetailsByEmailAddress(emailAddress: string): Promise<UserAuthDetails | null> {
+    return this.userAuthDetails.get(emailAddress) ?? null;
   }
 }
 
 export function initialAppSnapshot(): AppSnapshot {
-  return new AppSnapshot([], new Map());
+  return new AppSnapshot(
+    [],
+    new Map(),
+    new Map(),
+  );
 }
 
 export interface AppUpdate {
@@ -82,7 +113,8 @@ export type AppMutation<TEffect> =
 
 export type AppEffect =
   | ProjectContentsEffect
-  | {type: "projectAdd", value: ProjectAddEffect};
+  | {type: "projectAdd", value: ProjectAddEffect}
+  | {type: "userAdd", value: UserAddEffect};
 
 export function applyAppEffect(
   snapshot: AppSnapshot,
@@ -91,6 +123,8 @@ export function applyAppEffect(
   switch (effect.type) {
     case "projectAdd":
       return snapshot.projectAdd(effect.value);
+    case "userAdd":
+      return snapshot.userAdd(effect.value);
     default:
       return snapshot.mutateProjectContents(effect);
   }
@@ -483,6 +517,10 @@ export const appEffects = {
   projectAdd(effect: ProjectAddEffect): AppEffect {
     return {type: "projectAdd", value: effect};
   },
+
+  userAdd(effect: UserAddEffect): AppEffect {
+    return {type: "userAdd", value: effect};
+  }
 };
 
 export function projectContentsEffectCreatedAt(effect: ProjectContentsEffect): Instant {

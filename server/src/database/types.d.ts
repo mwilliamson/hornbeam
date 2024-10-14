@@ -59,10 +59,18 @@ export interface Project {
   name: string;
 }
 
+export interface User {
+  emailAddress: string;
+  id: string;
+  passwordHash: string;
+  passwordSalt: string;
+}
+
 export interface DB {
   cards: Card;
   categories: Category;
   comments: Comment;
   effectLog: EffectLog;
   projects: Project;
+  users: User;
 }

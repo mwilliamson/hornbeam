@@ -160,6 +160,14 @@ export const SerializedProjectAddEffect = t.intersection([
   })
 ], "SerializedProjectAddEffect");
 
+export const SerializedUserAddEffect = t.type({
+  createdAt: t2.instant,
+  emailAddress: t.string,
+  id: t.string,
+  passwordHash: t.string,
+  passwordSalt: t.string,
+}, "SerializedUserAddEffect");
+
 export const SerializedAppMutation = t.union([
   t.type({type: t.literal("projectAdd"), value: SerializedProjectAddMutation}),
   SerializedProjectContentsMutation,
@@ -167,6 +175,7 @@ export const SerializedAppMutation = t.union([
 
 export const SerializedAppEffect = t.union([
   t.type({type: t.literal("projectAdd"), value: SerializedProjectAddEffect}),
+  t.type({type: t.literal("userAdd"), value: SerializedUserAddEffect}),
   SerializedProjectContentsEffect,
 ]);
 

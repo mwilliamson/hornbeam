@@ -13,6 +13,7 @@ import { serializeAllCategoriesResponse, serializeAllColorsResponse, serializeAl
 import mapSeries from "p-map-series";
 import { colorSetPresetsOnly } from "hornbeam-common/lib/app/colors";
 import { CardHistoryFetcher } from "./repositories/cardHistory";
+import { UserRepositoryDatabase } from "./repositories/users";
 
 export class App {
   private readonly database: Database;
@@ -178,6 +179,11 @@ class AppTransaction {
       case "projectAdd": {
         const projectRepository = new ProjectRepositoryDatabase(this.transaction);
         await projectRepository.add(effect.value);
+        return;
+      }
+      case "userAdd": {
+        const userRepository = new UserRepositoryDatabase(this.transaction);
+        await userRepository.add(effect.value);
         return;
       }
       default: {

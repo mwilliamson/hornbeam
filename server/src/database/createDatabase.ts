@@ -10,7 +10,6 @@ export default async function createDatabase(databaseUrl: string) {
       CREATE TABLE users (
         id uuid PRIMARY KEY,
         email_address text NOT NULL,
-        password_salt text NOT NULL,
         password_hash text NOT NULL
       );
 

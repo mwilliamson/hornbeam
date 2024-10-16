@@ -76,7 +76,6 @@ export class AppSnapshot {
     userAuthDetails.set(effect.emailAddress, {
       id: effect.id,
       passwordHash: effect.passwordHash,
-      passwordSalt: effect.passwordSalt,
     });
     return new AppSnapshot(
       this.projects,

@@ -16,7 +16,6 @@ export function createUserRepositoryTests(
       emailAddress: "user1@example.com",
       id: USER_1_ID,
       passwordHash: "<password hash 1>",
-      passwordSalt: "<password salt 1>",
     }));
 
     const authDetails = await userRepository.fetchAuthDetailsByEmailAddress("user2@example.com");
@@ -29,14 +28,12 @@ export function createUserRepositoryTests(
       emailAddress: "user1@example.com",
       id: USER_1_ID,
       passwordHash: "<password hash 1>",
-      passwordSalt: "<password salt 1>",
     }));
 
     await userRepository.add(testingUserAddEffect({
       emailAddress: "user2@example.com",
       id: USER_2_ID,
       passwordHash: "<password hash 2>",
-      passwordSalt: "<password salt 2>",
     }));
 
     const authDetails = await userRepository.fetchAuthDetailsByEmailAddress("user2@example.com");
@@ -44,7 +41,6 @@ export function createUserRepositoryTests(
     assertThat(authDetails, hasProperties({
       id: USER_2_ID,
       passwordHash: "<password hash 2>",
-      passwordSalt: "<password salt 2>",
     }));
   });
 

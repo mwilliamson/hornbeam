@@ -63,7 +63,6 @@ export interface User {
   emailAddress: string;
   id: string;
   passwordHash: string;
-  passwordSalt: string;
 }
 
 export interface DB {

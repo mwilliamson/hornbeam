@@ -12,7 +12,6 @@ export function testingUserAddEffect(
     emailAddress: "hello@example.com",
     id: defaultUserAddId,
     passwordHash: "<default password hash>",
-    passwordSalt: "<default password salt>",
     ...effect,
   };
 }

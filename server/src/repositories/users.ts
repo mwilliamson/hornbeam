@@ -38,14 +38,13 @@ export class UserRepositoryDatabase implements UserRepository {
         emailAddress: effect.emailAddress,
         id: effect.id,
         passwordHash: effect.passwordHash,
-        passwordSalt: effect.passwordSalt,
       })
       .execute();
   }
 
   public async fetchAuthDetailsByEmailAddress(emailAddress: string): Promise<UserAuthDetails | null> {
     return await this.database.selectFrom("users")
-      .select(["id", "passwordHash", "passwordSalt"])
+      .select(["id", "passwordHash"])
       .where("emailAddress", "=", emailAddress)
       .executeTakeFirst() ?? null;
   }

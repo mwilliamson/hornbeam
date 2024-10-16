@@ -13,6 +13,7 @@
   "type": "commonjs",
   "dependencies": {
     "@fastify/static": "^7.0.4",
+    "argon2": "^0.41.1",
     "async": "^3.2.6",
     "disposablestack": "^1.1.6",
     "dotenv": "^16.4.5",

@@ -165,7 +165,6 @@ export const SerializedUserAddEffect = t.type({
   emailAddress: t.string,
   id: t.string,
   passwordHash: t.string,
-  passwordSalt: t.string,
 }, "SerializedUserAddEffect");
 
 export const SerializedAppMutation = t.union([

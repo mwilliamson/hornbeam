@@ -3,7 +3,7 @@ import { assertThat, containsExactly, deepEqualTo, hasProperties } from "@mwilli
 import { suite, test } from "mocha";
 import * as categoriesTesting from "hornbeam-common/lib/app/categories.testing";
 import { fileSuite } from "../testing";
-import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "./fixtures";
+import { RepositoryFixtures, repositoryFixturesDatabase, repositoryFixturesInMemory } from "../repositories/fixtures";
 import { testingCardAddEffect } from "hornbeam-common/lib/app/cards.testing";
 import { testingCommentAddEffect } from "hornbeam-common/lib/app/comments.testing";
 import { testingProjectAddEffect } from "hornbeam-common/lib/app/projects.testing";

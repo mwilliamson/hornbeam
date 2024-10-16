@@ -1,6 +1,6 @@
 import { CardHistory } from "hornbeam-common/lib/app/cards";
-import { CardRepository } from "./cards";
-import { CommentRepository } from "./comments";
+import { CardRepository } from "../repositories/cards";
+import { CommentRepository } from "../repositories/comments";
 import { CardHistoryQuery } from "hornbeam-common/lib/queries";
 
 export class CardHistoryFetcher {

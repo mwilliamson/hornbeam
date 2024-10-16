@@ -7,7 +7,7 @@ import { testDatabaseUrl } from "../settings";
 import * as testing from "../testing";
 import { AppSnapshotRef } from "./snapshotRef";
 import { CardRepository, CardRepositoryDatabase, CardRepositoryInMemory } from "./cards";
-import { CardHistoryFetcher } from "./cardHistory";
+import { CardHistoryFetcher } from "../services/cardHistory";
 import { CommentRepository, CommentRepositoryDatabase, CommentRepositoryInMemory } from "./comments";
 import { EffectLogRepository, EffectLogRepositoryDatabase, EffectLogRepositoryInMemory } from "./effectLog";
 import { ProjectRepository, ProjectRepositoryDatabase, ProjectRepositoryInMemory } from "./projects";

@@ -12,7 +12,7 @@ import { CardRepositoryDatabase } from "./repositories/cards";
 import { serializeAllCategoriesResponse, serializeAllColorsResponse, serializeAllProjectsResponse, serializeBoardCardTreesResponse, serializeCardChildCountResponse, serializeCardHistoryResponse, serializeCardResponse, serializeParentBoardResponse, serializeParentCardResponse, serializeSearchCardsResponse, ServerQuery } from "hornbeam-common/lib/serialization/serverQueries";
 import mapSeries from "p-map-series";
 import { colorSetPresetsOnly } from "hornbeam-common/lib/app/colors";
-import { CardHistoryFetcher } from "./repositories/cardHistory";
+import { CardHistoryFetcher } from "./services/cardHistory";
 import { UserRepositoryDatabase } from "./repositories/users";
 
 export class App {
